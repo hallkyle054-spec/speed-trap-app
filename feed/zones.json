@@ -1,0 +1,1180 @@
+{
+  "listedOn": "2026-09-04",
+  "source": "https://www.gosafe.org/camera-map/",
+  "authorities": [
+    "Carmarthenshire"
+  ],
+  "generatedAt": "2026-09-04T17:18:16.227Z",
+  "zones": [
+    {
+      "id": "gosafe-2391",
+      "road": "A476",
+      "name": "Cross Hands Rdbt To Phoenix Inn, Gorslas (1)",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2391",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.798819,
+          "longitude": -4.0814731
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2392",
+      "road": "A484",
+      "name": "Saron, Llandysul",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2392",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 52.013973,
+          "longitude": -4.367729
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2393",
+      "road": "A484",
+      "name": "Rhos, Llandysul",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2393",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.990214,
+          "longitude": -4.360561
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2399",
+      "road": "Lower Trostre Road",
+      "name": "Llanelli",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2399",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.672921,
+          "longitude": -4.143165
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2401",
+      "road": "High Street",
+      "name": "Ammanford",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2401",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.795325,
+          "longitude": -3.976548
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2402",
+      "road": "Hendre Road",
+      "name": "Llangennech",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2402",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.689295,
+          "longitude": -4.092894
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2403",
+      "road": "Colby Road",
+      "name": "Burry Port",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2403",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.689473,
+          "longitude": -4.24203
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2404",
+      "road": "A484",
+      "name": "Burry Port, 30mph Speed Limit Area (1)",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2404",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.690625,
+          "longitude": -4.249495
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2405",
+      "road": "A484",
+      "name": "Burry Port, 30mph Speed Limit Area",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2405",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.690118,
+          "longitude": -4.245462
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2406",
+      "road": "Felinfoel",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2406",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.694698,
+          "longitude": -4.151661
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2407",
+      "road": "B429",
+      "name": "Gelli Road, Bryn",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2407",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.684855,
+          "longitude": -4.123316
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2408",
+      "road": "B4297",
+      "name": "Cwmfelyn Road, Bynea to Llanelli (1)",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2408",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.675436,
+          "longitude": -4.107543
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2409",
+      "road": "B4297",
+      "name": "Cwmfelyn Road, Bynea to Llanelli",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2409",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.672633,
+          "longitude": -4.100847
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2411",
+      "road": "College Road",
+      "name": "Carmarthen",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2411",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.858989,
+          "longitude": -4.318347
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2412",
+      "road": "Heol Llanelli",
+      "name": "Trimsaran",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2412",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.716143,
+          "longitude": -4.236516
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2413",
+      "road": "B4309",
+      "name": "Pontyates",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2413",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.765177,
+          "longitude": -4.225809
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2414",
+      "road": "A476",
+      "name": "Swiss Valley",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2414",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.706276,
+          "longitude": -4.142078
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2415",
+      "road": "A484",
+      "name": "Pembrey",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2415",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.690568,
+          "longitude": -4.284609
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2416",
+      "road": "A476",
+      "name": "Gorslas",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2416",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.805013,
+          "longitude": -4.073955
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2417",
+      "road": "A474",
+      "name": "Glanaman",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2417",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.804702,
+          "longitude": -3.928497
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2419",
+      "road": "A474",
+      "name": "Heol Wallasey, Jct Ammanford To National Speed Limit, Pontamman",
+      "limitMph": 40,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2419",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.79632,
+          "longitude": -3.968151
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2420",
+      "road": "A4138",
+      "name": "Talyclun",
+      "limitMph": 40,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2420",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.704995,
+          "longitude": -4.068565
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2421",
+      "road": "A4138",
+      "name": "Llanelli, Halfway Traffic Signals (2)",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2421",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.682583,
+          "longitude": -4.133567
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2428",
+      "road": "A476",
+      "name": "Carmel South",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2428",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.817217,
+          "longitude": -4.0513
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2431",
+      "road": "A476",
+      "name": "Carmel North",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2431",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.83682,
+          "longitude": -4.048258
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2442",
+      "road": "A485",
+      "name": "Rhydargaeau",
+      "limitMph": 40,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2442",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.916461,
+          "longitude": -4.269888
+        }
+      ]
+    },
+    {
+      "id": "gosafe-2443",
+      "road": "Nantycaws",
+      "name": "Carmarthen",
+      "limitMph": 30,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=2443",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.84121,
+          "longitude": -4.23782
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23145",
+      "road": "Old Road Community Primary School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23145",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.68688,
+          "longitude": -4.1626468
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23146",
+      "road": "Rhydygors School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23146",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.841729,
+          "longitude": -4.3216846
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23148",
+      "road": "Drefach CP School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23148",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.799311,
+          "longitude": -4.1337958
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23149",
+      "road": "Pembrey CP School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23149",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.686154,
+          "longitude": -4.274809
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23150",
+      "road": "Llechyfedach CP School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23150",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.785151,
+          "longitude": -4.1081744
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23151",
+      "road": "Y Tumble",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23151",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.788181,
+          "longitude": -4.1182337
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23154",
+      "road": "Dafen Community Primary School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23154",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.689097,
+          "longitude": -4.1373026
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23159",
+      "road": "Llangunnor Primary School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23159",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.851131,
+          "longitude": -4.3013168
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23160",
+      "road": "Ysgol Gynradd Cross Hands",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23160",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.796399,
+          "longitude": -4.0891495
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23161",
+      "road": "Ysgol Gymunedol Cae&#x27;r Felin",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23161",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 52.002296,
+          "longitude": -4.2651239
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23166",
+      "road": "Bryn Community Primary School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23166",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.685861,
+          "longitude": -4.1124109
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23167",
+      "road": "Cefneithin Primary School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23167",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.803903,
+          "longitude": -4.0984752
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23168",
+      "road": "Model Church in Wales School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23168",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.858605,
+          "longitude": -4.3236574
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23169",
+      "road": "Swiss Valley Primary School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23169",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.704323,
+          "longitude": -4.1372099
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23171",
+      "road": "Saron Primary School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23171",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.787184,
+          "longitude": -4.0357418
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23172",
+      "road": "B4332",
+      "name": "Cenarth",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23172",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 52.044858,
+          "longitude": -4.5267217
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23173",
+      "road": "Betws Primary School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23173",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.787158,
+          "longitude": -3.9846878
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23174",
+      "road": "Pontyberem Primary School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23174",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.779455,
+          "longitude": -4.1745385
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23177",
+      "road": "Ysgol Gymraeg Ffwrnes",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23177",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.689873,
+          "longitude": -4.1777792
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23180",
+      "road": "Llangadog Primary School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23180",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.938569,
+          "longitude": -3.879519
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23181",
+      "road": "Meidrim Primary School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23181",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.859567,
+          "longitude": -4.477397
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23182",
+      "road": "Ferryside Primary School",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23182",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.768268,
+          "longitude": -4.3689601
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23185",
+      "road": "Capel Road",
+      "name": "Llanelli North",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23185",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.688346,
+          "longitude": -4.1400451
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23186",
+      "road": "Cilsaig Road",
+      "name": "Dafen Road, Llanelli North",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23186",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.693687,
+          "longitude": -4.1400451
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23187",
+      "road": "Dafen Road",
+      "name": "Llanelli North",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23187",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.693628,
+          "longitude": -4.1374003
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23188",
+      "road": "Corporation Avenue",
+      "name": "Llanelli North",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23188",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.69177,
+          "longitude": -4.1505088
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23189",
+      "road": "Bryngwyn Road",
+      "name": "Llanelli North",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23189",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.688956,
+          "longitude": -4.132232
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23190",
+      "road": "Heol Goffa",
+      "name": "Llanelli North",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23190",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.689608,
+          "longitude": -4.152157
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23191",
+      "road": "Capel Isaf Road",
+      "name": "Llanelli North",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23191",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.684343,
+          "longitude": -4.1401022
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23192",
+      "road": "Bryngwyn School",
+      "name": "Llanelli North",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23192",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.694225,
+          "longitude": -4.1396858
+        }
+      ]
+    },
+    {
+      "id": "gosafe-23194",
+      "road": "Penallt Road",
+      "name": "Brynallt Terrace, Llanelli",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=23194",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.682755,
+          "longitude": -4.1472894
+        }
+      ]
+    },
+    {
+      "id": "gosafe-30345",
+      "road": "A485",
+      "name": "Village of Cwmann",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=30345",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 52.10322,
+          "longitude": -4.0734562
+        }
+      ]
+    },
+    {
+      "id": "gosafe-30346",
+      "road": "B4310",
+      "name": "Heol Caegwyn, Drefach",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=30346",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.803928,
+          "longitude": -4.1419628
+        }
+      ]
+    },
+    {
+      "id": "gosafe-30347",
+      "road": "B4337",
+      "name": "Llanybydder",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=30347",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 52.073027,
+          "longitude": -4.148126
+        }
+      ]
+    },
+    {
+      "id": "gosafe-30349",
+      "road": "A482",
+      "name": "Village of Llanwrda",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=30349",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.971056,
+          "longitude": -3.876176
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31526",
+      "road": "Llethri Road",
+      "name": "Felinfoel",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31526",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.700396,
+          "longitude": -4.142032
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31527",
+      "road": "B4309",
+      "name": "Meinciau",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31527",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.774506,
+          "longitude": -4.2322551
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31528",
+      "road": "B4306",
+      "name": "Heol y Banc, Bancffosfelen",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31528",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.787221,
+          "longitude": -4.1935881
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31530",
+      "road": "A485",
+      "name": "Rhydargaeau",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31530",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.913476,
+          "longitude": -4.2717149
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31531",
+      "road": "Cwmgwili",
+      "name": "",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31531",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.778052,
+          "longitude": -4.0659042
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31532",
+      "road": "A484",
+      "name": "Cwmffrwd",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31532",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.828403,
+          "longitude": -4.2872116
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31533",
+      "road": "Hendre Road",
+      "name": "Tycroes, Caple Hendre",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31533",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.781503,
+          "longitude": -4.0272948
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31534",
+      "road": "B4310",
+      "name": "Nantgaredig",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31534",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.871384,
+          "longitude": -4.1896348
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31536",
+      "road": "B4302",
+      "name": "Talley",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31536",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.973568,
+          "longitude": -3.9813133
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31537",
+      "road": "A482",
+      "name": "Cwmann South",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31537",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 52.104506,
+          "longitude": -4.0662877
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31539",
+      "road": "Black Lion Road",
+      "name": "Cross Hands-Gorslas",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31539",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.795093,
+          "longitude": -4.0633187
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31549",
+      "road": "B4310",
+      "name": "Porthyrhyd",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31549",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.821385,
+          "longitude": -4.1482036
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31550",
+      "road": "B4309",
+      "name": "Five Roads",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31550",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.730532,
+          "longitude": -4.1887414
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31551",
+      "road": "A4069",
+      "name": "Broad Street, LLandovery",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31551",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.991761,
+          "longitude": -3.8015064
+        }
+      ]
+    },
+    {
+      "id": "gosafe-31552",
+      "road": "Saron Church",
+      "name": "Saron",
+      "limitMph": 20,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=31552",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.792814,
+          "longitude": -4.0305139
+        }
+      ]
+    },
+    {
+      "id": "gosafe-61552",
+      "road": "A477",
+      "name": "Red Roses",
+      "limitMph": 60,
+      "note": "Published enforcement site. Source: https://www.gosafe.org/camera-details?id=61552",
+      "firstListed": "2026-09-04",
+      "lastListed": "2026-09-04",
+      "path": [
+        {
+          "latitude": 51.772465,
+          "longitude": -4.6153502
+        }
+      ]
+    }
+  ]
+}
