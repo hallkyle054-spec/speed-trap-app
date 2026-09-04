@@ -29,15 +29,13 @@ is committed so the intent stays with the code.
 - Fonts (**Cormorant Garamond** 400/600, **Lora** 400/600/400-italic) are bundled
   with the app, not fetched at runtime.
 
-This needs a **development build** — `react-native-maps` and `expo-location` are
-native modules, so Expo Go will not run it.
+This needs a **development or release build** — `react-native-maps` and
+`expo-location` are native modules, so Expo Go will not run it.
 
 ```bash
 npm install
 npm run typecheck        # tsc --noEmit
 npm test                 # 22 unit tests over the pure logic
-npm run prebuild         # expo prebuild --platform android --clean
-npm run android
 ```
 
 ### Configuration
@@ -48,6 +46,53 @@ Both are read from the environment; neither is committed.
 | --- | --- |
 | `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` | Android Maps SDK key. Without it the map renders blank. |
 | `EXPO_PUBLIC_ZONE_FEED_URL` | The JSON zone feed. **Unset**, so the app falls back to the committed fixture — see *Ingest*. |
+
+> The Maps key is written into `AndroidManifest.xml` at **prebuild** time, not read
+> at runtime. It has to be set in the environment before the build, or the manifest
+> ships without a key and the map is blank.
+
+---
+
+## Getting an APK
+
+There is no APK in this repo — it is source, and the Android SDK is not part of it.
+Two routes:
+
+### EAS Build (no local Android toolchain)
+
+`eas.json` is set up; the `preview` profile produces an installable APK rather than
+a Play Store bundle.
+
+```bash
+npm install -g eas-cli
+eas login
+eas secret:create --scope project --name EXPO_PUBLIC_GOOGLE_MAPS_API_KEY --value <your-key>
+eas build --platform android --profile preview
+```
+
+EAS returns a download link; open it on the phone and install it. Because it is
+sideloaded, Android will ask you to allow installs from that browser once.
+
+### Locally (needs Android Studio / the Android SDK)
+
+```bash
+export EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=<your-key>
+npx expo prebuild --platform android --clean
+cd android && ./gradlew assembleRelease
+# android/app/build/outputs/apk/release/app-release.apk
+```
+
+The generated project signs release builds with the debug keystore, so the APK
+installs without any signing setup. That is fine for your own phone and not fine
+for distribution.
+
+The `android/` folder is generated and gitignored — `expo prebuild` recreates it.
+
+### A Google Maps key
+
+Google Cloud console → enable **Maps SDK for Android** → create an API key. The free
+tier covers personal use. Without one the app runs and every screen works; the map
+canvas is just empty.
 
 ---
 
