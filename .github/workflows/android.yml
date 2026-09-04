@@ -1,0 +1,73 @@
+name: Android APK
+
+# Builds an installable, sideloadable APK and attaches it to the run.
+# Download it from the run's Artifacts section.
+on:
+  push:
+    branches:
+      - main
+      - claude/claude-design-implementation-sye53r
+  workflow_dispatch:
+
+jobs:
+  apk:
+    name: Build release APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up the Android SDK
+        uses: android-actions/setup-android@v3
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Warn if the Maps key is missing
+        if: ${{ secrets.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY == '' }}
+        run: |
+          echo "::warning title=No Google Maps key::EXPO_PUBLIC_GOOGLE_MAPS_API_KEY is not set as a repository secret. The APK will build and run, but the map canvas will be blank. Add the secret and re-run to fix it."
+
+      # The Maps key is written into AndroidManifest.xml here, not read at
+      # runtime, so it has to be present before prebuild.
+      - name: Generate the native project
+        env:
+          EXPO_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY }}
+          EXPO_PUBLIC_ZONE_FEED_URL: ${{ secrets.EXPO_PUBLIC_ZONE_FEED_URL }}
+        run: npx expo prebuild --platform android --no-install
+
+      # The generated project signs release builds with the debug keystore, so
+      # the APK sideloads without any signing setup. Fine for a personal phone,
+      # not fine for distribution.
+      - name: Assemble release APK
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Name the APK
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/release/app-release.apk "dist/verge-${GITHUB_SHA::7}.apk"
+          ls -lh dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verge-apk
+          path: dist/*.apk
+          if-no-files-found: error
+          retention-days: 30
