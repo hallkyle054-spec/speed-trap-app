@@ -91,38 +91,6 @@ jobs:
           VERGE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: ./gradlew assembleRelease --no-daemon --stacktrace
 
-      # Read off the APK itself, so it reports what actually signed it rather
-      # than what we hoped would. These are the values Google Cloud wants for an
-      # Android application restriction on the Maps key.
-      - name: Report the signing certificate
-        run: |
-          set -euo pipefail
-          APK=android/app/build/outputs/apk/release/app-release.apk
-          CERT=$(keytool -printcert -jarfile "$APK")
-          SHA1=$(echo "$CERT" | grep -m1 'SHA1:' | sed 's/.*SHA1: *//')
-          OWNER=$(echo "$CERT" | grep -m1 'Owner:' | sed 's/.*Owner: *//')
-          {
-            echo '### Signing certificate'
-            echo ''
-            echo "Owner: \`$OWNER\`"
-            echo ''
-            echo 'Restrict the Google Maps key to this app in Google Cloud →'
-            echo 'Credentials → your key → Application restrictions → Android apps:'
-            echo ''
-            echo '| Field | Value |'
-            echo '| --- | --- |'
-            echo '| Package name | `com.hallkyle054.verge` |'
-            echo "| SHA-1 fingerprint | \`$SHA1\` |"
-          } >> "$GITHUB_STEP_SUMMARY"
-          echo "signing SHA-1: $SHA1"
-          echo "SIGNING_SHA1=$SHA1" >> "$GITHUB_ENV"
-          case "$OWNER" in
-            *Android\ Debug*)
-              echo "SIGNING_DEBUG=true" >> "$GITHUB_ENV"
-              echo "::warning title=Debug-signed::This APK is signed with the public debug key, whose private key is published in the React Native template."
-              ;;
-          esac
-
       - name: Name the APK
         run: |
           mkdir -p dist
@@ -136,15 +104,65 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      # Read off the APK itself, so it reports what actually signed it rather
+      # than what we hoped would. apksigner, not keytool: modern APKs carry only
+      # a v2/v3 signature and `keytool -printcert -jarfile` cannot see those —
+      # it exits non-zero, which is what killed build 12.
+      #
+      # Nothing here may fail the job. The APK is already built and uploaded;
+      # losing it over a reporting step would be absurd.
+      - name: Report the signing certificate
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          APK=dist/*.apk
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f 2>/dev/null | sort -V | tail -1)
+          if [ -z "$APKSIGNER" ]; then
+            echo "::warning title=No apksigner::Cannot report the signing certificate."
+            exit 0
+          fi
+
+          CERTS=$("$APKSIGNER" verify --print-certs $APK 2>&1) || {
+            echo "::warning title=Could not read signature::$CERTS"
+            exit 0
+          }
+          echo "$CERTS"
+
+          SHA1=$(printf '%s\n' "$CERTS" | grep -m1 -i 'SHA-1 digest' | sed 's/.*digest: *//')
+          DN=$(printf '%s\n' "$CERTS" | grep -m1 -i 'certificate DN' | sed 's/.*DN: *//')
+          [ -n "$SHA1" ] || { echo "::warning title=No SHA-1 in output::"; exit 0; }
+
+          echo "SIGNING_SHA1=$SHA1" >> "$GITHUB_ENV"
+          case "$DN" in
+            *"Android Debug"*)
+              echo "SIGNING_DEBUG=true" >> "$GITHUB_ENV"
+              echo "::warning title=Debug-signed::Signed with the public debug key from the React Native template."
+              ;;
+          esac
+
+          {
+            echo '### Signing certificate'
+            echo ''
+            echo "Signed by: \`$DN\`"
+            echo ''
+            echo 'Google Cloud → Credentials → your key → Application restrictions → Android apps:'
+            echo ''
+            echo '| Field | Value |'
+            echo '| --- | --- |'
+            echo '| Package name | `com.hallkyle054.verge` |'
+            echo "| SHA-1 fingerprint | \`$SHA1\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
       # An Actions artifact is a zip, which is awkward to install from a phone.
       # A release asset is a direct .apk link instead. The repo is private, so
       # the release is too.
       - name: Publish the APK as a release
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
           MAPS_KEY_SET: ${{ env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY != '' }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
           TAG="apk-${GITHUB_RUN_NUMBER}"
 
           if [ -n "${SIGNING_SHA1:-}" ] && [ "${SIGNING_DEBUG:-}" != "true" ]; then
@@ -179,8 +197,21 @@ jobs:
               --notes "$NOTES"
           fi
 
-          {
-            echo "### APK"
-            echo "Maps key present: \`${MAPS_KEY_SET}\`"
-            echo "Release: $(gh release view "$TAG" --json url --jq .url)"
-          } >> "$GITHUB_STEP_SUMMARY"
+          if URL=$(gh release view "$TAG" --json url --jq .url 2>/dev/null); then
+            {
+              echo "### APK"
+              echo "Maps key present: \`${MAPS_KEY_SET}\`"
+              echo "Release: $URL"
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo "### APK"
+              echo 'Could not publish a release — the APK is attached to this run as the'
+              echo '`verge-apk` artifact instead.'
+              echo ''
+              echo 'A 403 here means the workflow token lacks write access. Check'
+              echo 'Settings → Actions → General → Workflow permissions is set to'
+              echo '**Read and write permissions**.'
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning title=Release not published::Download the verge-apk artifact from this run instead."
+          fi
