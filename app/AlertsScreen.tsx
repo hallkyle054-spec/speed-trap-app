@@ -121,20 +121,20 @@ export function AlertsScreen({
             onChange={value => set('mark', value)}
           />
           <Text style={[body(11), styles.controlSub, { color: t.ink55 }]}>
-            How a site is drawn. The source publishes a single point per site, not a stretch of
+            How a zone is drawn. The source publishes a single point per zone, not a stretch of
             road.
           </Text>
         </View>
 
         <SectionLabel>Data</SectionLabel>
         <Row
-          label="Show removed sites"
-          sub="Sites dropped from the most recent published list"
+          label="Show removed zones"
+          sub="Zones dropped from the most recent published list"
           control={
             <Switch
               value={settings.showStale}
               onChange={() => toggle('showStale')}
-              label="Show removed sites"
+              label="Show removed zones"
             />
           }
         />

@@ -8,7 +8,7 @@ export type TabId = 'map' | 'today' | 'routes' | 'alerts';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'map', label: 'Map' },
-  { id: 'today', label: 'Sites' },
+  { id: 'today', label: 'Zones' },
   { id: 'routes', label: 'Routes' },
   { id: 'alerts', label: 'Alerts' },
 ];

@@ -10,10 +10,16 @@ import { RoutesScreen } from './app/RoutesScreen';
 import { TodayScreen } from './app/TodayScreen';
 import { DriveHud } from './components/DriveHud';
 import { OfflineBanner } from './components/OfflineBanner';
-import { SampleDataBanner } from './components/SampleDataBanner';
+import { DataNoticeBanner } from './components/DataNoticeBanner';
 import { TabBar, TabId } from './components/TabBar';
 import { ZoneSheet } from './components/ZoneSheet';
-import { IS_FIXTURE, useZoneFeed } from './data/feed';
+import {
+  BUNDLED_STALE_AFTER_DAYS,
+  FEED_URL,
+  IS_FIXTURE,
+  ageInDays,
+  useZoneFeed,
+} from './data/feed';
 import { fixtureRoutes } from './data/routes';
 import { Zone, distanceTo, latestListing, statusOf as statusOfZone } from './data/zones';
 import { useDrive } from './state/drive';
@@ -47,9 +53,36 @@ function Verge() {
   const listedOn = useMemo(() => latestListing(allZones), [allZones]);
   const statusOf = useCallback((zone: Zone) => statusOfZone(zone, listedOn), [listedOn]);
 
-  // The sample-data banner sits in the flow and takes the status-bar inset,
-  // so the screen below it must not pad for it a second time.
-  const screenInset = IS_FIXTURE ? 0 : insets.top;
+  /**
+   * The one notice worth interrupting the design for: the list is invented, or
+   * it is old enough that a driver should not lean on it.
+   */
+  const notice = useMemo(() => {
+    if (IS_FIXTURE) {
+      return {
+        title: 'Sample data — not a real list',
+        body:
+          'No zone feed is connected. These zones are invented for testing and their positions ' +
+          'are approximate. Do not drive by them.',
+      };
+    }
+    if (!FEED_URL) {
+      const age = ageInDays(fetchedAt, now);
+      if (Number.isFinite(age) && age > BUNDLED_STALE_AFTER_DAYS) {
+        return {
+          title: `Built-in list is ${age} days old`,
+          body:
+            'This build carries the list from the day it was made and cannot refresh itself. ' +
+            'Install a newer build to pick up changes.',
+        };
+      }
+    }
+    return null;
+  }, [fetchedAt, now]);
+
+  // The notice banner sits in the flow and takes the status-bar inset, so the
+  // screen below it must not pad for it a second time.
+  const screenInset = notice ? 0 : insets.top;
 
   /** `Show removed sites` off drops them from the map, the list and the count. */
   const zones = useMemo(
@@ -87,7 +120,9 @@ function Verge() {
     <View style={[styles.frame, { backgroundColor: t.bg }]}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
 
-      {IS_FIXTURE ? <SampleDataBanner topInset={insets.top} /> : null}
+      {notice ? (
+        <DataNoticeBanner title={notice.title} body={notice.body} topInset={insets.top} />
+      ) : null}
 
       {tab === 'map' ? (
         <MapScreen

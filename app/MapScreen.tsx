@@ -146,7 +146,7 @@ export function MapScreen({
               {zoneTitle(nearest)}
             </Text>
             <Text style={[body(11.5), tnum, styles.nearestMeta, { color: t.ink60 }]}>
-              {`Published site · ${limitLabel(nearest)} · camera not confirmed`}
+              {`Published zone · ${limitLabel(nearest)} · camera not confirmed`}
             </Text>
             <Button
               label="Start drive"

@@ -1,7 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { AppState } from 'react-native';
 
+import bundledFeed from '../feed/zones.json';
+import { dayLabel } from './dates';
 import { LatLng } from './geo';
 import { Zone, fixtureZones } from './zones';
 
@@ -25,14 +28,6 @@ export const PUBLISHER = 'GoSafe';
  * exercisable, and the ingest job is still to be built.
  */
 export const FEED_URL = process.env.EXPO_PUBLIC_ZONE_FEED_URL ?? '';
-
-/**
- * True when no feed is configured and the app is running on the committed
- * fixture. The UI must say so plainly wherever it would otherwise imply the
- * list is real — a build that quietly shows invented zones is worse than one
- * that shows none.
- */
-export const IS_FIXTURE = !FEED_URL;
 
 export type Sync = 'ok' | 'syncing' | 'offline';
 
@@ -69,6 +64,29 @@ export function parseZones(raw: unknown): Zone[] {
     );
   });
 }
+
+/**
+ * The real site list, imported from the feed the scheduled ingest commits and
+ * shipped inside the app. It is authoritative as of the build, and does not
+ * refresh on its own — `bundledListedOn` is what the UI reports so a driver can
+ * see how old it is.
+ */
+export const BUNDLED_ZONES: Zone[] = parseZones(bundledFeed);
+
+export const BUNDLED_LISTED_ON: string | null =
+  typeof (bundledFeed as { listedOn?: unknown }).listedOn === 'string'
+    ? (bundledFeed as { listedOn: string }).listedOn
+    : null;
+
+/**
+ * True only when we have fallen all the way back to the invented fixture — no
+ * feed URL and no usable bundled list. The UI must say so plainly: a build that
+ * quietly shows invented zones is worse than one that shows none.
+ */
+export const IS_FIXTURE = !FEED_URL && BUNDLED_ZONES.length === 0;
+
+/** How old the built-in list may get before the UI starts complaining. */
+export const BUNDLED_STALE_AFTER_DAYS = 7;
 
 async function readCache(): Promise<Cached | null> {
   try {
@@ -119,10 +137,19 @@ export type FeedState = {
  * Always keeps the last good list plus the time it was fetched; the age is what
  * the offline banner reports.
  */
+const startingZones = () => (BUNDLED_ZONES.length ? BUNDLED_ZONES : fixtureZones);
+
+const bundledDate = () => {
+  if (!BUNDLED_LISTED_ON) return null;
+  const [y, m, d] = BUNDLED_LISTED_ON.split('-').map(Number);
+  const parsed = new Date(y, (m ?? 1) - 1, d ?? 1);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
 export function useZoneFeed(): FeedState {
-  const [zones, setZones] = useState<Zone[]>(fixtureZones);
+  const [zones, setZones] = useState<Zone[]>(startingZones);
   const [sync, setSync] = useState<Sync>('ok');
-  const [fetchedAt, setFetchedAt] = useState<Date | null>(null);
+  const [fetchedAt, setFetchedAt] = useState<Date | null>(bundledDate);
   const inFlight = useRef(false);
   const mounted = useRef(true);
 
@@ -155,9 +182,14 @@ export function useZoneFeed(): FeedState {
         failed = true;
       }
     } else {
-      // No feed configured yet — the committed fixture stands in so the UI is
-      // exercisable. See the README's "Ingest" section.
-      next = fixtureZones;
+      // No feed URL: the list travels inside the app. Refreshing cannot make it
+      // newer, so keep the build's own date rather than stamping it now.
+      if (!mounted.current) return;
+      inFlight.current = false;
+      setZones(startingZones());
+      setFetchedAt(bundledDate());
+      setSync('ok');
+      return;
     }
 
     const wait = Math.max(0, MIN_SYNC_MS - (Date.now() - startedAt));
@@ -176,8 +208,8 @@ export function useZoneFeed(): FeedState {
 
     // Failed. Keep showing whatever we last had, and say how old it is.
     if (failed && !cached) {
-      setZones(fixtureZones);
-      setFetchedAt(null);
+      setZones(startingZones());
+      setFetchedAt(bundledDate());
     }
     setSync('offline');
   }, []);
@@ -210,6 +242,11 @@ export function useZoneFeed(): FeedState {
 export function syncLabel(sync: Sync, fetchedAt: Date | null, now = new Date()): string {
   if (sync === 'syncing') return 'Fetching the published list…';
   if (IS_FIXTURE) return 'Sample data · no feed configured';
+  if (!FEED_URL) {
+    return fetchedAt
+      ? `Built-in list · ${PUBLISHER} ${dayLabel(fetchedAt)}`
+      : `Built-in list · ${PUBLISHER}`;
+  }
   if (sync === 'offline') return `Offline · list is ${ageLabel(fetchedAt, now)}`;
   if (!fetchedAt) return `No list fetched yet · ${PUBLISHER} list`;
   return `Fetched ${clockLabel(fetchedAt)} · ${PUBLISHER} list`;

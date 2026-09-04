@@ -81,7 +81,7 @@ export const statusLabel = (status: ZoneStatus) =>
 /** The note under each row. Never omits the disclaimer. */
 export function rowNote(zone: Zone, status: ZoneStatus): string {
   return status === 'listed'
-    ? 'Published site · camera not confirmed'
+    ? 'Published zone · camera not confirmed'
     : `Removed from the list ${shortDate(zone.lastListed)} · camera not confirmed`;
 }
 

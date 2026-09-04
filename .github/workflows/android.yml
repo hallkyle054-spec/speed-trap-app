@@ -12,6 +12,8 @@ on:
       - '.github/workflows/ingest-probe.yml'
       - 'README.md'
       - 'design_reference/**'
+      # feed/zones.json is deliberately NOT ignored: the list ships inside the
+      # APK, so a new list means a new build is worth making.
   workflow_dispatch:
 
 permissions:

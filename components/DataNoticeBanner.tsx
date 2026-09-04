@@ -5,11 +5,19 @@ import { useTheme } from '../theme/ThemeProvider';
 import { body, heading } from '../theme/type';
 
 /**
- * Shown whenever no feed is configured. The zones on screen are then invented
- * and must never be mistaken for a published list — this is the one place the
- * app is allowed to shout.
+ * Says something about the data on screen that the driver needs to know before
+ * trusting it: that it is invented, or that it has gone stale. This is the one
+ * place the app is allowed to shout, so it appears only when it must.
  */
-export function SampleDataBanner({ topInset }: { topInset: number }) {
+export function DataNoticeBanner({
+  title,
+  body: message,
+  topInset,
+}: {
+  title: string;
+  body: string;
+  topInset: number;
+}) {
   const { t } = useTheme();
 
   return (
@@ -19,11 +27,8 @@ export function SampleDataBanner({ topInset }: { topInset: number }) {
         { backgroundColor: t.bg, borderBottomColor: t.accent, paddingTop: 11 + topInset },
       ]}
     >
-      <Text style={[heading(15), { color: t.accentInk }]}>Sample data — not a real list</Text>
-      <Text style={[body(11), styles.sub, { color: t.ink60 }]}>
-        No zone feed is connected. These zones are invented for testing and their positions are
-        approximate. Do not drive by them.
-      </Text>
+      <Text style={[heading(15), { color: t.accentInk }]}>{title}</Text>
+      <Text style={[body(11), styles.sub, { color: t.ink60 }]}>{message}</Text>
     </View>
   );
 }
