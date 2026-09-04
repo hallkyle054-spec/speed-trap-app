@@ -85,21 +85,37 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           MAPS_KEY_SET: ${{ env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY != '' }}
         run: |
+          set -euo pipefail
           TAG="apk-${GITHUB_RUN_NUMBER}"
+
           if [ "$MAPS_KEY_SET" = "true" ]; then
             MAP_NOTE="Built with a Google Maps key, so the map renders."
           else
-            MAP_NOTE="Built **without** a Google Maps key, so the map canvas is blank. Every other screen works. Add the EXPO_PUBLIC_GOOGLE_MAPS_API_KEY repository secret and re-run to fix it."
+            MAP_NOTE="Built **without** a Google Maps key, so the map canvas is blank. Every other screen works. Add the \`EXPO_PUBLIC_GOOGLE_MAPS_API_KEY\` repository secret and re-run to fix it."
           fi
-          gh release create "$TAG" dist/*.apk \
-            --target "$GITHUB_SHA" \
-            --title "Verge APK (build ${GITHUB_RUN_NUMBER})" \
-            --prerelease \
-            --notes "Sideload build from \`${GITHUB_SHA}\`.
+
+          NOTES="Sideload build from \`${GITHUB_SHA}\`.
 
           $MAP_NOTE
 
           Signed with the debug keystore, so it installs on your own phone but is not fit for distribution.
 
           The zone list is the committed fixture and its road geometry is approximate. Use it to judge the app, not to drive by."
-          echo "Release: $(gh release view "$TAG" --json url --jq .url)" >> "$GITHUB_STEP_SUMMARY"
+
+          # A re-run keeps the same run number, so the release may already exist.
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/*.apk --clobber
+            gh release edit "$TAG" --notes "$NOTES"
+          else
+            gh release create "$TAG" dist/*.apk \
+              --target "$GITHUB_SHA" \
+              --title "Verge APK (build ${GITHUB_RUN_NUMBER})" \
+              --prerelease \
+              --notes "$NOTES"
+          fi
+
+          {
+            echo "### APK"
+            echo "Maps key present: \`${MAPS_KEY_SET}\`"
+            echo "Release: $(gh release view "$TAG" --json url --jq .url)"
+          } >> "$GITHUB_STEP_SUMMARY"
