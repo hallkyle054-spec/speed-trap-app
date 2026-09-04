@@ -4,6 +4,7 @@ import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { Button } from '../components/Button';
 import { ZoneMarks } from '../components/ZoneMarks';
+import { dayLabel } from '../data/dates';
 import { Sync, syncLabel } from '../data/feed';
 import { LatLng, formatDistance } from '../data/geo';
 import {
@@ -55,11 +56,7 @@ export function MapScreen({
   const nearest = useMemo(() => nearestZone(zones, origin), [zones, origin]);
   const nearestDistance = nearest ? distanceTo(nearest, origin) : null;
 
-  const dateLabel = now.toLocaleDateString('en-GB', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  });
+  const dateLabel = dayLabel(now);
 
   return (
     <View style={styles.root}>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { dayLabel } from '../data/dates';
 import { ageInDays } from '../data/feed';
 import { useTheme } from '../theme/ThemeProvider';
 import { body, heading, tnum } from '../theme/type';
@@ -22,11 +23,7 @@ export function OfflineBanner({
   const days = ageInDays(fetchedAt, now);
 
   const heading1 = fetchedAt
-    ? `Offline — showing ${fetchedAt.toLocaleDateString('en-GB', {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short',
-      })}`
+    ? `Offline — showing ${dayLabel(fetchedAt)}`
     : 'Offline — no list cached';
   const sub = !Number.isFinite(days)
     ? 'Nothing has been fetched on this device yet.'

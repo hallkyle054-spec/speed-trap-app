@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
+import { dayLabel, shortDayLabel } from '../data/dates';
 import {
   Zone,
   fixtureZones,
@@ -10,6 +11,7 @@ import {
   nearestZone,
   phaseOf,
   rowNote,
+  shortDate,
   statusLabel,
   FALLBACK_ORIGIN,
 } from '../data/zones';
@@ -103,4 +105,13 @@ test('the fixture keeps the six zones from the handoff', () => {
   // B4300 Golden Grove is the stale one, and it is the only stale one.
   const stale = fixtureZones.filter(z => isStale(z, new Date()));
   assert.deepEqual(stale.map(z => z.road), ['B4300']);
+});
+
+test('date labels match the design exactly, not the locale default', () => {
+  // en-GB renders this as 'Fri, 4 Sept' on some ICU builds; the design says 'Fri 4 Sep'.
+  assert.equal(dayLabel(new Date(2026, 8, 4)), 'Fri 4 Sep');
+  assert.equal(dayLabel(new Date(2026, 0, 1)), 'Thu 1 Jan');
+  assert.equal(shortDayLabel(new Date(2026, 7, 28)), '28 Aug');
+  assert.equal(shortDate('2026-08-28'), '28 Aug');
+  assert.equal(shortDate('nonsense'), 'unknown');
 });

@@ -10,5 +10,5 @@
     "rootDir": ".",
     "types": ["node"]
   },
-  "include": ["data/geo.ts", "data/zones.ts", "data/routes.ts", "tests/**/*.ts"]
+  "include": ["data/geo.ts", "data/zones.ts", "data/routes.ts", "data/dates.ts", "tests/**/*.ts"]
 }

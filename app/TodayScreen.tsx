@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { dayLabel } from '../data/dates';
 import { PUBLISHER } from '../data/feed';
 import { Zone, ZonePhase, hoursLabel, rowNote } from '../data/zones';
 import { useTheme } from '../theme/ThemeProvider';
@@ -17,11 +18,7 @@ type Props = {
 /** The day's sheet, scannable by road. */
 export function TodayScreen({ zones, phaseOf, now, onOpenZone, topInset }: Props) {
   const { t } = useTheme();
-  const dateLabel = now.toLocaleDateString('en-GB', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  });
+  const dateLabel = dayLabel(now);
 
   return (
     <View style={styles.root}>

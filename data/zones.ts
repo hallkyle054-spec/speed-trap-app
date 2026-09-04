@@ -1,3 +1,4 @@
+import { shortDayLabel } from './dates';
 import { LatLng, distanceToPath, pathLength } from './geo';
 
 /**
@@ -115,7 +116,7 @@ export function rowNote(z: Zone, phase: ZonePhase): string {
 export function shortDate(iso: string): string {
   const day = parseDay(iso);
   if (Number.isNaN(day)) return 'unknown';
-  return new Date(day).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return shortDayLabel(new Date(day));
 }
 
 export const zoneLength = (z: Zone) => pathLength(z.path);
