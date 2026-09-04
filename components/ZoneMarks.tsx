@@ -66,23 +66,23 @@ export function ZoneMarks({ zone, phase, mark, onPress }: Props) {
 
   if (mark === 'segment') {
     // Recommended treatment: the published data is a stretch of road, so the
-    // mark is a bar along it — outlined in the ground colour so it reads over
-    // the road line.
+    // mark is a bar along it.
+    //
+    // The design asks for a ground-coloured casing under the bar. That was
+    // built as a second, wider polyline beneath it — which does not work: the
+    // New Architecture's Polyline has no `zIndex` prop (see
+    // react-native-maps/src/specs/NativeComponentPolyline.ts), so the casing's
+    // draw order is undefined and it can land on top, painting the mark out in
+    // exactly the map's background colour. A single stroke is drawn instead,
+    // weighted to read on its own against the hairline roads of the basemap.
     return (
       <>
         <Polyline
           coordinates={zone.path}
-          strokeColor={t.bg}
-          strokeWidth={10}
-          lineCap="round"
-          zIndex={1}
-        />
-        <Polyline
-          coordinates={zone.path}
           strokeColor={color}
-          strokeWidth={6}
+          strokeWidth={7}
           lineCap="round"
-          zIndex={2}
+          lineJoin="round"
           tappable
           onPress={() => onPress(zone)}
         />

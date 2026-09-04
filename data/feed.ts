@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState } from 'react-native';
 
 import { LatLng } from './geo';
 import { Zone, fixtureZones } from './zones';
@@ -24,6 +25,14 @@ export const PUBLISHER = 'GoSafe';
  * exercisable, and the ingest job is still to be built.
  */
 export const FEED_URL = process.env.EXPO_PUBLIC_ZONE_FEED_URL ?? '';
+
+/**
+ * True when no feed is configured and the app is running on the committed
+ * fixture. The UI must say so plainly wherever it would otherwise imply the
+ * list is real — a build that quietly shows invented zones is worse than one
+ * that shows none.
+ */
+export const IS_FIXTURE = !FEED_URL;
 
 export type Sync = 'ok' | 'syncing' | 'offline';
 
@@ -178,6 +187,21 @@ export function useZoneFeed(): FeedState {
     void load();
   }, [load]);
 
+  /**
+   * The list is published daily, so fetching only at mount would leave an app
+   * that stays open — or sits backgrounded overnight — showing yesterday's
+   * sheet under yesterday's stamp. Refetch when it returns to the foreground,
+   * and when the day has turned over since the list on screen was fetched.
+   */
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', next => {
+      if (next !== 'active') return;
+      if (fetchedAt && ageInDays(fetchedAt) === 0) return;
+      void load();
+    });
+    return () => subscription.remove();
+  }, [load, fetchedAt]);
+
   const simulateOffline = useCallback(() => setSync('offline'), []);
 
   return { zones, sync, fetchedAt, refresh: () => void load(), simulateOffline };
@@ -186,6 +210,7 @@ export function useZoneFeed(): FeedState {
 /** 'Fetched 06:42 · GoSafe list' / 'Fetching today's list…' / 'Offline · list is 2 days old' */
 export function syncLabel(sync: Sync, fetchedAt: Date | null, now = new Date()): string {
   if (sync === 'syncing') return 'Fetching today’s list…';
+  if (IS_FIXTURE) return 'Sample data · no feed configured';
   if (sync === 'offline') return `Offline · list is ${ageLabel(fetchedAt, now)}`;
   if (!fetchedAt) return `No list fetched yet · ${PUBLISHER} list`;
   return `Fetched ${clockLabel(fetchedAt)} · ${PUBLISHER} list`;

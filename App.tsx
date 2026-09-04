@@ -10,9 +10,10 @@ import { RoutesScreen } from './app/RoutesScreen';
 import { TodayScreen } from './app/TodayScreen';
 import { DriveHud } from './components/DriveHud';
 import { OfflineBanner } from './components/OfflineBanner';
+import { SampleDataBanner } from './components/SampleDataBanner';
 import { TabBar, TabId } from './components/TabBar';
 import { ZoneSheet } from './components/ZoneSheet';
-import { useZoneFeed } from './data/feed';
+import { IS_FIXTURE, useZoneFeed } from './data/feed';
 import { fixtureRoutes } from './data/routes';
 import { Zone, distanceTo, isStale, phaseOf as phaseOfZone } from './data/zones';
 import { useDrive } from './state/drive';
@@ -44,6 +45,10 @@ function Verge() {
   const [sheetId, setSheetId] = useState<string | null>(null);
 
   const phaseOf = useCallback((zone: Zone) => phaseOfZone(zone, now), [now]);
+
+  // The sample-data banner sits in the flow and takes the status-bar inset,
+  // so the screen below it must not pad for it a second time.
+  const screenInset = IS_FIXTURE ? 0 : insets.top;
 
   /** `Show stale zones` off filters them out of the map, the list and the count. */
   const zones = useMemo(
@@ -79,6 +84,8 @@ function Verge() {
     <View style={[styles.frame, { backgroundColor: t.bg }]}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
 
+      {IS_FIXTURE ? <SampleDataBanner topInset={insets.top} /> : null}
+
       {tab === 'map' ? (
         <MapScreen
           zones={zones}
@@ -92,7 +99,7 @@ function Verge() {
           onRefresh={refresh}
           onOpenZone={openZone}
           onStartDrive={startDrive}
-          topInset={insets.top}
+          topInset={screenInset}
         />
       ) : null}
 
@@ -102,12 +109,12 @@ function Verge() {
           phaseOf={phaseOf}
           now={now}
           onOpenZone={openZone}
-          topInset={insets.top}
+          topInset={screenInset}
         />
       ) : null}
 
       {tab === 'routes' ? (
-        <RoutesScreen routes={fixtureRoutes} zones={zones} topInset={insets.top} />
+        <RoutesScreen routes={fixtureRoutes} zones={zones} topInset={screenInset} />
       ) : null}
 
       {tab === 'alerts' ? (
@@ -120,13 +127,13 @@ function Verge() {
           now={now}
           onRefresh={refresh}
           onSimulateOffline={goOffline}
-          topInset={insets.top}
+          topInset={screenInset}
         />
       ) : null}
 
       <TabBar tab={tab} onChange={goToTab} bottomInset={insets.bottom} />
 
-      {sync === 'offline' ? (
+      {!IS_FIXTURE && sync === 'offline' ? (
         <OfflineBanner
           fetchedAt={fetchedAt}
           now={now}
