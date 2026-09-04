@@ -132,7 +132,9 @@ jobs:
           DN=$(printf '%s\n' "$CERTS" | grep -m1 -i 'certificate DN' | sed 's/.*DN: *//')
           [ -n "$SHA1" ] || { echo "::warning title=No SHA-1 in output::"; exit 0; }
 
-          echo "SIGNING_SHA1=$SHA1" >> "$GITHUB_ENV"
+          # apksigner prints bare hex; the Google Cloud field wants colon pairs.
+          SHA1_COLONS=$(printf '%s' "$SHA1" | tr -d ':' | tr 'a-f' 'A-F' | sed 's/../&:/g; s/:$//')
+          echo "SIGNING_SHA1=$SHA1_COLONS" >> "$GITHUB_ENV"
           case "$DN" in
             *"Android Debug"*)
               echo "SIGNING_DEBUG=true" >> "$GITHUB_ENV"
@@ -150,7 +152,7 @@ jobs:
             echo '| Field | Value |'
             echo '| --- | --- |'
             echo '| Package name | `com.hallkyle054.verge` |'
-            echo "| SHA-1 fingerprint | \`$SHA1\` |"
+            echo "| SHA-1 fingerprint | \`$SHA1_COLONS\` |"
           } >> "$GITHUB_STEP_SUMMARY"
 
       # An Actions artifact is a zip, which is awkward to install from a phone.
@@ -183,7 +185,7 @@ jobs:
 
           $SIGN_NOTE
 
-          The zone list is the committed fixture and its road geometry is approximate. Use it to judge the app, not to drive by."
+          Carries the GoSafe enforcement zone list built into the app on the day of the build. It cannot refresh itself — install a newer build to pick up changes. A published zone is not a confirmation that a camera is present."
 
           # A re-run keeps the same run number, so the release may already exist.
           if gh release view "$TAG" >/dev/null 2>&1; then
