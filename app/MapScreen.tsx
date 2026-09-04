@@ -7,7 +7,15 @@ import { ZoneMarks } from '../components/ZoneMarks';
 import { dayLabel } from '../data/dates';
 import { Sync, syncLabel } from '../data/feed';
 import { LatLng, formatDistance } from '../data/geo';
-import { COUNTY_REGION, Zone, ZoneStatus, distanceTo, limitLabel, nearestZone } from '../data/zones';
+import {
+  COUNTY_REGION,
+  Zone,
+  ZoneStatus,
+  distanceTo,
+  limitLabel,
+  nearestZone,
+  zoneTitle,
+} from '../data/zones';
 import { ZoneMark } from '../state/settings';
 import { useTheme } from '../theme/ThemeProvider';
 import { darkMapStyle, lightMapStyle } from '../theme/mapStyle';
@@ -135,7 +143,7 @@ export function MapScreen({
         {nearest ? (
           <>
             <Text style={[heading(20, -0.01), { color: t.ink }]}>
-              {nearest.road} · {nearest.name}
+              {zoneTitle(nearest)}
             </Text>
             <Text style={[body(11.5), tnum, styles.nearestMeta, { color: t.ink60 }]}>
               {`Published site · ${limitLabel(nearest)} · camera not confirmed`}

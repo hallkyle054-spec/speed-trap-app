@@ -37,7 +37,9 @@ jobs:
       - name: Commit it if it changed
         run: |
           set -euo pipefail
-          if git diff --quiet -- feed/zones.json; then
+          # `git diff` does not see untracked files, so a first-ever feed would
+          # look unchanged and never land. Ask git status instead.
+          if [ -z "$(git status --porcelain -- feed/zones.json)" ]; then
             echo "no change in the published list"
             exit 0
           fi

@@ -97,11 +97,14 @@ export function splitDescription(description, authority) {
     const road = match[1].toUpperCase().replace(/\s+/g, '');
     const rest = parts
       .map((p, i) => (i === 0 ? p.replace(ROAD, '').replace(/^[\s,/-]+/, '') : p))
-      .filter(Boolean);
-    return { road, name: rest.join(', ') || cleaned };
+      .filter(Boolean)
+      .filter(p => p.toLowerCase() !== road.toLowerCase());
+    return { road, name: rest.join(', ') };
   }
   // No road number published — lead with the first phrase instead of inventing one.
-  return { road: parts[0] ?? cleaned, name: parts.slice(1).join(', ') || parts[0] || cleaned };
+  const road = parts[0] ?? cleaned;
+  const rest = parts.slice(1).filter(p => p.toLowerCase() !== road.toLowerCase());
+  return { road, name: rest.join(', ') };
 }
 
 const isFiniteNumber = n => typeof n === 'number' && Number.isFinite(n);

@@ -3,7 +3,7 @@ import { Animated, Easing, StyleSheet, View } from 'react-native';
 import { Circle, Marker, Polyline } from 'react-native-maps';
 
 import { LatLng } from '../data/geo';
-import { Zone, ZoneStatus } from '../data/zones';
+import { Zone, ZoneStatus, zoneTitle } from '../data/zones';
 import { useTheme } from '../theme/ThemeProvider';
 import { Tokens } from '../theme/tokens';
 import { ZoneMark } from '../state/settings';
@@ -62,7 +62,7 @@ export function ZoneMarks({ zone, status, mark, onPress }: Props) {
   const { t } = useTheme();
   const color = markColor(t, status);
   const active = status === 'listed';
-  const label = `${zone.road} ${zone.name}`;
+  const label = zoneTitle(zone);
 
   // A site published as a single point has no stretch to draw along.
   if (mark === 'segment' && zone.path.length >= 2) {

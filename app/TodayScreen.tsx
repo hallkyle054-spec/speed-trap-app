@@ -58,7 +58,9 @@ export function TodayScreen({ zones, statusOf, listedOn, onOpenZone, topInset }:
                   {limitLabel(zone)}
                 </Text>
               </View>
-              <Text style={[body(13), styles.rowName, { color: t.ink80 }]}>{zone.name}</Text>
+              {zone.name ? (
+                <Text style={[body(13), styles.rowName, { color: t.ink80 }]}>{zone.name}</Text>
+              ) : null}
               <Text style={[body(10.5), tnum, styles.rowNote, { color: t.ink50 }]}>
                 {rowNote(zone, status)}
               </Text>

@@ -69,6 +69,9 @@ export function statusOf(zone: Zone, latest: string | null): ZoneStatus {
   return zone.lastListed >= latest ? 'listed' : 'removed';
 }
 
+/** 'A484 · Llangain', or just the road when the source gives nothing more. */
+export const zoneTitle = (z: Zone) => (z.name ? `${z.road} · ${z.name}` : z.road);
+
 export const limitLabel = (z: Zone) => (z.limitMph == null ? 'Not published' : `${z.limitMph} mph`);
 
 /** The status kicker on the detail sheet. */

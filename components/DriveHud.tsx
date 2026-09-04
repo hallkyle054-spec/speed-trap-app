@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 
 import { formatDistance, pathLength } from '../data/geo';
-import { Zone } from '../data/zones';
+import { Zone, zoneTitle } from '../data/zones';
 import { DriveSource } from '../state/drive';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius } from '../theme/tokens';
@@ -74,7 +74,7 @@ export function DriveHud({
         <View style={[styles.divider, { backgroundColor: t.rule3 }]} />
 
         <Text style={[heading(25, -0.01), { color: t.ink }]}>
-          {zone.road} · {zone.name}
+          {zoneTitle(zone)}
         </Text>
         <Text style={[body(12.5), tnum, styles.meta, { color: t.ink60 }]}>
           {zone.path.length >= 2

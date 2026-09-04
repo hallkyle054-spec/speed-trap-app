@@ -70,3 +70,14 @@ test('each site carries a link back to its own published page', () => {
   const { sites } = toSites(rowsOf('pois'), { authorities: ['Carmarthenshire'] });
   assert.equal(sites[0].sourceUrl, 'https://www.gosafe.org/camera-details?id=3001');
 });
+
+test('a location that only repeats its own road name is not doubled up', () => {
+  assert.deepEqual(splitDescription('Felinfoel, Felinfoel', 'Carmarthenshire'), {
+    road: 'Felinfoel',
+    name: '',
+  });
+  assert.deepEqual(splitDescription('A484, A484, Carmarthenshire', 'Carmarthenshire'), {
+    road: 'A484',
+    name: '',
+  });
+});

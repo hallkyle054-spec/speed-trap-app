@@ -52,7 +52,9 @@ export function ZoneSheet({ zone, status, distance, onClose, onDrive, bottomInse
           {statusLabel(status)}
         </Text>
         <Text style={[display(30, -0.02), styles.road, { color: t.ink }]}>{zone.road}</Text>
-        <Text style={[body(14), { color: t.ink80 }]}>{zone.name}</Text>
+        {zone.name ? (
+          <Text style={[body(14), { color: t.ink80 }]}>{zone.name}</Text>
+        ) : null}
 
         <View style={[styles.divider, { backgroundColor: t.rule }]} />
 
