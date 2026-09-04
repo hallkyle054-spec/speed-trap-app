@@ -9,6 +9,9 @@ on:
       - claude/claude-design-implementation-sye53r
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     name: Build release APK
@@ -73,3 +76,30 @@ jobs:
           path: dist/*.apk
           if-no-files-found: error
           retention-days: 30
+
+      # An Actions artifact is a zip, which is awkward to install from a phone.
+      # A release asset is a direct .apk link instead. The repo is private, so
+      # the release is too.
+      - name: Publish the APK as a release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MAPS_KEY_SET: ${{ env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY != '' }}
+        run: |
+          TAG="apk-${GITHUB_RUN_NUMBER}"
+          if [ "$MAPS_KEY_SET" = "true" ]; then
+            MAP_NOTE="Built with a Google Maps key, so the map renders."
+          else
+            MAP_NOTE="Built **without** a Google Maps key, so the map canvas is blank. Every other screen works. Add the EXPO_PUBLIC_GOOGLE_MAPS_API_KEY repository secret and re-run to fix it."
+          fi
+          gh release create "$TAG" dist/*.apk \
+            --target "$GITHUB_SHA" \
+            --title "Verge APK (build ${GITHUB_RUN_NUMBER})" \
+            --prerelease \
+            --notes "Sideload build from \`${GITHUB_SHA}\`.
+
+          $MAP_NOTE
+
+          Signed with the debug keystore, so it installs on your own phone but is not fit for distribution.
+
+          The zone list is the committed fixture and its road geometry is approximate. Use it to judge the app, not to drive by."
+          echo "Release: $(gh release view "$TAG" --json url --jq .url)" >> "$GITHUB_STEP_SUMMARY"
