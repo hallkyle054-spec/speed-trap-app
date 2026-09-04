@@ -20,3 +20,4 @@ jobs:
         with:
           node-version: 22
       - run: node ingest/probe.mjs
+      - run: node ingest/probe-map.mjs
