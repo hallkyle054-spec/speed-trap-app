@@ -1,0 +1,210 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import { LatLng } from './geo';
+import { Zone, fixtureZones } from './zones';
+
+/**
+ * The body that publishes the list. Every user-facing string that names the
+ * source reads it from here — change it in one place.
+ *
+ * The handoff asked for this to be verified against the real publisher before
+ * shipping. For Carmarthenshire that is GoSafe, the Welsh road casualty
+ * reduction partnership (gosafe.org.uk), so the brief's name is retained.
+ * Confirm the URL and the terms of use before pointing the feed at it.
+ */
+export const PUBLISHER = 'GoSafe';
+
+/**
+ * A clean JSON feed served by our own scheduled job — never the publisher's
+ * HTML scraped from the phone. Scraping on-device is brittle, leaks the user's
+ * IP to the publisher, and makes offline caching harder.
+ *
+ * Unset in this repo: the app falls back to the committed fixture so the UI is
+ * exercisable, and the ingest job is still to be built.
+ */
+export const FEED_URL = process.env.EXPO_PUBLIC_ZONE_FEED_URL ?? '';
+
+export type Sync = 'ok' | 'syncing' | 'offline';
+
+const CACHE_KEY = 'verge.feed.v1';
+/** The refresh spinner never flashes; the design gives it 1300 ms. */
+const MIN_SYNC_MS = 1300;
+const REQUEST_TIMEOUT_MS = 12_000;
+
+type Cached = { fetchedAt: string; zones: Zone[] };
+
+const isLatLng = (v: unknown): v is LatLng =>
+  !!v &&
+  typeof v === 'object' &&
+  typeof (v as LatLng).latitude === 'number' &&
+  typeof (v as LatLng).longitude === 'number';
+
+/** Drops anything malformed rather than warning a driver with a broken zone. */
+export function parseZones(raw: unknown): Zone[] {
+  const list = Array.isArray(raw) ? raw : (raw as { zones?: unknown })?.zones;
+  if (!Array.isArray(list)) return [];
+  return list.filter((z): z is Zone => {
+    const c = z as Partial<Zone>;
+    return (
+      typeof c?.id === 'string' &&
+      typeof c.road === 'string' &&
+      typeof c.name === 'string' &&
+      typeof c.limitMph === 'number' &&
+      typeof c.note === 'string' &&
+      typeof c.lastPublished === 'string' &&
+      Array.isArray(c.path) &&
+      c.path.length > 0 &&
+      c.path.every(isLatLng) &&
+      (c.window === null ||
+        (typeof c.window?.from === 'string' && typeof c.window?.to === 'string'))
+    );
+  });
+}
+
+async function readCache(): Promise<Cached | null> {
+  try {
+    const json = await AsyncStorage.getItem(CACHE_KEY);
+    if (!json) return null;
+    const parsed = JSON.parse(json) as Partial<Cached>;
+    const zones = parseZones(parsed?.zones);
+    if (!zones.length || typeof parsed.fetchedAt !== 'string') return null;
+    return { fetchedAt: parsed.fetchedAt, zones };
+  } catch {
+    return null;
+  }
+}
+
+async function writeCache(value: Cached): Promise<void> {
+  try {
+    await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(value));
+  } catch {
+    /* a full or unwritable store must not break the drive */
+  }
+}
+
+async function fetchFeed(): Promise<Zone[]> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await fetch(FEED_URL, { signal: controller.signal });
+    if (!res.ok) throw new Error(`feed responded ${res.status}`);
+    const zones = parseZones(await res.json());
+    if (!zones.length) throw new Error('feed returned no usable zones');
+    return zones;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export type FeedState = {
+  zones: Zone[];
+  sync: Sync;
+  /** When the list on screen was fetched. Always kept, always surfaced. */
+  fetchedAt: Date | null;
+  refresh: () => void;
+  /** Dev-only affordance for exercising the offline banner. */
+  simulateOffline: () => void;
+};
+
+/**
+ * Always keeps the last good list plus the time it was fetched; the age is what
+ * the offline banner reports.
+ */
+export function useZoneFeed(): FeedState {
+  const [zones, setZones] = useState<Zone[]>(fixtureZones);
+  const [sync, setSync] = useState<Sync>('ok');
+  const [fetchedAt, setFetchedAt] = useState<Date | null>(null);
+  const inFlight = useRef(false);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  const load = useCallback(async () => {
+    if (inFlight.current) return;
+    inFlight.current = true;
+    setSync('syncing');
+    const startedAt = Date.now();
+
+    const cached = await readCache();
+    if (cached && mounted.current) {
+      setZones(cached.zones);
+      setFetchedAt(new Date(cached.fetchedAt));
+    }
+
+    let next: Zone[] | null = null;
+    let failed = false;
+
+    if (FEED_URL) {
+      try {
+        next = await fetchFeed();
+      } catch {
+        failed = true;
+      }
+    } else {
+      // No feed configured yet — the committed fixture stands in so the UI is
+      // exercisable. See the README's "Ingest" section.
+      next = fixtureZones;
+    }
+
+    const wait = Math.max(0, MIN_SYNC_MS - (Date.now() - startedAt));
+    if (wait) await new Promise(resolve => setTimeout(resolve, wait));
+    inFlight.current = false;
+    if (!mounted.current) return;
+
+    if (next) {
+      const stamp = new Date();
+      setZones(next);
+      setFetchedAt(stamp);
+      setSync('ok');
+      void writeCache({ fetchedAt: stamp.toISOString(), zones: next });
+      return;
+    }
+
+    // Failed. Keep showing whatever we last had, and say how old it is.
+    if (failed && !cached) {
+      setZones(fixtureZones);
+      setFetchedAt(null);
+    }
+    setSync('offline');
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const simulateOffline = useCallback(() => setSync('offline'), []);
+
+  return { zones, sync, fetchedAt, refresh: () => void load(), simulateOffline };
+}
+
+/** 'Fetched 06:42 · GoSafe list' / 'Fetching today's list…' / 'Offline · list is 2 days old' */
+export function syncLabel(sync: Sync, fetchedAt: Date | null, now = new Date()): string {
+  if (sync === 'syncing') return 'Fetching today’s list…';
+  if (sync === 'offline') return `Offline · list is ${ageLabel(fetchedAt, now)}`;
+  if (!fetchedAt) return `No list fetched yet · ${PUBLISHER} list`;
+  return `Fetched ${clockLabel(fetchedAt)} · ${PUBLISHER} list`;
+}
+
+export const clockLabel = (d: Date) =>
+  `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+
+export function ageInDays(fetchedAt: Date | null, now = new Date()): number {
+  if (!fetchedAt) return Number.POSITIVE_INFINITY;
+  const a = new Date(fetchedAt).setHours(0, 0, 0, 0);
+  const b = new Date(now).setHours(0, 0, 0, 0);
+  return Math.max(0, Math.round((b - a) / 86_400_000));
+}
+
+function ageLabel(fetchedAt: Date | null, now: Date): string {
+  const days = ageInDays(fetchedAt, now);
+  if (!Number.isFinite(days)) return 'no list cached';
+  if (days === 0) return 'list is from today';
+  if (days === 1) return 'list is 1 day old';
+  return `list is ${days} days old`;
+}
