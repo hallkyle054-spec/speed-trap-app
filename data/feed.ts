@@ -59,14 +59,13 @@ export function parseZones(raw: unknown): Zone[] {
       typeof c?.id === 'string' &&
       typeof c.road === 'string' &&
       typeof c.name === 'string' &&
-      typeof c.limitMph === 'number' &&
+      (c.limitMph === null || typeof c.limitMph === 'number') &&
       typeof c.note === 'string' &&
-      typeof c.lastPublished === 'string' &&
+      typeof c.firstListed === 'string' &&
+      typeof c.lastListed === 'string' &&
       Array.isArray(c.path) &&
       c.path.length > 0 &&
-      c.path.every(isLatLng) &&
-      (c.window === null ||
-        (typeof c.window?.from === 'string' && typeof c.window?.to === 'string'))
+      c.path.every(isLatLng)
     );
   });
 }
@@ -207,9 +206,9 @@ export function useZoneFeed(): FeedState {
   return { zones, sync, fetchedAt, refresh: () => void load(), simulateOffline };
 }
 
-/** 'Fetched 06:42 · GoSafe list' / 'Fetching today's list…' / 'Offline · list is 2 days old' */
+/** 'Fetched 06:42 · GoSafe list' / 'Fetching the list…' / 'Offline · list is 2 days old' */
 export function syncLabel(sync: Sync, fetchedAt: Date | null, now = new Date()): string {
-  if (sync === 'syncing') return 'Fetching today’s list…';
+  if (sync === 'syncing') return 'Fetching the published list…';
   if (IS_FIXTURE) return 'Sample data · no feed configured';
   if (sync === 'offline') return `Offline · list is ${ageLabel(fetchedAt, now)}`;
   if (!fetchedAt) return `No list fetched yet · ${PUBLISHER} list`;

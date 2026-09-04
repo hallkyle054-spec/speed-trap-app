@@ -7,6 +7,11 @@ on:
     branches:
       - main
       - claude/claude-design-implementation-sye53r
+    paths-ignore:
+      - 'ingest/**'
+      - '.github/workflows/ingest-probe.yml'
+      - 'README.md'
+      - 'design_reference/**'
   workflow_dispatch:
 
 permissions:

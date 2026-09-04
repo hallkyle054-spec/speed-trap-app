@@ -15,7 +15,7 @@ import { TabBar, TabId } from './components/TabBar';
 import { ZoneSheet } from './components/ZoneSheet';
 import { IS_FIXTURE, useZoneFeed } from './data/feed';
 import { fixtureRoutes } from './data/routes';
-import { Zone, distanceTo, isStale, phaseOf as phaseOfZone } from './data/zones';
+import { Zone, distanceTo, latestListing, statusOf as statusOfZone } from './data/zones';
 import { useDrive } from './state/drive';
 import { SettingsProvider, useSettings } from './state/settings';
 import { useLocation } from './state/useLocation';
@@ -44,16 +44,18 @@ function Verge() {
   const [tab, setTab] = useState<TabId>('map');
   const [sheetId, setSheetId] = useState<string | null>(null);
 
-  const phaseOf = useCallback((zone: Zone) => phaseOfZone(zone, now), [now]);
+  /** The date of the newest list we hold; everything older reads as removed. */
+  const listedOn = useMemo(() => latestListing(allZones), [allZones]);
+  const statusOf = useCallback((zone: Zone) => statusOfZone(zone, listedOn), [listedOn]);
 
   // The sample-data banner sits in the flow and takes the status-bar inset,
   // so the screen below it must not pad for it a second time.
   const screenInset = IS_FIXTURE ? 0 : insets.top;
 
-  /** `Show stale zones` off filters them out of the map, the list and the count. */
+  /** `Show removed sites` off drops them from the map, the list and the count. */
   const zones = useMemo(
-    () => (settings.showStale ? allZones : allZones.filter(z => !isStale(z, now))),
-    [allZones, settings.showStale, now],
+    () => (settings.showStale ? allZones : allZones.filter(z => statusOf(z) === 'listed')),
+    [allZones, settings.showStale, statusOf],
   );
 
   const sheetZone = useMemo(() => zones.find(z => z.id === sheetId) ?? null, [zones, sheetId]);
@@ -89,7 +91,7 @@ function Verge() {
       {tab === 'map' ? (
         <MapScreen
           zones={zones}
-          phaseOf={phaseOf}
+          statusOf={statusOf}
           origin={origin}
           originIsReal={isReal}
           mark={settings.mark}
@@ -106,8 +108,8 @@ function Verge() {
       {tab === 'today' ? (
         <TodayScreen
           zones={zones}
-          phaseOf={phaseOf}
-          now={now}
+          statusOf={statusOf}
+          listedOn={listedOn}
           onOpenZone={openZone}
           topInset={screenInset}
         />
@@ -144,7 +146,7 @@ function Verge() {
 
       <ZoneSheet
         zone={sheetZone}
-        phase={sheetZone ? phaseOf(sheetZone) : null}
+        status={sheetZone ? statusOf(sheetZone) : null}
         distance={sheetZone ? distanceTo(sheetZone, origin) : null}
         onClose={closeSheet}
         onDrive={startDrive}

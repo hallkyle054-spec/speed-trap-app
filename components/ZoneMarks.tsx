@@ -3,7 +3,7 @@ import { Animated, Easing, StyleSheet, View } from 'react-native';
 import { Circle, Marker, Polyline } from 'react-native-maps';
 
 import { LatLng } from '../data/geo';
-import { Zone, ZonePhase } from '../data/zones';
+import { Zone, ZoneStatus } from '../data/zones';
 import { useTheme } from '../theme/ThemeProvider';
 import { Tokens } from '../theme/tokens';
 import { ZoneMark } from '../state/settings';
@@ -13,7 +13,7 @@ const TAP = 44;
 /** The radius treatment's honest-about-uncertainty circle. */
 const RADIUS_M = 600;
 
-const markColor = (t: Tokens, phase: ZonePhase) => (phase === 'active' ? t.mark : t.ink45);
+const markColor = (t: Tokens, status: ZoneStatus) => (status === 'listed' ? t.mark : t.ink45);
 
 const midpoint = (path: readonly LatLng[]): LatLng => path[Math.floor(path.length / 2)];
 
@@ -53,15 +53,15 @@ function PulseRing({ color }: { color: string }) {
 
 type Props = {
   zone: Zone;
-  phase: ZonePhase;
+  status: ZoneStatus;
   mark: ZoneMark;
   onPress: (zone: Zone) => void;
 };
 
-export function ZoneMarks({ zone, phase, mark, onPress }: Props) {
+export function ZoneMarks({ zone, status, mark, onPress }: Props) {
   const { t } = useTheme();
-  const color = markColor(t, phase);
-  const active = phase === 'active';
+  const color = markColor(t, status);
+  const active = status === 'listed';
   const label = `${zone.road} ${zone.name}`;
 
   if (mark === 'segment') {

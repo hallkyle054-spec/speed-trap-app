@@ -1,30 +1,30 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { dayLabel } from '../data/dates';
 import { PUBLISHER } from '../data/feed';
-import { Zone, ZonePhase, hoursLabel, rowNote } from '../data/zones';
+import { Zone, ZoneStatus, limitLabel, rowNote, shortDate } from '../data/zones';
 import { useTheme } from '../theme/ThemeProvider';
 import { body, display, heading, kicker, tnum } from '../theme/type';
 
 type Props = {
   zones: Zone[];
-  phaseOf: (zone: Zone) => ZonePhase;
-  now: Date;
+  statusOf: (zone: Zone) => ZoneStatus;
+  /** The date of the list on screen, or null when nothing has been fetched. */
+  listedOn: string | null;
   onOpenZone: (zone: Zone) => void;
   topInset: number;
 };
 
 /** The day's sheet, scannable by road. */
-export function TodayScreen({ zones, phaseOf, now, onOpenZone, topInset }: Props) {
+export function TodayScreen({ zones, statusOf, listedOn, onOpenZone, topInset }: Props) {
   const { t } = useTheme();
-  const dateLabel = dayLabel(now);
+
 
   return (
     <View style={styles.root}>
       <View style={[styles.header, { paddingTop: 16 + topInset, borderBottomColor: t.rule }]}>
         <Text style={[kicker(9.5, 0.14), { color: t.ink50 }]}>
-          The day&rsquo;s sheet · {dateLabel}
+          {listedOn ? `The published list · ${shortDate(listedOn)}` : 'The published list'}
         </Text>
         <Text style={[display(31, -0.02), styles.h1, { color: t.ink }]}>
           {zones.length} {zones.length === 1 ? 'zone' : 'zones'} published
@@ -33,7 +33,7 @@ export function TodayScreen({ zones, phaseOf, now, onOpenZone, topInset }: Props
 
       <ScrollView style={styles.list}>
         {zones.map(zone => {
-          const phase = phaseOf(zone);
+          const status = statusOf(zone);
           return (
             <Pressable
               key={zone.id}
@@ -49,18 +49,18 @@ export function TodayScreen({ zones, phaseOf, now, onOpenZone, topInset }: Props
                 <Text
                   style={[
                     heading(19, -0.01),
-                    { color: phase === 'active' ? t.mark : t.ink45 },
+                    { color: status === 'listed' ? t.mark : t.ink45 },
                   ]}
                 >
                   {zone.road}
                 </Text>
                 <Text style={[kicker(10.5, 0.09), tnum, { color: t.ink50 }]}>
-                  {hoursLabel(zone)}
+                  {limitLabel(zone)}
                 </Text>
               </View>
               <Text style={[body(13), styles.rowName, { color: t.ink80 }]}>{zone.name}</Text>
               <Text style={[body(10.5), tnum, styles.rowNote, { color: t.ink50 }]}>
-                {rowNote(zone, phase)}
+                {rowNote(zone, status)}
               </Text>
             </Pressable>
           );

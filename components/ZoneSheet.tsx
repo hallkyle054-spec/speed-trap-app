@@ -3,7 +3,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { PUBLISHER } from '../data/feed';
 import { formatDistance } from '../data/geo';
-import { Zone, ZonePhase, hoursLabel, limitLabel, statusLabel } from '../data/zones';
+import { Zone, ZoneStatus, limitLabel, listedSince, statusLabel } from '../data/zones';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius } from '../theme/tokens';
 import { body, display, kicker, tnum } from '../theme/type';
@@ -11,7 +11,7 @@ import { Button } from './Button';
 
 type Props = {
   zone: Zone | null;
-  phase: ZonePhase | null;
+  status: ZoneStatus | null;
   distance: number | null;
   onClose: () => void;
   onDrive: (zone: Zone) => void;
@@ -19,9 +19,9 @@ type Props = {
 };
 
 /** Bottom-anchored detail sheet — the only elevated surface in the app. */
-export function ZoneSheet({ zone, phase, distance, onClose, onDrive, bottomInset }: Props) {
+export function ZoneSheet({ zone, status, distance, onClose, onDrive, bottomInset }: Props) {
   const { t } = useTheme();
-  if (!zone || !phase) return null;
+  if (!zone || !status) return null;
 
   return (
     <Modal transparent animationType="slide" visible onRequestClose={onClose}>
@@ -46,10 +46,10 @@ export function ZoneSheet({ zone, phase, distance, onClose, onDrive, bottomInset
         <Text
           style={[
             kicker(9.5, 0.14),
-            { color: phase === 'active' ? t.accentInk : t.ink50 },
+            { color: status === 'listed' ? t.accentInk : t.ink50 },
           ]}
         >
-          {statusLabel(phase)}
+          {statusLabel(status)}
         </Text>
         <Text style={[display(30, -0.02), styles.road, { color: t.ink }]}>{zone.road}</Text>
         <Text style={[body(14), { color: t.ink80 }]}>{zone.name}</Text>
@@ -57,9 +57,9 @@ export function ZoneSheet({ zone, phase, distance, onClose, onDrive, bottomInset
         <View style={[styles.divider, { backgroundColor: t.rule }]} />
 
         <View style={styles.grid}>
-          <Cell label="Published hours" value={hoursLabel(zone)} />
           <Cell label="Speed limit" value={limitLabel(zone)} />
           <Cell label="Distance" value={distance == null ? '—' : formatDistance(distance)} />
+          <Cell label="Listed since" value={listedSince(zone)} />
           <Cell label="Source" value={`${PUBLISHER} list`} figures={false} />
         </View>
 

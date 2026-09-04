@@ -1,0 +1,22 @@
+name: Zone feed probe
+
+# One-off reconnaissance of the publisher's site, run here because GitHub
+# runners have the network access the dev container does not. Read-only: it
+# fetches four pages once and prints what it finds.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'ingest/**'
+      - '.github/workflows/ingest-probe.yml'
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node ingest/probe.mjs

@@ -136,13 +136,13 @@ export function AlertsScreen({
 
         <SectionLabel>Data</SectionLabel>
         <Row
-          label="Show stale zones"
-          sub="Zones not republished in the last 7 days"
+          label="Show removed sites"
+          sub="Sites dropped from the most recent published list"
           control={
             <Switch
               value={settings.showStale}
               onChange={() => toggle('showStale')}
-              label="Show stale zones"
+              label="Show removed sites"
             />
           }
         />

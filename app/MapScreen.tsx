@@ -7,15 +7,7 @@ import { ZoneMarks } from '../components/ZoneMarks';
 import { dayLabel } from '../data/dates';
 import { Sync, syncLabel } from '../data/feed';
 import { LatLng, formatDistance } from '../data/geo';
-import {
-  COUNTY_REGION,
-  Zone,
-  ZonePhase,
-  distanceTo,
-  hoursLabel,
-  limitLabel,
-  nearestZone,
-} from '../data/zones';
+import { COUNTY_REGION, Zone, ZoneStatus, distanceTo, limitLabel, nearestZone } from '../data/zones';
 import { ZoneMark } from '../state/settings';
 import { useTheme } from '../theme/ThemeProvider';
 import { darkMapStyle, lightMapStyle } from '../theme/mapStyle';
@@ -24,7 +16,7 @@ import { body, display, heading, kicker, tnum } from '../theme/type';
 
 type Props = {
   zones: Zone[];
-  phaseOf: (zone: Zone) => ZonePhase;
+  statusOf: (zone: Zone) => ZoneStatus;
   origin: LatLng;
   originIsReal: boolean;
   mark: ZoneMark;
@@ -39,7 +31,7 @@ type Props = {
 
 export function MapScreen({
   zones,
-  phaseOf,
+  statusOf,
   origin,
   originIsReal,
   mark,
@@ -69,7 +61,7 @@ export function MapScreen({
         </View>
 
         <Text style={[display(33, -0.02), styles.h1, { color: t.ink }]}>
-          Today&rsquo;s published zones
+          Published enforcement zones
         </Text>
 
         <View style={styles.syncRow}>
@@ -117,7 +109,7 @@ export function MapScreen({
             <ZoneMarks
               key={zone.id}
               zone={zone}
-              phase={phaseOf(zone)}
+              status={statusOf(zone)}
               mark={mark}
               onPress={onOpenZone}
             />
@@ -125,8 +117,8 @@ export function MapScreen({
         </MapView>
 
         <View style={[styles.legend, { backgroundColor: t.legendBg, borderColor: t.rule }]}>
-          <LegendRow color={t.mark} label="Published for today" />
-          <LegendRow color={t.ink45} label="Scheduled later" />
+          <LegendRow color={t.mark} label="On the published list" />
+          <LegendRow color={t.ink45} label="Recently removed" />
         </View>
       </View>
 
@@ -146,9 +138,7 @@ export function MapScreen({
               {nearest.road} · {nearest.name}
             </Text>
             <Text style={[body(11.5), tnum, styles.nearestMeta, { color: t.ink60 }]}>
-              {nearest.window
-                ? `Published ${hoursLabel(nearest)} · ${limitLabel(nearest)} · camera not confirmed`
-                : `Not published today · ${limitLabel(nearest)} · camera not confirmed`}
+              {`Published site · ${limitLabel(nearest)} · camera not confirmed`}
             </Text>
             <Button
               label="Start drive"
@@ -160,7 +150,7 @@ export function MapScreen({
           </>
         ) : (
           <Text style={[body(13), styles.empty, { color: t.ink50 }]}>
-            Nothing published nearby today
+            Nothing published nearby
           </Text>
         )}
       </View>

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 
 import { formatDistance, pathLength } from '../data/geo';
-import { Zone, hoursLabel } from '../data/zones';
+import { Zone } from '../data/zones';
 import { DriveSource } from '../state/drive';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius } from '../theme/tokens';
@@ -40,7 +40,7 @@ export function DriveHud({
   const unit =
     metres <= 0 ? 'entering the zone' : metres >= 1000 ? 'km to the zone' : 'metres to the zone';
   const heads = metres <= 0 ? 'Zone begins' : metres <= warnAt ? 'Published zone ahead' : 'Approaching';
-  const over = speedMph > zone.limitMph;
+  const over = zone.limitMph != null && speedMph > zone.limitMph;
 
   return (
     <View
@@ -77,8 +77,7 @@ export function DriveHud({
           {zone.road} · {zone.name}
         </Text>
         <Text style={[body(12.5), tnum, styles.meta, { color: t.ink60 }]}>
-          {zone.window ? `Published ${hoursLabel(zone)} · ` : 'Not published today · '}
-          zone runs {formatDistance(pathLength(zone.path))}
+          Published site · zone runs {formatDistance(pathLength(zone.path))}
         </Text>
 
         <View style={[styles.disclosure, { borderLeftColor: t.accent }]}>
@@ -90,7 +89,11 @@ export function DriveHud({
 
       <View style={styles.cards}>
         <Card label="Your speed" value={String(speedMph)} color={over ? t.accentInk : t.ink} />
-        <Card label="Limit" value={String(zone.limitMph)} color={t.ink} />
+        <Card
+          label="Limit"
+          value={zone.limitMph == null ? '—' : String(zone.limitMph)}
+          color={t.ink}
+        />
       </View>
 
       {chiming ? (

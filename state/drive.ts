@@ -90,7 +90,9 @@ export function useDrive(settings: Settings): DriveState {
   const maybeAlert = useCallback(
     (metres: number, mph: number, target: Zone) => {
       if (alerted.current || metres > settings.warnAt) return;
-      if (settings.onlyOverLimit && mph <= target.limitMph) return;
+      // With no published limit there is nothing to be under, so the alert
+      // stands rather than being silently suppressed.
+      if (settings.onlyOverLimit && target.limitMph != null && mph <= target.limitMph) return;
       alerted.current = true;
       alert(settings.warnAt);
     },
