@@ -16,7 +16,6 @@ export type WarnAt = 300 | 500 | 800 | 1000;
 export type Settings = {
   chime: boolean;
   voice: boolean;
-  onlyOverLimit: boolean;
   showStale: boolean;
   warnAt: WarnAt;
   mark: ZoneMark;
@@ -26,7 +25,6 @@ export type Settings = {
 export const defaultSettings: Settings = {
   chime: true,
   voice: false,
-  onlyOverLimit: true,
   showStale: true,
   warnAt: 800,
   /**
@@ -47,7 +45,7 @@ type Ctx = {
   /** True once the persisted settings have been read back off disk. */
   loaded: boolean;
   set: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
-  toggle: (key: 'chime' | 'voice' | 'onlyOverLimit' | 'showStale') => void;
+  toggle: (key: 'chime' | 'voice' | 'showStale') => void;
 };
 
 const SettingsContext = createContext<Ctx | null>(null);

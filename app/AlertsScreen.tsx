@@ -12,7 +12,7 @@ import { body, display, kicker } from '../theme/type';
 type Props = {
   settings: Settings;
   set: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
-  toggle: (key: 'chime' | 'voice' | 'onlyOverLimit' | 'showStale') => void;
+  toggle: (key: 'chime' | 'voice' | 'showStale') => void;
   sync: Sync;
   fetchedAt: Date | null;
   now: Date;
@@ -35,13 +35,15 @@ const THEME_OPTIONS: { value: Theme; label: string }[] = [
 ];
 
 /**
- * `pin` and `radius` are the treatments the design set aside; the control keeps
- * the choice switchable, as the handoff asks.
+ * Point matches the source, which publishes one coordinate per site. Radius is
+ * for anyone who would rather see the uncertainty drawn. Segment is kept because
+ * the design asks for the choice to stay open, but with no published extent it
+ * falls back to the point.
  */
 const MARK_OPTIONS: { value: ZoneMark; label: string }[] = [
-  { value: 'segment', label: 'Segment' },
   { value: 'pin', label: 'Point' },
   { value: 'radius', label: 'Radius' },
+  { value: 'segment', label: 'Segment' },
 ];
 
 export function AlertsScreen({
@@ -85,17 +87,6 @@ export function AlertsScreen({
             />
           }
         />
-        <Row
-          label="Only when over the limit"
-          sub="Stay quiet if you are already under"
-          control={
-            <Switch
-              value={settings.onlyOverLimit}
-              onChange={() => toggle('onlyOverLimit')}
-              label="Only when over the limit"
-            />
-          }
-        />
 
         <View style={styles.controlBlock}>
           <Text style={[body(14), styles.controlLabel, { color: t.ink }]}>Warn me at</Text>
@@ -130,7 +121,8 @@ export function AlertsScreen({
             onChange={value => set('mark', value)}
           />
           <Text style={[body(11), styles.controlSub, { color: t.ink55 }]}>
-            How a zone is drawn on the map. A segment matches how the zones are published.
+            How a site is drawn. The source publishes a single point per site, not a stretch of
+            road.
           </Text>
         </View>
 

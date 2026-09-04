@@ -4,16 +4,18 @@ import * as Location from 'expo-location';
 import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { distanceToPath, metresPerSecondToMph } from '../data/geo';
-import { Zone } from '../data/zones';
+import { updateAlerts } from '../data/alerts';
+import { metresPerSecondToMph } from '../data/geo';
+import { Zone, distanceTo } from '../data/zones';
 import { Settings } from './settings';
 
 /** Where the numbers on the HUD are coming from. */
 export type DriveSource = 'gps' | 'simulated';
 
 export type DriveState = {
+  /** The site being approached — it follows the drive rather than being fixed. */
   zone: Zone | null;
-  /** Metres to the start of the zone. */
+  /** Metres to it. */
   distance: number;
   speedMph: number;
   chiming: boolean;
@@ -23,17 +25,16 @@ export type DriveState = {
 };
 
 /**
- * The prototype's simulated approach, kept as the fallback for when location
- * permission is refused or the provider has not produced a fix yet: distance
- * starts at 1600 m and decrements 34 m every 150 ms; own speed reads 58 and
- * drops to 56 under 900 m; the countdown stops at 0.
+ * The prototype's simulated approach, kept for when location permission is
+ * refused or no fix has arrived: distance starts at 1600 m and drops 34 m every
+ * 150 ms; speed reads 58 then 56 under 900 m; it stops at 0.
  */
 const SIM = { from: 1600, step: 34, everyMs: 150, fastMph: 58, slowMph: 56, slowUnder: 900 };
 
-/** How long the chime banner stays up after the tone fires. */
+/** How long the chime banner stays up after the tone. */
 const CHIME_BANNER_MS = 6000;
 
-export function useDrive(settings: Settings): DriveState {
+export function useDrive(settings: Settings, zones: readonly Zone[]): DriveState {
   const [zone, setZone] = useState<Zone | null>(null);
   const [distance, setDistance] = useState(SIM.from);
   const [speedMph, setSpeedMph] = useState(SIM.fastMph);
@@ -41,12 +42,11 @@ export function useDrive(settings: Settings): DriveState {
   const [chiming, setChiming] = useState(false);
 
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-  /** The simulation's own countdown, kept out of state so the tick stays pure. */
-  const simDistance = useRef(SIM.from);
   const banner = useRef<ReturnType<typeof setTimeout> | null>(null);
   const watcher = useRef<Location.LocationSubscription | null>(null);
-  /** One soft tone per drive, not a repeating alarm. */
-  const alerted = useRef(false);
+  const simDistance = useRef(SIM.from);
+  /** Sites already chimed for on this drive; they re-arm once well clear. */
+  const alerted = useRef<Set<string>>(new Set());
 
   const player = useAudioPlayer(require('../assets/chime.wav'));
 
@@ -68,8 +68,13 @@ export function useDrive(settings: Settings): DriveState {
 
   useEffect(() => stopEverything, [stopEverything]);
 
-  const alert = useCallback(
-    (metres: number) => {
+  /**
+   * One soft tone as a site comes inside the warn distance. It fires whatever
+   * the driver's speed — going carefully past a published site is exactly when
+   * a warning is wanted, so nothing suppresses it.
+   */
+  const chime = useCallback(
+    (target: Zone) => {
       if (settings.chime) {
         setChiming(true);
         player.seekTo(0).then(() => player.play()).catch(() => player.play());
@@ -77,67 +82,57 @@ export function useDrive(settings: Settings): DriveState {
         banner.current = setTimeout(() => setChiming(false), CHIME_BANNER_MS);
       }
       if (settings.voice) {
-        Speech.speak(`Published zone in ${Math.round(metres)} metres`, { rate: 0.95 });
+        const where = target.name ? `${target.road}, ${target.name}` : target.road;
+        Speech.speak(`Published zone in ${settings.warnAt} metres. ${where}`, { rate: 0.95 });
       }
     },
-    [player, settings.chime, settings.voice],
+    [player, settings.chime, settings.voice, settings.warnAt],
   );
 
-  /**
-   * Fires once, at or inside the warn distance. `Only when over the limit`
-   * keeps it quiet while the driver is already under.
-   */
-  const maybeAlert = useCallback(
-    (metres: number, mph: number, target: Zone) => {
-      if (alerted.current || metres > settings.warnAt) return;
-      // With no published limit there is nothing to be under, so the alert
-      // stands rather than being silently suppressed.
-      if (settings.onlyOverLimit && target.limitMph != null && mph <= target.limitMph) return;
-      alerted.current = true;
-      alert(settings.warnAt);
-    },
-    [alert, settings.onlyOverLimit, settings.warnAt],
-  );
-
-  /**
-   * The countdown and the location watcher both capture their callback when
-   * they start; routing through a ref keeps a setting changed mid-drive live.
-   */
-  const maybeAlertRef = useRef(maybeAlert);
+  // The watcher and the countdown capture their callbacks when they start;
+  // going through refs keeps a setting changed mid-drive live.
+  const chimeRef = useRef(chime);
+  const settingsRef = useRef(settings);
+  const zonesRef = useRef(zones);
   useEffect(() => {
-    maybeAlertRef.current = maybeAlert;
-  }, [maybeAlert]);
+    chimeRef.current = chime;
+    settingsRef.current = settings;
+    zonesRef.current = zones;
+  }, [chime, settings, zones]);
 
-  const runSimulation = useCallback(
-    (target: Zone) => {
-      setSource('simulated');
-      simDistance.current = SIM.from;
-      setDistance(SIM.from);
-      setSpeedMph(SIM.fastMph);
-      timer.current = setInterval(() => {
-        // Deliberately not inside a state updater — React may run those twice,
-        // which would fire the chime twice.
-        const next = Math.max(0, simDistance.current - SIM.step);
-        simDistance.current = next;
-        const mph = next < SIM.slowUnder ? SIM.slowMph : SIM.fastMph;
-        setDistance(next);
-        setSpeedMph(mph);
-        maybeAlertRef.current(next, mph, target);
-        if (next <= 0 && timer.current) {
-          clearInterval(timer.current);
-          timer.current = null;
-        }
-      }, SIM.everyMs);
-    },
-    [],
-  );
+  const runSimulation = useCallback((target: Zone) => {
+    setSource('simulated');
+    simDistance.current = SIM.from;
+    setDistance(SIM.from);
+    setSpeedMph(SIM.fastMph);
+    setZone(target);
+
+    timer.current = setInterval(() => {
+      // Deliberately not inside a state updater — React may run those twice,
+      // which would fire the chime twice.
+      const next = Math.max(0, simDistance.current - SIM.step);
+      simDistance.current = next;
+      setDistance(next);
+      setSpeedMph(next < SIM.slowUnder ? SIM.slowMph : SIM.fastMph);
+
+      if (next <= settingsRef.current.warnAt && !alerted.current.has(target.id)) {
+        alerted.current.add(target.id);
+        chimeRef.current(target);
+      }
+      if (next <= 0 && timer.current) {
+        clearInterval(timer.current);
+        timer.current = null;
+      }
+    }, SIM.everyMs);
+  }, []);
 
   const start = useCallback(
     (target: Zone) => {
       stopEverything();
-      alerted.current = false;
+      alerted.current = new Set();
       setChiming(false);
       setZone(target);
+      setDistance(distanceTo(target, target.path[0]));
       activateKeepAwakeAsync('verge-drive').catch(() => {});
 
       (async () => {
@@ -157,12 +152,25 @@ export function useDrive(settings: Settings): DriveState {
             },
             position => {
               setSource('gps');
-              const metres = distanceToPath(position.coords, target.path);
+
               const raw = position.coords.speed;
-              const mph = metresPerSecondToMph(raw != null && raw > 0 ? raw : 0);
-              setDistance(metres);
-              setSpeedMph(mph);
-              maybeAlertRef.current(metres, mph, target);
+              setSpeedMph(metresPerSecondToMph(raw != null && raw > 0 ? raw : 0));
+
+              // Follow whatever is actually being approached, not only the site
+              // tapped before setting off.
+              const update = updateAlerts({
+                zones: zonesRef.current,
+                origin: position.coords,
+                warnAt: settingsRef.current.warnAt,
+                alerted: alerted.current,
+              });
+              alerted.current = update.alerted;
+
+              if (update.nearest) {
+                setZone(update.nearest);
+                setDistance(update.distance);
+              }
+              for (const z of update.toChime) chimeRef.current(z);
             },
           );
         } catch {

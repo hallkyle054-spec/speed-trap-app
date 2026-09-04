@@ -39,7 +39,6 @@ function Verge() {
 
   const { zones: allZones, sync, fetchedAt, refresh, simulateOffline } = useZoneFeed();
   const { origin, isReal } = useLocation();
-  const drive = useDrive(settings);
 
   const [tab, setTab] = useState<TabId>('map');
   const [sheetId, setSheetId] = useState<string | null>(null);
@@ -57,6 +56,8 @@ function Verge() {
     () => (settings.showStale ? allZones : allZones.filter(z => statusOf(z) === 'listed')),
     [allZones, settings.showStale, statusOf],
   );
+
+  const drive = useDrive(settings, zones);
 
   const sheetZone = useMemo(() => zones.find(z => z.id === sheetId) ?? null, [zones, sheetId]);
 
