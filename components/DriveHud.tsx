@@ -77,7 +77,9 @@ export function DriveHud({
           {zone.road} · {zone.name}
         </Text>
         <Text style={[body(12.5), tnum, styles.meta, { color: t.ink60 }]}>
-          Published site · zone runs {formatDistance(pathLength(zone.path))}
+          {zone.path.length >= 2
+            ? `Published site · zone runs ${formatDistance(pathLength(zone.path))}`
+            : 'Published site · extent not published'}
         </Text>
 
         <View style={[styles.disclosure, { borderLeftColor: t.accent }]}>

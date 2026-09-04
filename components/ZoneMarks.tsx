@@ -64,7 +64,8 @@ export function ZoneMarks({ zone, status, mark, onPress }: Props) {
   const active = status === 'listed';
   const label = `${zone.road} ${zone.name}`;
 
-  if (mark === 'segment') {
+  // A site published as a single point has no stretch to draw along.
+  if (mark === 'segment' && zone.path.length >= 2) {
     // Recommended treatment: the published data is a stretch of road, so the
     // mark is a bar along it.
     //

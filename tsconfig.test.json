@@ -8,7 +8,18 @@
     "skipLibCheck": true,
     "outDir": ".test-build",
     "rootDir": ".",
-    "types": ["node"]
+    "types": [
+      "node"
+    ],
+    "allowJs": true,
+    "checkJs": false
   },
-  "include": ["data/geo.ts", "data/zones.ts", "data/routes.ts", "data/dates.ts", "tests/**/*.ts"]
+  "include": [
+    "data/geo.ts",
+    "data/zones.ts",
+    "data/routes.ts",
+    "data/dates.ts",
+    "ingest/parse.mjs",
+    "tests/**/*.ts"
+  ]
 }

@@ -30,11 +30,13 @@ export const defaultSettings: Settings = {
   showStale: true,
   warnAt: 800,
   /**
-   * The handoff recommends `segment` — the published data is a stretch of road,
-   * not a point — and that is what ships. `pin` and `radius` stay switchable
-   * because the design keeps the choice open.
+   * The handoff recommended `segment` on the belief that the source publishes a
+   * stretch of road. It does not — each site is a single published point (see
+   * ingest/parse.mjs), so a bar along the road would be inventing an extent
+   * nobody published. `pin` draws exactly what the source gives. `radius` stays
+   * available for anyone who wants the uncertainty shown.
    */
-  mark: 'segment',
+  mark: 'pin',
   theme: 'system',
 };
 
