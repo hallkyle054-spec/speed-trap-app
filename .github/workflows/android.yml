@@ -29,6 +29,7 @@ jobs:
     env:
       EXPO_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY }}
       EXPO_PUBLIC_ZONE_FEED_URL: ${{ secrets.EXPO_PUBLIC_ZONE_FEED_URL }}
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
     steps:
       - uses: actions/checkout@v4
@@ -64,12 +65,63 @@ jobs:
       - name: Generate the native project
         run: npx expo prebuild --platform android --no-install
 
-      # The generated project signs release builds with the debug keystore, so
-      # the APK sideloads without any signing setup. Fine for a personal phone,
-      # not fine for distribution.
+      # Without these the APK is signed with the template's PUBLIC debug key,
+      # which proves nothing about who built it. The script says so loudly if
+      # the secrets are absent rather than quietly shipping debug-signed.
+      - name: Restore the release keystore
+        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
+          echo "keystore restored ($(stat -c%s android/app/release.keystore) bytes)"
+
+      - name: Configure release signing
+        env:
+          VERGE_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          VERGE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          VERGE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: node scripts/configure-signing.mjs
+
+      # Signed with the release keystore when the secrets are set, and with the
+      # template's public debug key otherwise. Either way it sideloads.
       - name: Assemble release APK
         working-directory: android
+        env:
+          VERGE_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          VERGE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          VERGE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: ./gradlew assembleRelease --no-daemon --stacktrace
+
+      # Read off the APK itself, so it reports what actually signed it rather
+      # than what we hoped would. These are the values Google Cloud wants for an
+      # Android application restriction on the Maps key.
+      - name: Report the signing certificate
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          CERT=$(keytool -printcert -jarfile "$APK")
+          SHA1=$(echo "$CERT" | grep -m1 'SHA1:' | sed 's/.*SHA1: *//')
+          OWNER=$(echo "$CERT" | grep -m1 'Owner:' | sed 's/.*Owner: *//')
+          {
+            echo '### Signing certificate'
+            echo ''
+            echo "Owner: \`$OWNER\`"
+            echo ''
+            echo 'Restrict the Google Maps key to this app in Google Cloud →'
+            echo 'Credentials → your key → Application restrictions → Android apps:'
+            echo ''
+            echo '| Field | Value |'
+            echo '| --- | --- |'
+            echo '| Package name | `com.hallkyle054.verge` |'
+            echo "| SHA-1 fingerprint | \`$SHA1\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "signing SHA-1: $SHA1"
+          echo "SIGNING_SHA1=$SHA1" >> "$GITHUB_ENV"
+          case "$OWNER" in
+            *Android\ Debug*)
+              echo "SIGNING_DEBUG=true" >> "$GITHUB_ENV"
+              echo "::warning title=Debug-signed::This APK is signed with the public debug key, whose private key is published in the React Native template."
+              ;;
+          esac
 
       - name: Name the APK
         run: |
@@ -95,6 +147,12 @@ jobs:
           set -euo pipefail
           TAG="apk-${GITHUB_RUN_NUMBER}"
 
+          if [ -n "${SIGNING_SHA1:-}" ] && [ "${SIGNING_DEBUG:-}" != "true" ]; then
+            SIGN_NOTE="Signed with the project release key (SHA-1 \`${SIGNING_SHA1}\`)."
+          else
+            SIGN_NOTE="Signed with the **public debug key** from the React Native template, so the signature proves nothing about who built it. Fine for your own phone; set the ANDROID_KEYSTORE_* secrets before giving it to anyone else."
+          fi
+
           if [ "$MAPS_KEY_SET" = "true" ]; then
             MAP_NOTE="Built with a Google Maps key, so the map renders."
           else
@@ -105,7 +163,7 @@ jobs:
 
           $MAP_NOTE
 
-          Signed with the debug keystore, so it installs on your own phone but is not fit for distribution.
+          $SIGN_NOTE
 
           The zone list is the committed fixture and its road geometry is approximate. Use it to judge the app, not to drive by."
 

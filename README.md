@@ -82,11 +82,57 @@ cd android && ./gradlew assembleRelease
 # android/app/build/outputs/apk/release/app-release.apk
 ```
 
-The generated project signs release builds with the debug keystore, so the APK
-installs without any signing setup. That is fine for your own phone and not fine
-for distribution.
+By default the generated project signs release builds with the **debug**
+keystore. That keystore ships in the React Native template, so its private key is
+public: the signature proves nothing, and anyone could sign a modified APK that
+Android would accept as an update to yours. Fine for your own phone, not fine for
+handing to other people.
 
 The `android/` folder is generated and gitignored — `expo prebuild` recreates it.
+
+### Signing it properly
+
+Generate a keystore once and keep it safe — lose it and you can never ship an
+update that installs over the old app.
+
+```bash
+keytool -genkeypair -v -keystore release.keystore \
+  -alias verge -keyalg RSA -keysize 4096 -validity 10000
+base64 -w0 release.keystore   # macOS: base64 -i release.keystore
+```
+
+Add four repository secrets (Settings → Secrets and variables → Actions):
+
+| Secret | Value |
+| --- | --- |
+| `ANDROID_KEYSTORE_BASE64` | the base64 blob printed above |
+| `ANDROID_KEYSTORE_PASSWORD` | the store password you chose |
+| `ANDROID_KEY_ALIAS` | `verge` |
+| `ANDROID_KEY_PASSWORD` | the key password you chose |
+
+Builds work without them, but the workflow logs a warning and the release notes
+say plainly that the APK is debug-signed. Passwords are read from the environment
+at build time and never written to disk.
+
+Switching from debug-signed to release-signed **changes the signature**, so the
+first release-signed build will not install over a debug-signed one. Uninstall
+first, that once only.
+
+### Locking down the Maps key
+
+Because the name starts `EXPO_PUBLIC_`, the Maps key is compiled into the APK and
+anyone with the file can extract it. Restrict what a leaked copy can do:
+
+1. **API restriction** — Google Cloud → Credentials → your key → API restrictions
+   → restrict to *Maps SDK for Android*.
+2. **Application restriction** — the same page, Application restrictions → Android
+   apps. It needs the package name and the signing certificate's SHA-1, and every
+   build prints both in its job summary under *Signing certificate*, read from the
+   APK itself rather than from what we hoped signed it.
+
+Do the application restriction *after* setting up the release keystore, or you
+will pin the key to the debug certificate and the properly signed build will show
+a blank map.
 
 ### A Google Maps key
 
