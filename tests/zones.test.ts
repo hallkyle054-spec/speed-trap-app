@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { dayLabel, shortDayLabel } from '../data/dates';
+import { reconcile } from '../state/settingsSchema';
 import {
   FALLBACK_ORIGIN,
   Zone,
@@ -111,4 +112,17 @@ test('the fixture keeps the six sites, one of them removed', () => {
   const latest = latestListing(fixtureZones);
   const removed = fixtureZones.filter(z => statusOf(z, latest) === 'removed');
   assert.deepEqual(removed.map(z => z.road), ['B4300']);
+});
+
+test('a retired or corrupt stored setting falls back rather than sticking', () => {
+  // 'segment' was a real option once; a stored copy must not survive its removal.
+  assert.equal(reconcile({ mark: 'segment' }).mark, 'pin');
+  assert.equal(reconcile({ mark: 'banana' }).mark, 'pin');
+  assert.equal(reconcile({ theme: 'neon' }).theme, 'system');
+  assert.equal(reconcile({ warnAt: 12345 }).warnAt, 800);
+  // Valid values still come through.
+  assert.equal(reconcile({ mark: 'radius' }).mark, 'radius');
+  assert.equal(reconcile({ warnAt: 300, theme: 'dark' }).warnAt, 300);
+  assert.equal(reconcile({ chime: false }).chime, false);
+  assert.equal(reconcile(null).mark, 'pin');
 });

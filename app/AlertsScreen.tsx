@@ -35,15 +35,13 @@ const THEME_OPTIONS: { value: Theme; label: string }[] = [
 ];
 
 /**
- * Point matches the source, which publishes one coordinate per site. Radius is
- * for anyone who would rather see the uncertainty drawn. Segment is kept because
- * the design asks for the choice to stay open, but with no published extent it
- * falls back to the point.
+ * Point draws the published coordinate; Radius draws the uncertainty around it.
+ * The design's third treatment, a bar along the road, is not offered: the source
+ * publishes no extent to draw one from.
  */
 const MARK_OPTIONS: { value: ZoneMark; label: string }[] = [
   { value: 'pin', label: 'Point' },
   { value: 'radius', label: 'Radius' },
-  { value: 'segment', label: 'Segment' },
 ];
 
 export function AlertsScreen({
@@ -121,8 +119,8 @@ export function AlertsScreen({
             onChange={value => set('mark', value)}
           />
           <Text style={[body(11), styles.controlSub, { color: t.ink55 }]}>
-            How a zone is drawn. The source publishes a single point per zone, not a stretch of
-            road.
+            How a zone is drawn. The source publishes a single point per zone, so Radius shows
+            roughly where it is rather than implying the point is the whole of it.
           </Text>
         </View>
 

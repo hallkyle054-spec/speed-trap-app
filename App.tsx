@@ -20,9 +20,9 @@ import {
   ageInDays,
   useZoneFeed,
 } from './data/feed';
-import { fixtureRoutes } from './data/routes';
 import { Zone, distanceTo, latestListing, statusOf as statusOfZone } from './data/zones';
 import { useDrive } from './state/drive';
+import { SavedRoutesProvider, useSavedRoutes } from './state/savedRoutes';
 import { SettingsProvider, useSettings } from './state/settings';
 import { useLocation } from './state/useLocation';
 import { ThemeProvider, useTheme } from './theme/ThemeProvider';
@@ -91,6 +91,7 @@ function Verge() {
   );
 
   const drive = useDrive(settings, zones);
+  const savedRoutes = useSavedRoutes();
 
   const sheetZone = useMemo(() => zones.find(z => z.id === sheetId) ?? null, [zones, sheetId]);
 
@@ -152,7 +153,13 @@ function Verge() {
       ) : null}
 
       {tab === 'routes' ? (
-        <RoutesScreen routes={fixtureRoutes} zones={zones} topInset={screenInset} />
+        <RoutesScreen
+          routes={savedRoutes.routes}
+          zones={zones}
+          onAdd={savedRoutes.add}
+          onRemove={savedRoutes.remove}
+          topInset={screenInset}
+        />
       ) : null}
 
       {tab === 'alerts' ? (
@@ -232,9 +239,11 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <SettingsProvider>
-        <ThemeProvider>
-          <Root />
-        </ThemeProvider>
+        <SavedRoutesProvider>
+          <ThemeProvider>
+            <Root />
+          </ThemeProvider>
+        </SavedRoutesProvider>
       </SettingsProvider>
     </SafeAreaProvider>
   );

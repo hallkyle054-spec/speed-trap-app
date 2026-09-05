@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
-import { Circle, Marker, Polyline } from 'react-native-maps';
+import { Circle, Marker } from 'react-native-maps';
 
 import { LatLng } from '../data/geo';
 import { Zone, ZoneStatus, zoneTitle } from '../data/zones';
@@ -63,34 +63,6 @@ export function ZoneMarks({ zone, status, mark, onPress }: Props) {
   const color = markColor(t, status);
   const active = status === 'listed';
   const label = zoneTitle(zone);
-
-  // A site published as a single point has no stretch to draw along.
-  if (mark === 'segment' && zone.path.length >= 2) {
-    // Recommended treatment: the published data is a stretch of road, so the
-    // mark is a bar along it.
-    //
-    // The design asks for a ground-coloured casing under the bar. That was
-    // built as a second, wider polyline beneath it — which does not work: the
-    // New Architecture's Polyline has no `zIndex` prop (see
-    // react-native-maps/src/specs/NativeComponentPolyline.ts), so the casing's
-    // draw order is undefined and it can land on top, painting the mark out in
-    // exactly the map's background colour. A single stroke is drawn instead,
-    // weighted to read on its own against the hairline roads of the basemap.
-    return (
-      <>
-        <Polyline
-          coordinates={zone.path}
-          strokeColor={color}
-          strokeWidth={7}
-          lineCap="round"
-          lineJoin="round"
-          tappable
-          onPress={() => onPress(zone)}
-        />
-        <TapTarget coordinate={midpoint(zone.path)} label={label} onPress={() => onPress(zone)} />
-      </>
-    );
-  }
 
   if (mark === 'radius') {
     return (

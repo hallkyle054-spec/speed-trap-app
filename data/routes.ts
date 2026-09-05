@@ -10,6 +10,28 @@ export type SavedRoute = {
   path: LatLng[];
 };
 
+/** Drops anything malformed rather than counting zones against broken geometry. */
+export function parseRoutes(raw: unknown): SavedRoute[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((r): r is SavedRoute => {
+    const c = r as Partial<SavedRoute>;
+    return (
+      typeof c?.id === 'string' &&
+      typeof c.title === 'string' &&
+      typeof c.sub === 'string' &&
+      Array.isArray(c.path) &&
+      c.path.length >= 2 &&
+      c.path.every(
+        p =>
+          typeof (p as LatLng)?.latitude === 'number' &&
+          Number.isFinite((p as LatLng).latitude) &&
+          typeof (p as LatLng)?.longitude === 'number' &&
+          Number.isFinite((p as LatLng).longitude),
+      )
+    );
+  });
+}
+
 /** How close a zone has to come to the corridor to count as on the route. */
 const CORRIDOR_M = 500;
 

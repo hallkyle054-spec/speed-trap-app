@@ -1,6 +1,7 @@
-import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { AddRouteSheet } from '../components/AddRouteSheet';
 import { Button } from '../components/Button';
 import { SavedRoute, zonesOnRoute } from '../data/routes';
 import { Zone } from '../data/zones';
@@ -11,12 +12,15 @@ import { body, display, heading, kicker, tnum } from '../theme/type';
 type Props = {
   routes: SavedRoute[];
   zones: Zone[];
+  onAdd: (route: SavedRoute) => void;
+  onRemove: (id: string) => void;
   topInset: number;
 };
 
 /** Saved commutes with a zone count for today. */
-export function RoutesScreen({ routes, zones, topInset }: Props) {
+export function RoutesScreen({ routes, zones, onAdd, onRemove, topInset }: Props) {
   const { t } = useTheme();
+  const [adding, setAdding] = useState(false);
 
   return (
     <View style={styles.root}>
@@ -29,7 +33,16 @@ export function RoutesScreen({ routes, zones, topInset }: Props) {
         {routes.map(route => {
           const onRoute = zonesOnRoute(route, zones);
           return (
-            <View key={route.id} style={[styles.card, { borderColor: t.rule }]}>
+            <Pressable
+              key={route.id}
+              onLongPress={() =>
+                Alert.alert('Remove route', `Remove “${route.title}”?`, [
+                  { text: 'Keep', style: 'cancel' },
+                  { text: 'Remove', style: 'destructive', onPress: () => onRemove(route.id) },
+                ])
+              }
+              style={[styles.card, { borderColor: t.rule }]}
+            >
               <View style={styles.cardTop}>
                 <Text style={[heading(20), { color: t.ink }]}>{route.title}</Text>
                 <Text
@@ -53,24 +66,23 @@ export function RoutesScreen({ routes, zones, topInset }: Props) {
                   Nothing published on this route today
                 </Text>
               )}
-            </View>
+            </Pressable>
           );
         })}
 
         <Button
           label="Add a route"
           tone="dashed"
-          onPress={() =>
-            // Capturing a route needs the routing layer, which is not part of
-            // this handoff — see the README's "Not built yet".
-            Alert.alert(
-              'Add a route',
-              'Route capture needs the routing layer, which is not built yet.',
-            )
-          }
+          onPress={() => setAdding(true)}
           style={styles.add}
         />
+
+        <Text style={[body(11), styles.hint, { color: t.ink50 }]}>
+          Press and hold a route to remove it.
+        </Text>
       </ScrollView>
+
+      <AddRouteSheet visible={adding} onClose={() => setAdding(false)} onSave={onAdd} />
     </View>
   );
 }
@@ -92,4 +104,5 @@ const styles = StyleSheet.create({
   zoneList: { lineHeight: 11 * 1.7 },
   emptyLine: { fontStyle: 'italic' },
   add: { paddingVertical: 10 },
+  hint: { textAlign: 'center', marginTop: 2 },
 });

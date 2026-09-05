@@ -9,34 +9,10 @@ import React, {
   useState,
 } from 'react';
 
-export type Theme = 'system' | 'light' | 'dark';
-export type ZoneMark = 'pin' | 'segment' | 'radius';
-export type WarnAt = 300 | 500 | 800 | 1000;
+import { Settings, defaultSettings, reconcile } from './settingsSchema';
 
-export type Settings = {
-  chime: boolean;
-  voice: boolean;
-  showStale: boolean;
-  warnAt: WarnAt;
-  mark: ZoneMark;
-  theme: Theme;
-};
-
-export const defaultSettings: Settings = {
-  chime: true,
-  voice: false,
-  showStale: true,
-  warnAt: 800,
-  /**
-   * The handoff recommended `segment` on the belief that the source publishes a
-   * stretch of road. It does not — each site is a single published point (see
-   * ingest/parse.mjs), so a bar along the road would be inventing an extent
-   * nobody published. `pin` draws exactly what the source gives. `radius` stays
-   * available for anyone who wants the uncertainty shown.
-   */
-  mark: 'pin',
-  theme: 'system',
-};
+export type { Settings, Theme, WarnAt, ZoneMark } from './settingsSchema';
+export { defaultSettings } from './settingsSchema';
 
 const STORAGE_KEY = 'verge.settings.v1';
 
@@ -49,20 +25,6 @@ type Ctx = {
 };
 
 const SettingsContext = createContext<Ctx | null>(null);
-
-/** Drops unknown keys and keeps anything the stored blob is missing at default. */
-function reconcile(raw: unknown): Settings {
-  if (!raw || typeof raw !== 'object') return defaultSettings;
-  const stored = raw as Partial<Settings>;
-  const out = { ...defaultSettings };
-  for (const key of Object.keys(defaultSettings) as (keyof Settings)[]) {
-    const value = stored[key];
-    if (typeof value === typeof defaultSettings[key]) {
-      (out as Record<string, unknown>)[key] = value;
-    }
-  }
-  return out;
-}
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<Settings>(defaultSettings);

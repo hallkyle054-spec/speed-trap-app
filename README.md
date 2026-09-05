@@ -46,6 +46,7 @@ Both are read from the environment; neither is committed.
 | --- | --- |
 | `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` | Android Maps SDK key. Without it the map renders blank. |
 | `EXPO_PUBLIC_ZONE_FEED_URL` | The JSON zone feed. **Unset**, so the app falls back to the committed fixture — see *Ingest*. |
+| `EXPO_PUBLIC_GOOGLE_ROUTES_API_KEY` | Directions + Places, for building saved routes. Needs to be a **second key** — see below. |
 
 > The Maps key is written into `AndroidManifest.xml` at **prebuild** time, not read
 > at runtime. It has to be set in the environment before the build, or the manifest
@@ -133,6 +134,26 @@ anyone with the file can extract it. Restrict what a leaked copy can do:
 Do the application restriction *after* setting up the release keystore, or you
 will pin the key to the debug certificate and the properly signed build will show
 a blank map.
+
+### Routing needs its own key
+
+`Add a route` calls the Directions and Places **Web Service** APIs. An Android
+application restriction — package name plus signing certificate — does not apply
+to those: Google rejects an app-restricted key on a web service call with
+`REQUEST_DENIED`. So the Maps key that draws the basemap cannot also do routing.
+
+Create a second key and restrict it by **API** instead of by app:
+
+1. Enable **Directions API** and **Places API (New)**.
+2. New key → API restrictions → those two only. Leave application restrictions
+   set to None; there is no app restriction that would work here.
+3. **Cap its quota.** APIs & Services → Quotas → set a low daily ceiling. The key
+   is compiled into the APK and extractable, and unlike the Maps key these calls
+   are billable per request.
+4. Add it as the `EXPO_PUBLIC_GOOGLE_ROUTES_API_KEY` repository secret.
+
+Without it the Routes tab still lists saved routes and their zone counts; only
+searching for new ones is unavailable, and the sheet says so.
 
 ### A Google Maps key
 
