@@ -147,9 +147,15 @@ Create a second key and restrict it by **API** instead of by app:
 1. Enable **Directions API** and **Places API (New)**.
 2. New key → API restrictions → those two only. Leave application restrictions
    set to None; there is no app restriction that would work here.
-3. **Cap its quota.** APIs & Services → Quotas → set a low daily ceiling. The key
-   is compiled into the APK and extractable, and unlike the Maps key these calls
-   are billable per request.
+3. **Put a ceiling on the spend.** Quota editing is not always available — on a
+   project without a billing account the console refuses it. Set a budget alert
+   instead (Billing → Budgets & alerts), which works either way. The key is
+   compiled into the APK and extractable, and unlike the Maps key these calls are
+   billed per request.
+
+   The app is built to keep that number small: place search runs when you press
+   Search, not while you type, so one lookup costs one request rather than one
+   per pause. A route costs one Directions call when you save it.
 4. Add it as the `EXPO_PUBLIC_GOOGLE_ROUTES_API_KEY` repository secret.
 
 Without it the Routes tab still lists saved routes and their zone counts; only

@@ -17,8 +17,6 @@ import { radius } from '../theme/tokens';
 import { body, display, heading, kicker } from '../theme/type';
 import { Button } from './Button';
 
-/** Long enough that a place search is not fired off on every keystroke. */
-const DEBOUNCE_MS = 350;
 
 type Field = 'from' | 'to';
 
@@ -59,34 +57,33 @@ export function AddRouteSheet({
   /** Only the newest search may write results, or a slow one overwrites a fast one. */
   const searchId = useRef(0);
 
-  useEffect(() => {
-    if (!visible) return;
+  /**
+   * Searching happens on submit rather than as you type. Place search is billed
+   * per request and the quota cannot always be capped, so one deliberate search
+   * costs one request instead of one per pause in typing.
+   */
+  const runSearch = useCallback(() => {
     const text = query.trim();
-    if (text.length < 3) {
-      setResults([]);
-      setSearching(false);
-      return;
-    }
+    if (text.length < 3) return;
 
     const id = ++searchId.current;
     setSearching(true);
-    const timer = setTimeout(() => {
-      searchPlaces(text)
-        .then(found => {
-          if (id === searchId.current) setResults(found);
-        })
-        .catch(e => {
-          if (id !== searchId.current) return;
-          setResults([]);
-          setError(e instanceof RoutingError ? e.message : 'Place search failed.');
-        })
-        .finally(() => {
-          if (id === searchId.current) setSearching(false);
-        });
-    }, DEBOUNCE_MS);
-
-    return () => clearTimeout(timer);
-  }, [query, visible]);
+    setError(null);
+    searchPlaces(text)
+      .then(found => {
+        if (id !== searchId.current) return;
+        setResults(found);
+        if (found.length === 0) setError(`Nothing found for “${text}”.`);
+      })
+      .catch(e => {
+        if (id !== searchId.current) return;
+        setResults([]);
+        setError(e instanceof RoutingError ? e.message : 'Place search failed.');
+      })
+      .finally(() => {
+        if (id === searchId.current) setSearching(false);
+      });
+  }, [query]);
 
   const choose = (place: Place) => {
     setError(null);
@@ -150,15 +147,29 @@ export function AddRouteSheet({
           <End label="To" place={to} active={field === 'to'} onPress={() => setField('to')} />
         </View>
 
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          editable={ROUTING_CONFIGURED && !saving}
-          placeholder={field === 'from' ? 'Search for a starting point' : 'Search for a destination'}
-          placeholderTextColor={t.ink45}
-          autoCorrect={false}
-          style={[body(14), styles.input, { color: t.ink, borderBottomColor: t.rule2 }]}
-        />
+        <View style={styles.searchRow}>
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            onSubmitEditing={runSearch}
+            editable={ROUTING_CONFIGURED && !saving}
+            placeholder={field === 'from' ? 'Where from?' : 'Where to?'}
+            placeholderTextColor={t.ink45}
+            autoCorrect={false}
+            returnKeyType="search"
+            style={[body(14), styles.input, { color: t.ink, borderBottomColor: t.rule2 }]}
+          />
+          <Button
+            label="Search"
+            size={13}
+            onPress={runSearch}
+            disabled={!ROUTING_CONFIGURED || saving || query.trim().length < 3}
+            style={[
+              styles.searchButton,
+              { opacity: !ROUTING_CONFIGURED || query.trim().length < 3 ? 0.5 : 1 },
+            ]}
+          />
+        </View>
 
         <View style={styles.results}>
           {searching ? <ActivityIndicator color={t.ink45} style={styles.spinner} /> : null}
@@ -251,7 +262,9 @@ const styles = StyleSheet.create({
   ends: { flexDirection: 'row', gap: 10 },
   end: { flex: 1, borderWidth: 1, borderRadius: radius.md, paddingVertical: 9, paddingHorizontal: 11 },
   endValue: { marginTop: 2 },
-  input: { paddingVertical: 10, marginTop: 14, borderBottomWidth: 1 },
+  searchRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 10, marginTop: 14 },
+  input: { flex: 1, paddingVertical: 10, borderBottomWidth: 1 },
+  searchButton: { paddingVertical: 8, paddingHorizontal: 14 },
   results: { flex: 1, marginTop: 4 },
   spinner: { marginTop: 12 },
   result: { paddingVertical: 12, borderBottomWidth: 1 },
