@@ -26,6 +26,7 @@ import { SavedRoutesProvider, useSavedRoutes } from './state/savedRoutes';
 import { SettingsProvider, useSettings } from './state/settings';
 import { useLocation } from './state/useLocation';
 import { ThemeProvider, useTheme } from './theme/ThemeProvider';
+import { useWidgetSummary } from './widgets/useWidgetSummary';
 
 /** Zone phases turn over on the clock, so the UI re-derives them every minute. */
 function useMinuteClock(): Date {
@@ -52,6 +53,9 @@ function Verge() {
   /** The date of the newest list we hold; everything older reads as removed. */
   const listedOn = useMemo(() => latestListing(allZones), [allZones]);
   const statusOf = useCallback((zone: Zone) => statusOfZone(zone, listedOn), [listedOn]);
+
+  // Keep the cover-screen widget fed with what the app currently knows.
+  useWidgetSummary({ zones: allZones, listedOn, origin, originIsReal: isReal });
 
   /**
    * The one notice worth interrupting the design for: the list is invented, or

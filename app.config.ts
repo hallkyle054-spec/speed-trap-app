@@ -35,6 +35,32 @@ const config: ExpoConfig = {
   web: { favicon: './assets/favicon.png' },
   plugins: [
     [
+      // A standard Android app widget. Samsung's Flex Window surfaces these on
+      // the cover screen, so this is what a Flip cover widget is made of.
+      'react-native-android-widget',
+      {
+        fonts: [
+          './node_modules/@expo-google-fonts/cormorant-garamond/400Regular/CormorantGaramond_400Regular.ttf',
+          './node_modules/@expo-google-fonts/lora/400Regular/Lora_400Regular.ttf',
+        ],
+        widgets: [
+          {
+            name: 'Verge',
+            label: 'Verge · published zones',
+            description: 'The nearest published enforcement zone, and how far it is.',
+            minWidth: '110dp',
+            minHeight: '58dp',
+            targetCellWidth: 2,
+            targetCellHeight: 1,
+            resizeMode: 'horizontal|vertical',
+            // Half an hour is Android's floor for automatic redraws; the app
+            // also pushes an update whenever it learns something new.
+            updatePeriodMillis: 1800000,
+          },
+        ],
+      },
+    ],
+    [
       'expo-location',
       {
         locationWhenInUsePermission:
