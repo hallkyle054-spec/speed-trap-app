@@ -1,7 +1,7 @@
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { BackHandler, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AlertsScreen } from './app/AlertsScreen';
@@ -90,7 +90,7 @@ function Verge() {
     [allZones, settings.showStale, statusOf],
   );
 
-  const drive = useDrive(settings, zones);
+  const drive = useDrive(settings, zones, origin);
   const savedRoutes = useSavedRoutes();
 
   const sheetZone = useMemo(() => zones.find(z => z.id === sheetId) ?? null, [zones, sheetId]);
@@ -111,6 +111,30 @@ function Verge() {
     setSheetId(null);
   }, []);
 
+  /**
+   * Android's back gesture unwinds the app one layer at a time. Without this it
+   * closed the whole app from inside the drive HUD — and if anything ever hides
+   * the End button again, this is the way out.
+   */
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (drive.zone) {
+        drive.end();
+        return true;
+      }
+      if (sheetId) {
+        setSheetId(null);
+        return true;
+      }
+      if (tab !== 'map') {
+        setTab('map');
+        return true;
+      }
+      return false;
+    });
+    return () => sub.remove();
+  }, [drive, sheetId, tab]);
+
   const goOffline = useCallback(() => {
     simulateOffline();
     setTab('map');
@@ -128,6 +152,7 @@ function Verge() {
       {tab === 'map' ? (
         <MapScreen
           zones={zones}
+          routes={savedRoutes.routes}
           statusOf={statusOf}
           origin={origin}
           originIsReal={isReal}

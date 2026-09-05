@@ -59,6 +59,8 @@ const styles = StyleSheet.create({
   bar: { flexDirection: 'row', borderTopWidth: 1 },
   tab: {
     flex: 1,
+    minHeight: 52,
+    justifyContent: 'center',
     paddingTop: 11,
     paddingBottom: 13,
     alignItems: 'center',

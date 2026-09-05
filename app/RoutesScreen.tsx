@@ -44,11 +44,14 @@ export function RoutesScreen({ routes, zones, onAdd, onRemove, topInset }: Props
               style={[styles.card, { borderColor: t.rule }]}
             >
               <View style={styles.cardTop}>
-                <Text style={[heading(20), { color: t.ink }]}>{route.title}</Text>
+                <Text numberOfLines={2} style={[heading(20), styles.cardTitle, { color: t.ink }]}>
+                  {route.title}
+                </Text>
                 <Text
                   style={[
                     display(26),
                     tnum,
+                    styles.cardCount,
                     { color: onRoute.length ? t.accentInk : t.ink40 },
                   ]}
                 >
@@ -98,11 +101,13 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 15,
   },
-  cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 },
+  cardTitle: { flexShrink: 1 },
+  cardCount: { flexShrink: 0 },
   sub: { marginTop: 1 },
   divider: { height: 1, marginVertical: 11 },
   zoneList: { lineHeight: 11 * 1.7 },
   emptyLine: { fontStyle: 'italic' },
-  add: { paddingVertical: 10 },
+  add: { minHeight: 48 },
   hint: { textAlign: 'center', marginTop: 2 },
 });

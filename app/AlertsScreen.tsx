@@ -234,6 +234,6 @@ const styles = StyleSheet.create({
   controlLabel: { marginBottom: 8 },
   themeBlock: { paddingTop: 4, paddingBottom: 6 },
   controlSub: { marginTop: 7 },
-  smallButton: { paddingVertical: 5, paddingHorizontal: 11 },
+  smallButton: { flexShrink: 0, minHeight: 40, paddingHorizontal: 14 },
   closing: { marginTop: 18, lineHeight: 11 * 1.65 },
 });

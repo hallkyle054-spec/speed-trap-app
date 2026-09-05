@@ -51,7 +51,7 @@ export function ZoneSheet({ zone, status, distance, onClose, onDrive, bottomInse
         >
           {statusLabel(status)}
         </Text>
-        <Text style={[display(30, -0.02), styles.road, { color: t.ink }]}>{zone.road}</Text>
+        <Text style={[display(30, -0.02), tnum, styles.road, { color: t.ink }]}>{zone.road}</Text>
         {zone.name ? (
           <Text style={[body(14), { color: t.ink80 }]}>{zone.name}</Text>
         ) : null}
@@ -126,5 +126,5 @@ const styles = StyleSheet.create({
   disclosure: { marginTop: 15, borderLeftWidth: 2, paddingLeft: 11, paddingVertical: 2 },
   disclosureText: { lineHeight: 11.5 * 1.6 },
   actions: { flexDirection: 'row', gap: 10, marginTop: 16 },
-  action: { flex: 1, paddingVertical: 10 },
+  action: { flex: 1, minHeight: 48 },
 });

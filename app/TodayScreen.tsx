@@ -47,14 +47,17 @@ export function TodayScreen({ zones, statusOf, listedOn, onOpenZone, topInset }:
             >
               <View style={styles.rowTop}>
                 <Text
+                  numberOfLines={2}
                   style={[
                     heading(19, -0.01),
+                    tnum,
+                    styles.rowRoad,
                     { color: status === 'listed' ? t.mark : t.ink45 },
                   ]}
                 >
                   {zone.road}
                 </Text>
-                <Text style={[kicker(10.5, 0.09), tnum, { color: t.ink50 }]}>
+                <Text style={[kicker(10.5, 0.09), tnum, styles.rowLimit, { color: t.ink50 }]}>
                   {limitLabel(zone)}
                 </Text>
               </View>
@@ -90,6 +93,8 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     gap: 12,
   },
+  rowRoad: { flexShrink: 1 },
+  rowLimit: { flexShrink: 0 },
   rowName: { marginTop: 1 },
   rowNote: { marginTop: 4 },
   closing: { marginTop: 16, marginHorizontal: 18, marginBottom: 22, lineHeight: 11 * 1.6 },

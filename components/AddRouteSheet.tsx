@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -9,6 +11,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Place, ROUTING_CONFIGURED, RoutingError, routeBetween, searchPlaces } from '../data/directions';
 import { SavedRoute } from '../data/routes';
@@ -30,6 +33,7 @@ export function AddRouteSheet({
   onSave: (route: SavedRoute) => void;
 }) {
   const { t } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const [field, setField] = useState<Field>('from');
   const [query, setQuery] = useState('');
@@ -126,12 +130,24 @@ export function AddRouteSheet({
         onPress={onClose}
         style={[styles.scrim, { backgroundColor: t.scrim }]}
       />
-      <View
-        style={[
-          styles.sheet,
-          { backgroundColor: t.bg, borderTopColor: t.rule, shadowColor: t.shadow },
-        ]}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.lift}
+        pointerEvents="box-none"
       >
+        <View
+          style={[
+            styles.sheet,
+            {
+              backgroundColor: t.bg,
+              borderTopColor: t.rule,
+              shadowColor: t.shadow,
+              paddingTop: 14 + insets.top,
+              // Clear of the gesture bar, and never flush against the edge.
+              paddingBottom: Math.max(insets.bottom, 12) + 12,
+            },
+          ]}
+        >
         <View style={[styles.handle, { backgroundColor: t.rule3 }]} />
         <Text style={[kicker(9.5, 0.14), { color: t.ink50 }]}>Saved routes</Text>
         <Text style={[display(30, -0.02), styles.title, { color: t.ink }]}>Add a route</Text>
@@ -171,27 +187,6 @@ export function AddRouteSheet({
           />
         </View>
 
-        <View style={styles.results}>
-          {searching ? <ActivityIndicator color={t.ink45} style={styles.spinner} /> : null}
-          <ScrollView keyboardShouldPersistTaps="handled">
-            {results.map(place => (
-              <Pressable
-                key={place.id}
-                onPress={() => choose(place)}
-                style={({ pressed }) => [
-                  styles.result,
-                  { borderBottomColor: t.rule, backgroundColor: pressed ? t.hover : 'transparent' },
-                ]}
-              >
-                <Text style={[heading(16), { color: t.ink }]}>{place.name}</Text>
-                <Text style={[body(11), { color: t.ink55 }]} numberOfLines={1}>
-                  {place.address}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
-
         {error ? (
           <View style={[styles.error, { borderLeftColor: t.accent }]}>
             <Text style={[body(11.5), styles.errorText, { color: t.ink70 }]}>{error}</Text>
@@ -207,7 +202,31 @@ export function AddRouteSheet({
             style={[styles.action, { opacity: !from || !to || saving ? 0.5 : 1 }]}
           />
         </View>
-      </View>
+
+        <View style={styles.results}>
+          {searching ? <ActivityIndicator color={t.ink45} style={styles.spinner} /> : null}
+          <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
+            {results.map(place => (
+              <Pressable
+                key={place.id}
+                onPress={() => choose(place)}
+                style={({ pressed }) => [
+                  styles.result,
+                  { borderBottomColor: t.rule, backgroundColor: pressed ? t.hover : 'transparent' },
+                ]}
+              >
+                <Text style={[heading(16), { color: t.ink }]} numberOfLines={2}>
+                  {place.name}
+                </Text>
+                <Text style={[body(11), { color: t.ink55 }]} numberOfLines={1}>
+                  {place.address}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+        </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -239,18 +258,13 @@ function End({
 
 const styles = StyleSheet.create({
   scrim: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  lift: { position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, justifyContent: 'flex-end' },
   sheet: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    top: 60,
+    maxHeight: '92%',
     borderTopWidth: 1,
     borderTopLeftRadius: radius.lg,
     borderTopRightRadius: radius.lg,
-    paddingTop: 14,
     paddingHorizontal: 18,
-    paddingBottom: 20,
     shadowOffset: { width: 0, height: 12 },
     shadowRadius: 32,
     shadowOpacity: 1,
@@ -260,16 +274,23 @@ const styles = StyleSheet.create({
   title: { marginTop: 6, marginBottom: 12, lineHeight: 30 * 1.08 },
   note: { marginBottom: 10 },
   ends: { flexDirection: 'row', gap: 10 },
-  end: { flex: 1, borderWidth: 1, borderRadius: radius.md, paddingVertical: 9, paddingHorizontal: 11 },
+  end: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: radius.md,
+    minHeight: 52,
+    justifyContent: 'center',
+    paddingHorizontal: 11,
+  },
   endValue: { marginTop: 2 },
   searchRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 10, marginTop: 14 },
   input: { flex: 1, paddingVertical: 10, borderBottomWidth: 1 },
-  searchButton: { paddingVertical: 8, paddingHorizontal: 14 },
-  results: { flex: 1, marginTop: 4 },
+  searchButton: { flexShrink: 0, minHeight: 44, paddingHorizontal: 16 },
+  results: { flexShrink: 1, marginTop: 6 },
   spinner: { marginTop: 12 },
-  result: { paddingVertical: 12, borderBottomWidth: 1 },
+  result: { paddingVertical: 12, minHeight: 48, justifyContent: 'center', borderBottomWidth: 1 },
   error: { marginTop: 10, borderLeftWidth: 2, paddingLeft: 11, paddingVertical: 2 },
   errorText: { lineHeight: 11.5 * 1.6 },
-  actions: { flexDirection: 'row', gap: 10, marginTop: 14 },
-  action: { flex: 1, paddingVertical: 10 },
+  actions: { flexDirection: 'row', gap: 10, marginTop: 16 },
+  action: { flex: 1, minHeight: 48 },
 });

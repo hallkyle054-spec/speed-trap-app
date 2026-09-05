@@ -57,5 +57,5 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   text: { flexShrink: 1 },
-  retry: { paddingVertical: 5, paddingHorizontal: 11 },
+  retry: { flexShrink: 0, minHeight: 40, paddingHorizontal: 14 },
 });

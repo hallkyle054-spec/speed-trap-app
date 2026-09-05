@@ -54,8 +54,15 @@ export function DriveHud({
       ]}
     >
       <View style={styles.topRow}>
-        <Text style={[kicker(9.5, 0.16), { color: t.ink50 }]} numberOfLines={1}>
-          Driving · {zone.road} {source === 'simulated' ? '· simulated' : ''}
+        {/*
+          The label must shrink. Real road names run long ("A476 Cross Hands
+          Rdbt To Phoenix Inn"), and without flexShrink the text claimed its
+          full measured width and pushed End clean off the screen — leaving no
+          way out of the drive HUD.
+        */}
+        <Text style={[kicker(9.5, 0.16), styles.driving, { color: t.ink50 }]} numberOfLines={1}>
+          Driving · {zone.road}
+          {source === 'simulated' ? ' · simulated' : ''}
         </Text>
         <Button
           label="End"
@@ -73,7 +80,7 @@ export function DriveHud({
 
         <View style={[styles.divider, { backgroundColor: t.rule3 }]} />
 
-        <Text style={[heading(25, -0.01), { color: t.ink }]}>
+        <Text style={[heading(25, -0.01), tnum, { color: t.ink }]}>
           {zoneTitle(zone)}
         </Text>
         <Text style={[body(12.5), tnum, styles.meta, { color: t.ink60 }]}>
@@ -146,8 +153,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
     zIndex: 9,
   },
-  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 },
-  endButton: { paddingVertical: 4, paddingHorizontal: 11 },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
+    minHeight: 44,
+  },
+  driving: { flexShrink: 1 },
+  // 44 dp of target, whatever the label measures.
+  endButton: { flexShrink: 0, minWidth: 72, minHeight: 44, paddingHorizontal: 14 },
   centre: { flex: 1, justifyContent: 'center' },
   figure: { marginTop: 10, lineHeight: 110 * 0.92 },
   unit: { marginTop: -2 },

@@ -68,5 +68,5 @@ export function Segmented<T extends string | number>({
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', borderWidth: 1, borderRadius: radius.md, overflow: 'hidden' },
-  cell: { flex: 1, paddingVertical: 9, alignItems: 'center', justifyContent: 'center' },
+  cell: { flex: 1, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
 });

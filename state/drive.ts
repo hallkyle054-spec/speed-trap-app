@@ -5,7 +5,7 @@ import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { updateAlerts } from '../data/alerts';
-import { metresPerSecondToMph } from '../data/geo';
+import { LatLng, metresPerSecondToMph } from '../data/geo';
 import { Zone, distanceTo } from '../data/zones';
 import { Settings } from './settings';
 
@@ -34,7 +34,11 @@ const SIM = { from: 1600, step: 34, everyMs: 150, fastMph: 58, slowMph: 56, slow
 /** How long the chime banner stays up after the tone. */
 const CHIME_BANNER_MS = 6000;
 
-export function useDrive(settings: Settings, zones: readonly Zone[]): DriveState {
+export function useDrive(
+  settings: Settings,
+  zones: readonly Zone[],
+  origin: LatLng,
+): DriveState {
   const [zone, setZone] = useState<Zone | null>(null);
   const [distance, setDistance] = useState(SIM.from);
   const [speedMph, setSpeedMph] = useState(SIM.fastMph);
@@ -94,11 +98,13 @@ export function useDrive(settings: Settings, zones: readonly Zone[]): DriveState
   const chimeRef = useRef(chime);
   const settingsRef = useRef(settings);
   const zonesRef = useRef(zones);
+  const originRef = useRef(origin);
   useEffect(() => {
     chimeRef.current = chime;
     settingsRef.current = settings;
     zonesRef.current = zones;
-  }, [chime, settings, zones]);
+    originRef.current = origin;
+  }, [chime, settings, zones, origin]);
 
   const runSimulation = useCallback((target: Zone) => {
     setSource('simulated');
@@ -132,7 +138,10 @@ export function useDrive(settings: Settings, zones: readonly Zone[]): DriveState
       alerted.current = new Set();
       setChiming(false);
       setZone(target);
-      setDistance(distanceTo(target, target.path[0]));
+      // Measured from where the driver actually is. This used to measure the
+      // zone against its own first point — always zero — so the HUD opened
+      // announcing "Now · Zone begins" before a single fix had arrived.
+      setDistance(distanceTo(target, originRef.current));
       activateKeepAwakeAsync('verge-drive').catch(() => {});
 
       (async () => {

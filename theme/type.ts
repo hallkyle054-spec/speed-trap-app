@@ -48,5 +48,11 @@ export const kicker = (fontSize: number, letterSpacingEm: number): TextStyle => 
   textTransform: 'uppercase',
 });
 
-/** Tabular figures — apply anywhere a number stands as a number. */
-export const tnum: TextStyle = { fontVariant: ['tabular-nums'] };
+/**
+ * Tabular *lining* figures — apply anywhere a number stands as a number.
+ *
+ * Cormorant defaults to oldstyle figures, where 1 is a short glyph all but
+ * indistinguishable from a small capital I. A route's zone count reading as
+ * "I" is not a stylistic quibble, so numbers that carry meaning are set lining.
+ */
+export const tnum: TextStyle = { fontVariant: ['lining-nums', 'tabular-nums'] };

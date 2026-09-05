@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
 
 import { Button } from '../components/Button';
 import { ZoneMarks } from '../components/ZoneMarks';
+import { SavedRoute } from '../data/routes';
 import { dayLabel } from '../data/dates';
 import { Sync, syncLabel } from '../data/feed';
 import { LatLng, formatDistance } from '../data/geo';
@@ -24,6 +25,8 @@ import { body, display, heading, kicker, tnum } from '../theme/type';
 
 type Props = {
   zones: Zone[];
+  /** Saved routes, drawn under the zone marks as context. */
+  routes: SavedRoute[];
   statusOf: (zone: Zone) => ZoneStatus;
   origin: LatLng;
   originIsReal: boolean;
@@ -39,6 +42,7 @@ type Props = {
 
 export function MapScreen({
   zones,
+  routes,
   statusOf,
   origin,
   originIsReal,
@@ -113,6 +117,22 @@ export function MapScreen({
           showsCompass={false}
           toolbarEnabled={false}
         >
+          {/*
+            Saved routes sit beneath the zone marks: thin and quiet, so they
+            read as context for the counts on the Routes tab rather than
+            competing with the zones themselves.
+          */}
+          {routes.map(route => (
+            <Polyline
+              key={route.id}
+              coordinates={route.path}
+              strokeColor={t.accent}
+              strokeWidth={3}
+              lineCap="round"
+              lineJoin="round"
+            />
+          ))}
+
           {zones.map(zone => (
             <ZoneMarks
               key={zone.id}
@@ -142,7 +162,7 @@ export function MapScreen({
 
         {nearest ? (
           <>
-            <Text style={[heading(20, -0.01), { color: t.ink }]}>
+            <Text numberOfLines={2} style={[heading(20, -0.01), tnum, { color: t.ink }]}>
               {zoneTitle(nearest)}
             </Text>
             <Text style={[body(11.5), tnum, styles.nearestMeta, { color: t.ink60 }]}>
@@ -189,7 +209,7 @@ const styles = StyleSheet.create({
   },
   syncStatus: { flexDirection: 'row', alignItems: 'center', gap: 7, flexShrink: 1 },
   dot: { width: 5, height: 5, borderRadius: 2.5 },
-  refresh: { paddingVertical: 5, paddingHorizontal: 12 },
+  refresh: { flexShrink: 0, minHeight: 40, paddingHorizontal: 14 },
 
   canvas: { flex: 1, position: 'relative', overflow: 'hidden' },
   legend: {
@@ -215,9 +235,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
+    gap: 12,
     marginBottom: 5,
   },
   nearestMeta: { marginTop: 2 },
-  startDrive: { marginTop: 11, paddingVertical: 11 },
+  startDrive: { marginTop: 11, minHeight: 52 },
   empty: { marginTop: 4, fontStyle: 'italic' },
 });
