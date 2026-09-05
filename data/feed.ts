@@ -57,6 +57,7 @@ export function parseZones(raw: unknown): Zone[] {
       (c.limitMph === null || typeof c.limitMph === 'number') &&
       typeof c.note === 'string' &&
       typeof c.firstListed === 'string' &&
+      (c.sourceUrl == null || typeof c.sourceUrl === 'string') &&
       typeof c.lastListed === 'string' &&
       Array.isArray(c.path) &&
       c.path.length > 0 &&

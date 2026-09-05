@@ -28,6 +28,8 @@ export type Zone = {
   limitMph: number | null;
   /** The sheet's plain-language provenance line. */
   note: string;
+  /** The published entry this zone came from, when the source links one. */
+  sourceUrl?: string | null;
   /** ISO date this site first appeared on a published list. */
   firstListed: string;
   /** ISO date of the most recent list this site appeared on. */

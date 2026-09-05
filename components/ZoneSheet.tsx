@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { PUBLISHER } from '../data/feed';
 import { formatDistance } from '../data/geo';
@@ -69,6 +69,17 @@ export function ZoneSheet({ zone, status, distance, onClose, onDrive, bottomInse
           <Text style={[body(11.5), styles.disclosureText, { color: t.ink70 }]}>
             Published zone — camera not confirmed. {zone.note}
           </Text>
+          {zone.sourceUrl ? (
+            <Pressable
+              accessibilityRole="link"
+              onPress={() => Linking.openURL(zone.sourceUrl as string).catch(() => {})}
+              style={styles.sourceLink}
+            >
+              <Text style={[body(11.5), { color: t.accentInk }]}>
+                View the published entry
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
 
         <View style={styles.actions}>
@@ -124,6 +135,7 @@ const styles = StyleSheet.create({
   cell: { width: '48%' },
   cellValue: { marginTop: 2 },
   disclosure: { marginTop: 15, borderLeftWidth: 2, paddingLeft: 11, paddingVertical: 2 },
+  sourceLink: { minHeight: 44, justifyContent: 'center' },
   disclosureText: { lineHeight: 11.5 * 1.6 },
   actions: { flexDirection: 'row', gap: 10, marginTop: 16 },
   action: { flex: 1, minHeight: 48 },

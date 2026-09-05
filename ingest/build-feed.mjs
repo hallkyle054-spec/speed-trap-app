@@ -76,7 +76,8 @@ async function main() {
       road: site.road,
       name: site.name,
       limitMph: site.limitMph,
-      note: site.sourceUrl ? `Source: ${site.sourceUrl}` : 'Published by the partnership.',
+      note: `Listed by ${site.authority} as a ${site.type.toLowerCase()} enforcement site.`,
+      sourceUrl: site.sourceUrl,
       firstListed: before?.firstListed ?? listedOn,
       lastListed: listedOn,
       // The source publishes a point per site, not a stretch of road. The
