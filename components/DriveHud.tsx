@@ -1,8 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, Platform, StyleSheet, Text, View } from 'react-native';
+import MapView, { PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
 
-import { formatDistance, pathLength } from '../data/geo';
-import { Zone, zoneTitle } from '../data/zones';
+import { LatLng, formatDistance, pathLength } from '../data/geo';
+import { SavedRoute } from '../data/routes';
+import { Zone, ZoneStatus, zoneTitle } from '../data/zones';
+import { ZoneMark } from '../state/settingsSchema';
+import { darkMapStyle, lightMapStyle } from '../theme/mapStyle';
+import { ZoneMarks } from './ZoneMarks';
 import { DriveSource } from '../state/drive';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius } from '../theme/tokens';
@@ -11,6 +16,13 @@ import { Button } from './Button';
 
 type Props = {
   zone: Zone;
+  /** Everything to plot: the zones around the driver and their saved routes. */
+  zones: Zone[];
+  routes: SavedRoute[];
+  statusOf: (zone: Zone) => ZoneStatus;
+  mark: ZoneMark;
+  /** The latest fix, or null while waiting for one. */
+  position: LatLng | null;
   distance: number;
   speedMph: number;
   chiming: boolean;
@@ -24,6 +36,11 @@ type Props = {
 /** Full-frame overlay. One big glanceable number, and nothing that moves except the chime dot. */
 export function DriveHud({
   zone,
+  zones,
+  routes,
+  statusOf,
+  mark,
+  position,
   distance,
   speedMph,
   chiming,
@@ -33,7 +50,8 @@ export function DriveHud({
   topInset,
   bottomInset,
 }: Props) {
-  const { t } = useTheme();
+  const { t, isDark } = useTheme();
+  const mapRef = useRef<MapView>(null);
 
   const metres = Math.max(0, Math.round(distance));
   const figure = metres <= 0 ? 'Now' : metres >= 1000 ? (metres / 1000).toFixed(1) : String(metres);
@@ -41,6 +59,12 @@ export function DriveHud({
     metres <= 0 ? 'entering the zone' : metres >= 1000 ? 'km to the zone' : 'metres to the zone';
   const heads = metres <= 0 ? 'Zone begins' : metres <= warnAt ? 'Published zone ahead' : 'Approaching';
   const over = zone.limitMph != null && speedMph > zone.limitMph;
+
+  const focus = position ?? zone.path[0];
+  useEffect(() => {
+    if (!focus) return;
+    mapRef.current?.animateCamera({ center: focus, zoom: 15 }, { duration: 700 });
+  }, [focus?.latitude, focus?.longitude]);
 
   return (
     <View
@@ -73,10 +97,57 @@ export function DriveHud({
         />
       </View>
 
+      {/*
+        The map earns its place here: a number alone tells you how far, not
+        which way. It stays below the readout in the visual hierarchy — the
+        distance is still the thing you glance at.
+      */}
+      <View style={[styles.map, { borderColor: t.rule }]}>
+        <MapView
+          ref={mapRef}
+          style={StyleSheet.absoluteFill}
+          provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
+          customMapStyle={isDark ? darkMapStyle : lightMapStyle}
+          initialRegion={{
+            latitude: focus?.latitude ?? 51.83,
+            longitude: focus?.longitude ?? -4.18,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          }}
+          showsUserLocation
+          followsUserLocation
+          showsMyLocationButton={false}
+          showsPointsOfInterests={false}
+          showsBuildings={false}
+          showsTraffic={false}
+          showsCompass={false}
+          toolbarEnabled={false}
+          // Nothing on this screen should need a deliberate touch while driving.
+          scrollEnabled={false}
+          zoomEnabled={false}
+          rotateEnabled={false}
+          pitchEnabled={false}
+        >
+          {routes.map(route => (
+            <Polyline
+              key={route.id}
+              coordinates={route.path}
+              strokeColor={t.accent}
+              strokeWidth={4}
+              lineCap="round"
+              lineJoin="round"
+            />
+          ))}
+          {zones.map(z => (
+            <ZoneMarks key={z.id} zone={z} status={statusOf(z)} mark={mark} onPress={() => {}} />
+          ))}
+        </MapView>
+      </View>
+
       <View style={styles.centre}>
         <Text style={[kicker(10, 0.16), { color: t.accentInk }]}>{heads}</Text>
-        <Text style={[display(110, -0.04), tnum, styles.figure, { color: t.ink }]}>{figure}</Text>
-        <Text style={[display(26), styles.unit, { color: t.ink55 }]}>{unit}</Text>
+        <Text style={[display(84, -0.04), tnum, styles.figure, { color: t.ink }]}>{figure}</Text>
+        <Text style={[display(22), styles.unit, { color: t.ink55 }]}>{unit}</Text>
 
         <View style={[styles.divider, { backgroundColor: t.rule3 }]} />
 
@@ -163,14 +234,25 @@ const styles = StyleSheet.create({
   driving: { flexShrink: 1 },
   // 44 dp of target, whatever the label measures.
   endButton: { flexShrink: 0, minWidth: 72, minHeight: 44, paddingHorizontal: 14 },
-  centre: { flex: 1, justifyContent: 'center' },
-  figure: { marginTop: 10, lineHeight: 110 * 0.92 },
+  map: {
+    flex: 1,
+    minHeight: 140,
+    // Capped so the distance stays the dominant thing on the screen — the map
+    // is for orientation, not for reading while moving.
+    maxHeight: '34%',
+    marginTop: 12,
+    borderWidth: 1,
+    borderRadius: radius.md,
+    overflow: 'hidden',
+  },
+  centre: { flex: 1, justifyContent: 'center', paddingTop: 12 },
+  figure: { marginTop: 4, lineHeight: 84 * 0.92 },
   unit: { marginTop: -2 },
-  divider: { height: 1, marginTop: 22, marginBottom: 18 },
+  divider: { height: 1, marginTop: 14, marginBottom: 12 },
   meta: { marginTop: 4 },
-  disclosure: { marginTop: 14, borderLeftWidth: 2, paddingLeft: 11, paddingVertical: 2 },
+  disclosure: { marginTop: 10, borderLeftWidth: 2, paddingLeft: 11, paddingVertical: 2 },
   disclosureText: { lineHeight: 12 * 1.55 },
-  cards: { flexDirection: 'row', gap: 16, alignItems: 'stretch' },
+  cards: { flexDirection: 'row', gap: 16, alignItems: 'stretch', marginTop: 14 },
   card: {
     flex: 1,
     borderWidth: 1,

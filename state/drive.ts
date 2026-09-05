@@ -20,6 +20,8 @@ export type DriveState = {
   speedMph: number;
   chiming: boolean;
   source: DriveSource;
+  /** The latest fix, so the HUD's map can follow the drive. Null until one arrives. */
+  position: LatLng | null;
   start: (zone: Zone) => void;
   end: () => void;
 };
@@ -44,6 +46,7 @@ export function useDrive(
   const [speedMph, setSpeedMph] = useState(SIM.fastMph);
   const [source, setSource] = useState<DriveSource>('simulated');
   const [chiming, setChiming] = useState(false);
+  const [position, setPosition] = useState<LatLng | null>(null);
 
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const banner = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -138,6 +141,7 @@ export function useDrive(
       alerted.current = new Set();
       setChiming(false);
       setZone(target);
+      setPosition(null);
       // Measured from where the driver actually is. This used to measure the
       // zone against its own first point — always zero — so the HUD opened
       // announcing "Now · Zone begins" before a single fix had arrived.
@@ -161,6 +165,10 @@ export function useDrive(
             },
             position => {
               setSource('gps');
+              setPosition({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              });
 
               const raw = position.coords.speed;
               setSpeedMph(metresPerSecondToMph(raw != null && raw > 0 ? raw : 0));
@@ -195,7 +203,8 @@ export function useDrive(
     stopEverything();
     setChiming(false);
     setZone(null);
+    setPosition(null);
   }, [stopEverything]);
 
-  return { zone, distance, speedMph, chiming, source, start, end };
+  return { zone, distance, speedMph, chiming, source, position, start, end };
 }

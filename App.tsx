@@ -224,6 +224,11 @@ function Verge() {
       {drive.zone ? (
         <DriveHud
           zone={drive.zone}
+          zones={zones}
+          routes={savedRoutes.routes}
+          statusOf={statusOf}
+          mark={settings.mark}
+          position={drive.position}
           distance={drive.distance}
           speedMph={drive.speedMph}
           chiming={drive.chiming}
