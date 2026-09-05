@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  BackHandler,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -57,6 +58,20 @@ export function AddRouteSheet({
   useEffect(() => {
     if (visible) reset();
   }, [visible, reset]);
+
+  /**
+   * While this sheet is up, back closes it and stops there. Without this the
+   * app-level handler also ran and dropped the user onto the Map tab — back
+   * did two things at once.
+   */
+  useEffect(() => {
+    if (!visible) return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => sub.remove();
+  }, [visible, onClose]);
 
   /** Only the newest search may write results, or a slow one overwrites a fast one. */
   const searchId = useRef(0);
