@@ -106,6 +106,32 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      # Read the widget's declarations back out of the APK that was just built,
+      # not out of the sources that produced it. The widget's eligibility for a
+      # Flip's cover screen turns on three manifest details, and "it was right
+      # in the prebuild output" is not the same claim as "it is right in the
+      # file being installed" — the manifest merger sits between the two.
+      - name: Report the widget declarations
+        continue-on-error: true
+        run: |
+          AAPT2=$(find "$ANDROID_HOME/build-tools" -name aapt2 -type f 2>/dev/null | sort -V | tail -1)
+          if [ -z "$AAPT2" ]; then
+            echo "::warning title=No aapt2::Cannot read the widget declarations."
+            exit 0
+          fi
+          APK=$(ls dist/*.apk | head -1)
+          echo "=== receiver, from the built APK ==="
+          "$AAPT2" dump xmltree --file AndroidManifest.xml "$APK" \
+            | grep -A 30 'E: receiver' || echo '(no receiver element found)'
+          echo "=== main activity resizability ==="
+          "$AAPT2" dump xmltree --file AndroidManifest.xml "$APK" \
+            | grep -E 'resizeableActivity|supports_size_changes' || echo '(neither found)'
+          echo "=== the two widget resources ==="
+          for x in res/xml/widgetprovider_verge.xml res/xml/samsung_widgetprovider_verge.xml; do
+            echo "--- $x"
+            "$AAPT2" dump xmltree --file "$x" "$APK" || echo "(missing: $x)"
+          done
+
       # Read off the APK itself, so it reports what actually signed it rather
       # than what we hoped would. apksigner, not keytool: modern APKs carry only
       # a v2/v3 signature and `keytool -printcert -jarfile` cannot see those —
