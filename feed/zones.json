@@ -1,10 +1,10 @@
 {
-  "listedOn": "2026-09-05",
+  "listedOn": "2026-09-06",
   "source": "https://www.gosafe.org/camera-map/",
   "authorities": [
     "Carmarthenshire"
   ],
-  "generatedAt": "2026-09-05T18:09:52.423Z",
+  "generatedAt": "2026-09-06T05:30:36.520Z",
   "zones": [
     {
       "id": "gosafe-2391",
@@ -14,7 +14,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2391",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.798819,
@@ -30,7 +30,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2392",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 52.013973,
@@ -46,7 +46,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2393",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.990214,
@@ -62,7 +62,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2399",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.672921,
@@ -78,7 +78,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2401",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.795325,
@@ -94,7 +94,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2402",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.689295,
@@ -110,7 +110,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2403",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.689473,
@@ -126,7 +126,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2404",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.690625,
@@ -142,7 +142,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2405",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.690118,
@@ -158,7 +158,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2406",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.694698,
@@ -174,7 +174,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2407",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.684855,
@@ -190,7 +190,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2408",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.675436,
@@ -206,7 +206,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2409",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.672633,
@@ -222,7 +222,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2411",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.858989,
@@ -238,7 +238,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2412",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.716143,
@@ -254,7 +254,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2413",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.765177,
@@ -270,7 +270,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2414",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.706276,
@@ -286,7 +286,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2415",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.690568,
@@ -302,7 +302,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2416",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.805013,
@@ -318,7 +318,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2417",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.804702,
@@ -334,7 +334,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2419",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.79632,
@@ -350,7 +350,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2420",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.704995,
@@ -366,7 +366,7 @@
       "note": "Listed by Carmarthenshire as a red-light enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2421",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.682583,
@@ -382,7 +382,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2428",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.817217,
@@ -398,7 +398,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2431",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.83682,
@@ -414,7 +414,7 @@
       "note": "Listed by Carmarthenshire as a fixed enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2442",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.916461,
@@ -430,7 +430,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=2443",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.84121,
@@ -446,7 +446,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23145",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.68688,
@@ -462,7 +462,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23146",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.841729,
@@ -478,7 +478,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23148",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.799311,
@@ -494,7 +494,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23149",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.686154,
@@ -510,7 +510,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23150",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.785151,
@@ -526,7 +526,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23151",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.788181,
@@ -542,7 +542,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23154",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.689097,
@@ -558,7 +558,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23159",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.851131,
@@ -574,7 +574,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23160",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.796399,
@@ -590,7 +590,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23161",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 52.002296,
@@ -606,7 +606,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23166",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.685861,
@@ -622,7 +622,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23167",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.803903,
@@ -638,7 +638,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23168",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.858605,
@@ -654,7 +654,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23169",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.704323,
@@ -670,7 +670,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23171",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.787184,
@@ -686,7 +686,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23172",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 52.044858,
@@ -702,7 +702,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23173",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.787158,
@@ -718,7 +718,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23174",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.779455,
@@ -734,7 +734,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23177",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.689873,
@@ -750,7 +750,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23180",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.938569,
@@ -766,7 +766,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23181",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.859567,
@@ -782,7 +782,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23182",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.768268,
@@ -798,7 +798,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23185",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.688346,
@@ -814,7 +814,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23186",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.693687,
@@ -830,7 +830,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23187",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.693628,
@@ -846,7 +846,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23188",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.69177,
@@ -862,7 +862,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23189",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.688956,
@@ -878,7 +878,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23190",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.689608,
@@ -894,7 +894,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23191",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.684343,
@@ -910,7 +910,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23192",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.694225,
@@ -926,7 +926,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=23194",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.682755,
@@ -942,7 +942,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=30345",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 52.10322,
@@ -958,7 +958,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=30346",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.803928,
@@ -974,7 +974,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=30347",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 52.073027,
@@ -990,7 +990,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=30349",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.971056,
@@ -1006,7 +1006,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31526",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.700396,
@@ -1022,7 +1022,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31527",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.774506,
@@ -1038,7 +1038,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31528",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.787221,
@@ -1054,7 +1054,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31530",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.913476,
@@ -1070,7 +1070,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31531",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.778052,
@@ -1086,7 +1086,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31532",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.828403,
@@ -1102,7 +1102,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31533",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.781503,
@@ -1118,7 +1118,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31534",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.871384,
@@ -1134,7 +1134,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31536",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.973568,
@@ -1150,7 +1150,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31537",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 52.104506,
@@ -1166,7 +1166,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31539",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.795093,
@@ -1182,7 +1182,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31549",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.821385,
@@ -1198,7 +1198,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31550",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.730532,
@@ -1214,7 +1214,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31551",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.991761,
@@ -1230,7 +1230,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=31552",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.792814,
@@ -1246,7 +1246,7 @@
       "note": "Listed by Carmarthenshire as a mobile enforcement site.",
       "sourceUrl": "https://www.gosafe.org/camera-details?id=61552",
       "firstListed": "2026-09-04",
-      "lastListed": "2026-09-05",
+      "lastListed": "2026-09-06",
       "path": [
         {
           "latitude": 51.772465,
