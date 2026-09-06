@@ -34,9 +34,11 @@ const config: ExpoConfig = {
   },
   web: { favicon: './assets/favicon.png' },
   plugins: [
+    './plugins/with-cover-screen',
     [
-      // A standard Android app widget. Samsung's Flex Window surfaces these on
-      // the cover screen, so this is what a Flip cover widget is made of.
+      // A standard Android app widget, sized 2x2 because that is the cell a
+      // Flip's cover screen offers. Tapping it opens Verge, which is the point
+      // of it: one tap from the closed phone to the live map.
       'react-native-android-widget',
       {
         fonts: [
@@ -47,11 +49,12 @@ const config: ExpoConfig = {
           {
             name: 'Verge',
             label: 'Verge · published zones',
-            description: 'The nearest published enforcement zone, and how far it is.',
+            description:
+              'The nearest published enforcement zone, and how far it is. Tap to open Verge.',
             minWidth: '110dp',
-            minHeight: '58dp',
+            minHeight: '110dp',
             targetCellWidth: 2,
-            targetCellHeight: 1,
+            targetCellHeight: 2,
             resizeMode: 'horizontal|vertical',
             // Half an hour is Android's floor for automatic redraws; the app
             // also pushes an update whenever it learns something new.

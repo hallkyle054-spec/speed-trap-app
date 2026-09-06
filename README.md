@@ -25,7 +25,7 @@ is committed so the intent stays with the code.
   from the same tokens as the rest of the UI (`theme/mapStyle.ts`).
 - **`expo-location`** for foreground position and speed, **`expo-audio`** for the
   chime, **`expo-speech`** for the spoken announcement, **`expo-keep-awake`** so the
-  drive HUD stays lit.
+  screen never blanks while Verge is in front.
 - Fonts (**Cormorant Garamond** 400/600, **Lora** 400/600/400-italic) are bundled
   with the app, not fetched at runtime.
 
@@ -169,6 +169,30 @@ canvas is just empty.
 
 ---
 
+## The cover screen
+
+A Flip's cover display is small in both directions, so `App.tsx` measures the
+window rather than the model — under 600dp on the long edge and Verge renders
+`CoverDrive` and nothing else: a full-bleed following map, the distance to the
+next published zone, and two zoom bubbles. Tracking starts on its own there,
+because unfolding the phone to press **Start drive** would defeat the point.
+
+Two pieces make it reachable from the closed phone:
+
+- **`plugins/with-cover-screen.js`** sets `android:resizeableActivity="true"` on
+  the main activity and adds the `android.supports_size_changes` flag. Without
+  them Android puts the activity in device-compatibility mode and draws it in a
+  fixed-size box in the middle of the cover screen. Samsung's own foldable
+  guidance names the same attribute.
+- **The widget is 2x2**, the cell size a cover screen offers, and its whole face
+  is a tap target that opens the app. Samsung curates which third-party widgets
+  it will place on the cover screen, so this is necessary but may not be
+  sufficient; MultiStar's app launcher is the fallback route.
+
+Neither has been checked on a device — there isn't one here.
+
+---
+
 ## Layout
 
 ```
@@ -176,7 +200,10 @@ app/           MapScreen · TodayScreen · RoutesScreen · AlertsScreen
 components/    ZoneMarks · ZoneSheet · DriveHud · OfflineBanner · Switch · Segmented · Button · TabBar
 theme/         tokens.ts (light + dark maps) · type.ts · mapStyle.ts · ThemeProvider.tsx
 data/          zones.ts (types, fixture, phase derivation) · feed.ts (fetch + cache + stamp) · routes.ts · geo.ts
-state/         settings.tsx (persisted) · drive.ts · useLocation.ts
+state/         settings.tsx (persisted) · drive.ts · useLocation.ts · savedRoutes.tsx
+widgets/       the 2x2 home/cover-screen widget and the headless task handler
+plugins/       config plugins applied at prebuild (cover-screen resizability)
+ingest/        the daily job that rebuilds feed/zones.json
 tests/         pure-logic unit tests
 design_reference/   the handoff bundle
 App.tsx        tab state, the three overlays, providers
@@ -266,9 +293,7 @@ is done:
 ## Not built yet
 
 - The ingest job and feed (above).
-- **`Add a route`** — capturing a route needs a routing layer that is not in this
-  handoff. The button is present and stubbed.
-- **Background location.** The drive HUD is foreground-only and holds the screen
+- **Background location.** Verge is foreground-only and holds the screen
   awake. Warning a driver with the app backgrounded needs a foreground service and
   `ACCESS_BACKGROUND_LOCATION`, which is a separate piece of work (and a Play Store
   declaration).

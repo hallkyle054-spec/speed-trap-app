@@ -1,5 +1,4 @@
 import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
-import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as Location from 'expo-location';
 import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -70,7 +69,6 @@ export function useDrive(
     watcher.current?.remove();
     watcher.current = null;
     Speech.stop();
-    deactivateKeepAwake().catch(() => {});
   }, []);
 
   useEffect(() => stopEverything, [stopEverything]);
@@ -146,7 +144,6 @@ export function useDrive(
       // zone against its own first point — always zero — so the HUD opened
       // announcing "Now · Zone begins" before a single fix had arrived.
       setDistance(distanceTo(target, originRef.current));
-      activateKeepAwakeAsync('verge-drive').catch(() => {});
 
       (async () => {
         const { granted } = await Location.requestForegroundPermissionsAsync().catch(() => ({

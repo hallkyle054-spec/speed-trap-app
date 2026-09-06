@@ -12,8 +12,11 @@ type Hex = `#${string}`;
 const hex = (token: string, ground: string): Hex => flatten(token, ground) as Hex;
 
 /**
- * The cover-screen widget. It is read at arm's length, in a second, so it says
- * one thing large and everything else quietly.
+ * The cover-screen widget: a 2x2 square, because that is the cell a Flip's
+ * cover screen offers. It is read at arm's length, in a second, so it says one
+ * thing large and everything else quietly — and the whole face is a tap target
+ * that opens Verge, which is how the app gets started without unfolding the
+ * phone.
  *
  * Widget styles take plain colours, not the app's translucent ink tokens, so
  * the tokens are composited over the ground first — the same treatment the map
@@ -60,38 +63,39 @@ export function VergeWidget({
         height: 'match_parent',
         width: 'match_parent',
         flexDirection: 'column',
-        justifyContent: 'center',
+        // A square has room to breathe, so the reading sits at the top and the
+        // provenance line holds the bottom edge rather than trailing after it.
+        justifyContent: 'space-between',
         backgroundColor: ground,
-        borderRadius: 16,
+        borderRadius: 22,
         paddingHorizontal: 14,
-        paddingVertical: 12,
+        paddingVertical: 13,
       }}
     >
-      <TextWidget
-        text={showDistance ? 'NEAREST ZONE' : 'PUBLISHED ZONES'}
-        style={{ fontSize: 9, letterSpacing: 1.2, color: faint, fontFamily: 'Lora' }}
-      />
-      <TextWidget
-        text={headline}
-        style={{ fontSize: 34, color: ink, fontFamily: 'CormorantGaramond', marginTop: 2 }}
-      />
-      <TextWidget
-        text={caption}
-        maxLines={2}
-        style={{ fontSize: 11, color: muted, fontFamily: 'Lora', marginTop: 2 }}
-      />
-      {summary ? (
+      <FlexWidget style={{ flexDirection: 'column' }}>
         <TextWidget
-          text={
-            showDistance
-              ? `as of ${clock(summary.at)} · camera not confirmed`
-              : 'camera not confirmed'
-          }
-          style={{ fontSize: 9, color: faint, fontFamily: 'Lora', marginTop: 6 }}
+          text={showDistance ? 'NEAREST ZONE' : 'PUBLISHED ZONES'}
+          style={{ fontSize: 9, letterSpacing: 1.2, color: faint, fontFamily: 'Lora' }}
         />
-      ) : (
-        <FlexWidget style={{ width: 0, height: 0 }} />
-      )}
+        <TextWidget
+          text={headline}
+          style={{ fontSize: 38, color: ink, fontFamily: 'CormorantGaramond', marginTop: 2 }}
+        />
+        <TextWidget
+          text={caption}
+          maxLines={3}
+          style={{ fontSize: 11, color: muted, fontFamily: 'Lora', marginTop: 2 }}
+        />
+      </FlexWidget>
+      <TextWidget
+        text={
+          summary && showDistance
+            ? `as of ${clock(summary.at)} · camera not confirmed`
+            : 'camera not confirmed'
+        }
+        maxLines={2}
+        style={{ fontSize: 9, color: faint, fontFamily: 'Lora', marginTop: 6 }}
+      />
     </FlexWidget>
   );
 }

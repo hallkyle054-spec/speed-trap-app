@@ -1,4 +1,5 @@
 import { useFonts } from 'expo-font';
+import { useKeepAwake } from 'expo-keep-awake';
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BackHandler, StyleSheet, View, useWindowDimensions } from 'react-native';
@@ -46,6 +47,14 @@ function useMinuteClock(): Date {
 }
 
 function Verge() {
+  /**
+   * The display stays on for as long as Verge is in front. A driver glances at
+   * this rather than touching it, and a screen that has blanked itself cannot
+   * warn anybody. Android drops the flag as soon as the app is backgrounded, so
+   * this costs nothing once the phone is put away.
+   */
+  useKeepAwake('verge');
+
   const { t, isDark } = useTheme();
   const { settings, set, toggle } = useSettings();
   const insets = useSafeAreaInsets();
