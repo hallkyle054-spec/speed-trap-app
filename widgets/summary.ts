@@ -20,6 +20,8 @@ export type WidgetSummary = {
   nearestLabel: string | null;
   /** Metres to it. */
   nearestMetres: number | null;
+  /** Its posted limit in mph, when the list gives one. */
+  nearestLimitMph: number | null;
   /** When this was written, as an ISO timestamp. */
   at: string;
   /** False when the position was the fallback origin rather than a real fix. */
@@ -45,6 +47,8 @@ export async function readSummary(): Promise<WidgetSummary | null> {
       listedOn: typeof parsed.listedOn === 'string' ? parsed.listedOn : null,
       nearestLabel: typeof parsed.nearestLabel === 'string' ? parsed.nearestLabel : null,
       nearestMetres: typeof parsed.nearestMetres === 'number' ? parsed.nearestMetres : null,
+      nearestLimitMph:
+        typeof parsed.nearestLimitMph === 'number' ? parsed.nearestLimitMph : null,
       at: parsed.at,
       fromRealFix: parsed.fromRealFix === true,
     };

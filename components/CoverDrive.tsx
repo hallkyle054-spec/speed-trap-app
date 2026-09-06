@@ -19,8 +19,15 @@ import { ZoneMarks } from './ZoneMarks';
  * A Flip's Flex Window is about four inches and is read at a glance with one
  * hand on the wheel, so this drops everything the phone screen carries except
  * the two things that matter — where you are, and how far the next published
- * zone is. Two zoom bubbles, because that is the one adjustment worth making
- * without unfolding the phone.
+ * zone is.
+ *
+ * The map follows you until you drag it, and then stops: a map that snaps back
+ * half a second after you have moved it is a map you cannot look ahead on. The
+ * recentre bubble puts it back on you and starts the following again.
+ *
+ * Pinch stays off. Zoom lives entirely in the two bubbles, so the zoom level
+ * this component holds is always what the map is actually showing — a pinch
+ * would desynchronise the two and the next follow would snap the zoom back.
  */
 
 const MIN_ZOOM = 11;
@@ -56,17 +63,29 @@ export function CoverDrive({
    * not saved: this is where the driver is going now, from where they are now,
    * and it stops meaning anything the moment either changes.
    */
+  /** Dragging the map stops it following, until the recentre bubble is pressed. */
+  const [following, setFollowing] = useState(true);
   const [routing, setRouting] = useState(false);
   const [route, setRoute] = useState<{ route: Route; to: Place } | null>(null);
 
   // Follow the fix. At two a second this is the only thing moving on screen.
   useEffect(() => {
-    if (!position) return;
+    if (!following || !position) return;
     mapRef.current?.animateCamera({ center: position, zoom }, { duration: 400 });
-  }, [position?.latitude, position?.longitude, zoom]);
+  }, [following, position?.latitude, position?.longitude, zoom]);
 
-  const nudgeZoom = (by: number) =>
-    setZoom(current => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, current + by)));
+  const nudgeZoom = (by: number) => {
+    const next = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom + by));
+    setZoom(next);
+    // While following, the effect above moves the camera. While panned away it
+    // does not run, so the zoom is applied here without dragging the view back.
+    if (!following) mapRef.current?.animateCamera({ zoom: next }, { duration: 200 });
+  };
+
+  const recentre = () => {
+    setFollowing(true);
+    if (position) mapRef.current?.animateCamera({ center: position, zoom }, { duration: 400 });
+  };
 
   return (
     <View style={[styles.root, { backgroundColor: t.bg }]}>
@@ -88,7 +107,8 @@ export function CoverDrive({
         showsTraffic={false}
         showsCompass={false}
         toolbarEnabled={false}
-        scrollEnabled={false}
+        scrollEnabled
+        onPanDrag={() => setFollowing(false)}
         rotateEnabled={false}
         pitchEnabled={false}
         zoomEnabled={false}
@@ -136,6 +156,13 @@ export function CoverDrive({
       </View>
 
       <View style={[styles.zoom, { bottom: insets.bottom + 10 }]}>
+        {/* Always rendered, so the stack never shifts under a moving thumb. */}
+        <Bubble
+          label="recentre"
+          onPress={recentre}
+          disabled={following || !position}
+          glyph={<Crosshair />}
+        />
         <Bubble label="+" onPress={() => nudgeZoom(1)} disabled={zoom >= MAX_ZOOM} />
         <Bubble label="–" onPress={() => nudgeZoom(-1)} disabled={zoom <= MIN_ZOOM} />
       </View>
@@ -184,20 +211,39 @@ export function CoverDrive({
   );
 }
 
+/**
+ * A ring around a dot, drawn rather than set: the obvious glyphs for this are
+ * not in either of the app's two fonts, and what Android falls back to for them
+ * is nobody's decision.
+ */
+function Crosshair() {
+  const { t } = useTheme();
+  return (
+    <View style={[styles.ring, { borderColor: t.ink }]}>
+      <View style={[styles.ringDot, { backgroundColor: t.ink }]} />
+    </View>
+  );
+}
+
 function Bubble({
   label,
   onPress,
   disabled,
+  glyph,
 }: {
   label: string;
   onPress: () => void;
   disabled: boolean;
+  /** Drawn instead of the label, when a glyph reads faster than a character. */
+  glyph?: React.ReactNode;
 }) {
   const { t } = useTheme();
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={label === '+' ? 'Zoom in' : 'Zoom out'}
+      accessibilityLabel={
+        label === '+' ? 'Zoom in' : label === '–' ? 'Zoom out' : 'Recentre on me'
+      }
       onPress={onPress}
       disabled={disabled}
       style={({ pressed }) => [
@@ -209,7 +255,7 @@ function Bubble({
         },
       ]}
     >
-      <Text style={[display(20), { color: t.ink }]}>{label}</Text>
+      {glyph ?? <Text style={[display(20), { color: t.ink }]}>{label}</Text>}
     </Pressable>
   );
 }
@@ -247,6 +293,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  ring: {
+    width: 17,
+    height: 17,
+    borderRadius: 9,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ringDot: { width: 5, height: 5, borderRadius: 3 },
   locating: {
     position: 'absolute',
     alignSelf: 'center',

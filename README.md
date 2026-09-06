@@ -174,9 +174,17 @@ canvas is just empty.
 A Flip's cover display is small in both directions, so `App.tsx` measures the
 window rather than the model — under 600dp on the long edge and Verge renders
 `CoverDrive` and nothing else: a full-bleed following map, the distance to the
-next published zone, two zoom bubbles, and a **ROUTE** button. Tracking starts on
-its own there, because unfolding the phone to press **Start drive** would defeat
-the point.
+next published zone, three bubbles and a **ROUTE** button. Tracking starts on its
+own there, because unfolding the phone to press **Start drive** would defeat the
+point.
+
+The map follows you until you drag it, and then stops: a map that snaps back
+half a second after you moved it is one you cannot look ahead on. The recentre
+bubble — a ring around a dot, drawn rather than set, because the obvious glyphs
+are in neither of the app's fonts — puts it back on you and resumes following.
+Pinch stays off deliberately: zoom lives entirely in the two bubbles, so the
+zoom level the component holds is always what the map is showing. A pinch would
+desynchronise the two and the next follow would snap the zoom back.
 
 Routing from the cover screen asks one question — where to. The start is
 wherever the driver is, which is the only sensible answer with the phone shut
@@ -220,7 +228,14 @@ because declaring cells makes Android place it on a home-screen grid and the
 cover screen is not a grid. It stays resizable, and Android reports the size it
 actually gave the widget on every redraw, so `VergeWidget` picks its layout from
 that: a one-line strip under 90dp, a tile under 200dp, the full panel above it.
-Tapping it opens the app.
+Tapping it opens the app — on the screen you tapped it from. The library routes
+every widget tap through a broadcast receiver and then calls a bare
+`startActivity`, which carries no display id, so a tap on the cover screen would
+have opened the app on the main one behind a closed phone. The config plugin
+replaces the generated provider class with one that sets `launchDisplayId` to
+whichever display is currently awake: shut, that is the cover screen; open, the
+main one. Every step of it is guarded — an app that cannot open on the right
+screen should still open on the wrong one rather than not at all.
 
 At the panel size the widget draws square and edge to edge. Samsung rounds the
 panel off itself, so rounding it again only opens a gap at each corner where the

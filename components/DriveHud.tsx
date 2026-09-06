@@ -162,7 +162,7 @@ export function DriveHud({
 
         <View style={[styles.disclosure, { borderLeftColor: t.accent }]}>
           <Text style={[body(12), styles.disclosureText, { color: t.ink70 }]}>
-            Published zone — camera not confirmed.
+            A published zone. A mobile camera may or may not be here.
           </Text>
         </View>
       </View>

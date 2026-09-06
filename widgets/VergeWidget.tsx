@@ -65,6 +65,7 @@ export function VergeWidget({
   const ink = t.ink as Hex;
   const muted = hex(t.ink55, t.bg);
   const faint = hex(t.ink45, t.bg);
+  const accentWash = hex(t.accentTint2, t.bg);
 
   // With no position yet the count is the honest headline; a distance would be
   // inventing a proximity nobody measured.
@@ -79,6 +80,91 @@ export function VergeWidget({
     : showDistance
       ? (summary.nearestLabel ?? 'Nearest published zone')
       : `zones published${summary.listedOn ? ` · ${shortDate(summary.listedOn)}` : ''}`;
+
+  if (variant === 'cover') {
+    const limit = summary?.nearestLimitMph;
+    return (
+      <FlexWidget
+        style={{
+          height: 'match_parent',
+          width: 'match_parent',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          backgroundColor: ground,
+          borderRadius: s.radius,
+          paddingHorizontal: s.pad,
+          paddingVertical: s.padY,
+        }}
+      >
+        {/* Tapping the reading opens the app too — the button is for finding, */}
+        {/* not for gatekeeping. */}
+        <FlexWidget clickAction="OPEN_APP" style={{ flexDirection: 'column', width: 'match_parent' }}>
+          <TextWidget
+            text={showDistance ? 'NEAREST ZONE' : 'PUBLISHED ZONES'}
+            style={{ fontSize: s.kicker, letterSpacing: 1.4, color: faint, fontFamily: 'Lora' }}
+          />
+          <TextWidget
+            text={headline}
+            style={{ fontSize: s.headline, color: ink, fontFamily: 'CormorantGaramond', marginTop: 2 }}
+          />
+          <TextWidget
+            text={caption}
+            maxLines={2}
+            style={{ fontSize: s.caption, color: muted, fontFamily: 'Lora', marginTop: 4 }}
+          />
+          {limit ? (
+            <TextWidget
+              text={`${limit} MPH limit`}
+              style={{ fontSize: s.caption, color: muted, fontFamily: 'Lora', marginTop: 2 }}
+            />
+          ) : (
+            <FlexWidget style={{ width: 0, height: 0 }} />
+          )}
+        </FlexWidget>
+
+        <FlexWidget
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: 'match_parent',
+          }}
+        >
+          <FlexWidget style={{ flexDirection: 'column', flexGap: 0, width: 'wrap_content' }}>
+            <TextWidget
+              text="possible mobile camera"
+              style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora' }}
+            />
+            {summary && showDistance ? (
+              <TextWidget
+                text={`as of ${clock(summary.at)}`}
+                style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora', marginTop: 1 }}
+              />
+            ) : (
+              <FlexWidget style={{ width: 0, height: 0 }} />
+            )}
+          </FlexWidget>
+
+          {/* A real target rather than a hint: the whole point of the widget is */}
+          {/* getting to the live map without unfolding the phone. */}
+          <FlexWidget
+            clickAction="OPEN_APP"
+            style={{
+              paddingHorizontal: 16,
+              paddingVertical: 10,
+              borderRadius: 20,
+              backgroundColor: accentWash,
+            }}
+          >
+            <TextWidget
+              text="OPEN"
+              style={{ fontSize: s.kicker, letterSpacing: 1.6, color: ink, fontFamily: 'Lora' }}
+            />
+          </FlexWidget>
+        </FlexWidget>
+      </FlexWidget>
+    );
+  }
 
   if (variant === 'compact') {
     return (
@@ -105,7 +191,7 @@ export function VergeWidget({
             style={{ fontSize: s.kicker, letterSpacing: 1.1, color: faint, fontFamily: 'Lora' }}
           />
           <TextWidget
-            text="camera not confirmed"
+            text="possible mobile camera"
             style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora', marginTop: 1 }}
           />
         </FlexWidget>
@@ -147,8 +233,8 @@ export function VergeWidget({
       <TextWidget
         text={
           summary && showDistance
-            ? `as of ${clock(summary.at)} · camera not confirmed`
-            : 'camera not confirmed'
+            ? `as of ${clock(summary.at)} · possible mobile camera`
+            : 'possible mobile camera'
         }
         maxLines={2}
         style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora', marginTop: s.gap }}

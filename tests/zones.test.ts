@@ -76,11 +76,16 @@ test('an unpublished speed limit says so rather than guessing', () => {
 });
 
 test('every note and status keeps the disclaimer and never claims a camera', () => {
-  assert.match(rowNote(zone(), 'listed'), /camera not confirmed$/);
-  assert.match(rowNote(zone({ lastListed: '2026-08-27' }), 'removed'), /camera not confirmed$/);
+  // The zone is the confirmed part; the camera is the maybe. Both notes have to
+  // carry that, and neither may promise a camera.
+  assert.match(rowNote(zone(), 'listed'), /possible mobile camera$/);
+  assert.match(rowNote(zone({ lastListed: '2026-08-27' }), 'removed'), /possible mobile camera$/);
   for (const status of ['listed', 'removed'] as const) {
     assert.doesNotMatch(statusLabel(status), /camera|van|confirmed/i);
-    assert.doesNotMatch(rowNote(zone(), status), /camera confirmed|camera present/i);
+    assert.doesNotMatch(
+      rowNote(zone(), status),
+      /camera (is |)(confirmed|present|here)|confirmed camera|camera ahead/i,
+    );
   }
 });
 

@@ -52,6 +52,7 @@ export function useWidgetSummary({
       listedOn,
       nearestLabel: nearest ? zoneTitle(nearest) : null,
       nearestMetres: metres,
+      nearestLimitMph: nearest?.limitMph ?? null,
       at: new Date().toISOString(),
       fromRealFix: originIsReal,
     };

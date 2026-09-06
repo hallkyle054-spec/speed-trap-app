@@ -72,9 +72,8 @@ export function TodayScreen({ zones, statusOf, listedOn, onOpenZone, topInset }:
         })}
 
         <Text style={[body(11), styles.closing, { color: t.ink50 }]}>
-          Every entry above is a zone {PUBLISHER} has published for enforcement. It is not a
-          confirmation that a camera van is present, and vans operate in zones that may not appear
-          here.
+          Every entry above is a zone {PUBLISHER} has published for enforcement. A van may or may
+          not be in any of them, and vans work zones that never appear here.
         </Text>
       </ScrollView>
     </View>

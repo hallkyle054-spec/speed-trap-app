@@ -67,7 +67,7 @@ export function ZoneSheet({ zone, status, distance, onClose, onDrive, bottomInse
 
         <View style={[styles.disclosure, { borderLeftColor: t.accent }]}>
           <Text style={[body(11.5), styles.disclosureText, { color: t.ink70 }]}>
-            Published zone — camera not confirmed. {zone.note}
+            A published zone. A mobile camera may or may not be here. {zone.note}
           </Text>
           {zone.sourceUrl ? (
             <Pressable

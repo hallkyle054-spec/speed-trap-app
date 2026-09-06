@@ -3,8 +3,9 @@ import { LatLng, Region, distanceToPath, pathLength } from './geo';
 
 /**
  * The premise the whole interface is built on: the partnership publishes
- * enforcement *zones*, not live camera positions. Nothing here may describe a
- * zone as a confirmed camera.
+ * enforcement *zones*, not live camera positions. The zone is the confirmed
+ * part; the camera is the maybe. Nothing here may describe a zone as a camera
+ * that is definitely there.
  *
  * The design assumed a daily list with published enforcement windows
  * ('08:00–13:00'). It does not exist — the publisher releases a list of
@@ -83,8 +84,8 @@ export const statusLabel = (status: ZoneStatus) =>
 /** The note under each row. Never omits the disclaimer. */
 export function rowNote(zone: Zone, status: ZoneStatus): string {
   return status === 'listed'
-    ? 'Published zone · camera not confirmed'
-    : `Removed from the list ${shortDate(zone.lastListed)} · camera not confirmed`;
+    ? 'Published zone · possible mobile camera'
+    : `Removed from the list ${shortDate(zone.lastListed)} · possible mobile camera`;
 }
 
 export function shortDate(iso: string): string {
