@@ -3,7 +3,7 @@ name: Flex Window probe
 # Reconnaissance only. Samsung's developer documentation is unreachable from
 # the environment this repo is worked on in, but an Actions runner has open
 # egress, so this fetches the pages describing how a widget opts in to a Flip's
-# cover screen and prints them for reading back out of the log.
+# cover screen and prints the relevant lines for reading back out of the log.
 #
 # It builds nothing and changes nothing.
 on:
@@ -21,19 +21,16 @@ jobs:
     steps:
       - name: Fetch the Flex Window widget documentation
         run: |
-          for url in \
-            'https://developer.samsung.com/codelab/galaxy-z/widget-flex-window.html' \
-            'https://developer.samsung.com/galaxy-z/flex_window.html' \
-            'https://akexorcist.dev/make-your-android-widget-display-on-the-cover-screen-of-the-samsung-galaxy-z-flip5/' \
-          ; do
+          urls="https://developer.samsung.com/codelab/galaxy-z/widget-flex-window.html
+          https://developer.samsung.com/galaxy-z/flex_window.html
+          https://akexorcist.dev/make-your-android-widget-display-on-the-cover-screen-of-the-samsung-galaxy-z-flip5/"
+          echo "$urls" | while read -r url; do
             echo "==================== $url ===================="
-            curl -sSL --max-time 60 "$url" \
-              | python3 -c "
-import html, re, sys
-raw = sys.stdin.read()
-raw = re.sub(r'(?is)<(script|style|svg)\b.*?</\1>', ' ', raw)
-text = html.unescape(re.sub(r'(?s)<[^>]+>', '\n', raw))
-lines = [l.strip() for l in text.splitlines()]
-print('\n'.join(l for l in lines if l))
-" || echo "(fetch failed)"
+            curl -sSL --max-time 60 "$url" -o page.html || { echo "(fetch failed)"; continue; }
+            wc -c page.html
+            sed -e 's/></>\n</g' page.html \
+              | grep -i -C 4 -E 'samsung-appwidget-provider|sub_screen|subscreen|com\.samsung\.android\.appwidget|cover_?screen|flex.window' \
+              | sed -e 's/<[^>]*>//g' -e 's/^[[:space:]]*//' \
+              | grep -v '^$' \
+              | head -200
           done
