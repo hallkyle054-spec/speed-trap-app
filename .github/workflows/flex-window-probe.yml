@@ -1,9 +1,9 @@
 name: Flex Window probe
 
-# Reconnaissance only. Samsung's developer documentation is unreachable from
-# the environment this repo is worked on in, but an Actions runner has open
-# egress, so this fetches the pages describing how a widget opts in to a Flip's
-# cover screen and prints the relevant lines for reading back out of the log.
+# Reconnaissance only. The pages describing how a widget gets onto a Flip's
+# cover screen are unreachable from the environment this repo is worked on in,
+# but an Actions runner has open egress, so this fetches them and prints the
+# relevant lines for reading back out of the log.
 #
 # It builds nothing and changes nothing.
 on:
@@ -19,18 +19,21 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch the Flex Window widget documentation
+      - name: Fetch cover-screen widget documentation and reports
         run: |
-          urls="https://developer.samsung.com/codelab/galaxy-z/widget-flex-window.html
-          https://developer.samsung.com/galaxy-z/flex_window.html
-          https://akexorcist.dev/make-your-android-widget-display-on-the-cover-screen-of-the-samsung-galaxy-z-flip5/"
+          urls="https://www.androidauthority.com/samsung-galaxy-z-flip-7-flip-7-fe-cover-screen-upgrade-3574841/
+          https://us.community.samsung.com/t5/Mobile-Tips/Z-Flip-7-Adding-Widgets-to-Your-Cover-Screen/ba-p/3371182
+          https://www.samsung.com/uk/support/mobile-devices/how-to-set-up-and-use-widgets-on-the-cover-screen-of-your-galaxy-z-flip7/
+          https://developer.samsung.com/sdp/blog/en/2024/01/09/best-practices-of-app-development-for-various-screen-sizespowered-by-good-lock"
           echo "$urls" | while read -r url; do
             echo "==================== $url ===================="
-            curl -sSL --max-time 60 "$url" -o page.html || { echo "(fetch failed)"; continue; }
+            curl -sSL --max-time 60 -A 'Mozilla/5.0 (X11; Linux x86_64)' "$url" -o page.html || { echo "(fetch failed)"; continue; }
             wc -c page.html
             sed -e 's/></>\n</g' page.html \
-              | grep -i -C 4 -E 'samsung-appwidget-provider|sub_screen|subscreen|com\.samsung\.android\.appwidget|cover_?screen|flex.window' \
+              | grep -i -C 3 -E 'widget|sub_screen|cover screen|flex window' \
               | sed -e 's/<[^>]*>//g' -e 's/^[[:space:]]*//' \
               | grep -v '^$' \
-              | head -200
+              | grep -v -E '^(--|\{|\}|\[|\]|,|"|\.|@)' \
+              | awk 'length($0) > 40' \
+              | head -80
           done
