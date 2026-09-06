@@ -34,6 +34,9 @@ const config: ExpoConfig = {
   },
   web: { favicon: './assets/favicon.png' },
   plugins: [
+    // Listed before react-native-android-widget so it runs after it: Expo
+    // applies mods in reverse registration order, and this one edits the
+    // manifest entry and provider XML that plugin writes.
     './plugins/with-cover-screen',
     [
       // A standard Android app widget, sized 2x2 because that is the cell a
@@ -63,6 +66,24 @@ const config: ExpoConfig = {
             previewImage: './assets/widget-preview.png',
             // Half an hour is Android's floor for automatic redraws; the app
             // also pushes an update whenever it learns something new.
+            updatePeriodMillis: 1800000,
+          },
+          {
+            // Sized for a Flip's Flex Window, which Samsung treats as one
+            // full-bleed widget rather than a grid of cells. The dimensions are
+            // Samsung's own for a cover-screen widget; `resizeMode` lets a
+            // larger cover screen than the Flip 5's grow it.
+            //
+            // `plugins/with-cover-screen.js` is what actually gets this offered
+            // on the cover screen — see the note there.
+            name: 'VergeCover',
+            label: 'Verge · cover screen',
+            description:
+              'The nearest published enforcement zone, sized for the cover screen. Tap to open Verge.',
+            minWidth: '352dp',
+            minHeight: '339dp',
+            resizeMode: 'horizontal|vertical',
+            previewImage: './assets/widget-preview-cover.png',
             updatePeriodMillis: 1800000,
           },
         ],

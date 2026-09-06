@@ -3,6 +3,7 @@ import { Appearance, Platform } from 'react-native';
 import { requestWidgetUpdate } from 'react-native-android-widget';
 
 import { VergeWidget } from './VergeWidget';
+import { WIDGETS } from './names';
 
 import { LatLng } from '../data/geo';
 import { Zone, distanceTo, nearestZone, zoneTitle } from '../data/zones';
@@ -57,12 +58,16 @@ export function useWidgetSummary({
 
     void writeSummary(summary).then(() => {
       if (Platform.OS !== 'android') return;
-      // Best effort: with no widget placed this is simply a no-op.
+      const isDark = Appearance.getColorScheme() === 'dark';
+      // Best effort, and for both sizes: with neither widget placed these are
+      // simply no-ops.
       requestWidgetUpdate({
-        widgetName: 'Verge',
-        renderWidget: () => (
-          <VergeWidget summary={summary} isDark={Appearance.getColorScheme() === 'dark'} />
-        ),
+        widgetName: WIDGETS.tile,
+        renderWidget: () => <VergeWidget summary={summary} isDark={isDark} variant="tile" />,
+      });
+      requestWidgetUpdate({
+        widgetName: WIDGETS.cover,
+        renderWidget: () => <VergeWidget summary={summary} isDark={isDark} variant="cover" />,
       });
     });
   }, [zones, listedOn, origin, originIsReal]);

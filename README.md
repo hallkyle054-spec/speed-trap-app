@@ -177,24 +177,45 @@ window rather than the model — under 600dp on the long edge and Verge renders
 next published zone, and two zoom bubbles. Tracking starts on its own there,
 because unfolding the phone to press **Start drive** would defeat the point.
 
-Two pieces make it reachable from the closed phone:
+`plugins/with-cover-screen.js` carries the Android and Samsung-specific parts,
+all of it from Samsung's published Flex Window guidance:
 
-- **`plugins/with-cover-screen.js`** sets `android:resizeableActivity="true"` on
-  the main activity and adds the `android.supports_size_changes` flag. Without
-  them Android puts the activity in device-compatibility mode and draws it in a
-  fixed-size box in the middle of the cover screen. Samsung's own foldable
-  guidance names the same attribute.
-- **The widget is 2x2**, the cell size a cover screen offers, and its whole face
-  is a tap target that opens the app. Samsung curates which third-party widgets
-  it will place on the cover screen, so this is necessary but may not be
-  sufficient; MultiStar's app launcher is the fallback route.
-- **`assets/widget-preview.png`** is what the widget picker draws. The widget's
-  own layout (`@layout/rn_widget`, from the library) is a transparent frame that
-  the app fills with a bitmap at runtime, so without a preview the picker shows
-  an empty tile — present, but easy to scroll straight past. Regenerate it to
-  match the design rather than screenshotting a device.
+- **The app fills the cover display.** `android:resizeableActivity="true"` on the
+  main activity plus the `android.supports_size_changes` flag. Without them
+  Android puts the activity in device-compatibility mode and draws it in a
+  fixed-size box in the middle of the screen.
+- **The cover widget is offered on the Flex Window at all.** Samsung does not
+  place arbitrary widgets there. A widget opts in with a
+  `com.samsung.android.appwidget.provider` meta-data pointing at a
+  `<samsung-appwidget-provider display="sub_screen">` resource, and its ordinary
+  provider must be categorised `keyguard` rather than `home_screen`.
+  react-native-android-widget knows about neither and hardcodes `home_screen`,
+  so the plugin writes the Samsung resource and rewrites the category — for the
+  cover widget only.
 
-Neither has been checked on a device — there isn't one here.
+There are two widgets, because one shape cannot serve both surfaces
+(`widgets/names.ts` holds the names, which are also the generated provider class
+names):
+
+- **`Verge`** — a 2x2 home-screen tile.
+- **`VergeCover`** — 352x339dp, Samsung's own dimensions for a Flex Window
+  widget, which the cover screen treats as one full-bleed widget rather than a
+  grid of cells.
+
+Both render from `VergeWidget` at different scales and both open the app when
+tapped. **`assets/widget-preview*.png`** are what the picker draws: the widget's
+own layout (`@layout/rn_widget`, from the library) is a transparent frame that
+the app fills with a bitmap at runtime, so without a preview the picker shows an
+empty tile — present, but easy to scroll straight past. Regenerate them to match
+the design rather than screenshotting a device.
+
+One known gap: the library opens the app from a broadcast receiver with a plain
+`startActivity` and no `ActivityOptions`, so nothing tells Android which display
+to launch on. Samsung's guidance is to set `launchDisplayId` on the
+`PendingIntent` (0 main, 1 cover). If a tap on the cover widget opens the app on
+the main screen, that is why.
+
+None of this has been checked on a device — there isn't one here.
 
 ---
 

@@ -12,16 +12,27 @@ type Hex = `#${string}`;
 const hex = (token: string, ground: string): Hex => flatten(token, ground) as Hex;
 
 /**
- * The cover-screen widget: a 2x2 square, because that is the cell a Flip's
- * cover screen offers. It is read at arm's length, in a second, so it says one
- * thing large and everything else quietly — and the whole face is a tap target
- * that opens Verge, which is how the app gets started without unfolding the
- * phone.
+ * The widget, in two sizes.
+ *
+ * `tile` is a 2x2 home-screen cell. `cover` fills a Flip's Flex Window, which
+ * Samsung treats as one full-bleed widget rather than a grid of cells — so it
+ * is the same reading, set larger, with room for the road it belongs to.
+ *
+ * Either way it is read at arm's length, in a second, so it says one thing
+ * large and everything else quietly, and its whole face is a tap target that
+ * opens Verge.
  *
  * Widget styles take plain colours, not the app's translucent ink tokens, so
  * the tokens are composited over the ground first — the same treatment the map
  * style gets.
  */
+export type WidgetVariant = 'tile' | 'cover';
+
+/** One scale per variant rather than a multiplier: these are read, not derived. */
+const SIZES = {
+  tile: { pad: 14, padY: 13, radius: 22, kicker: 9, headline: 38, caption: 11, foot: 9, gap: 6 },
+  cover: { pad: 30, padY: 28, radius: 34, kicker: 13, headline: 84, caption: 19, foot: 12, gap: 10 },
+} as const;
 
 const clock = (iso: string) => {
   const d = new Date(iso);
@@ -32,11 +43,14 @@ const clock = (iso: string) => {
 export function VergeWidget({
   summary,
   isDark,
+  variant = 'tile',
 }: {
   summary: WidgetSummary | null;
   isDark: boolean;
+  variant?: WidgetVariant;
 }) {
   const t = isDark ? dark : light;
+  const s = SIZES[variant];
   const ground = t.bg as Hex;
   const ink = t.ink as Hex;
   const muted = hex(t.ink55, t.bg);
@@ -63,28 +77,28 @@ export function VergeWidget({
         height: 'match_parent',
         width: 'match_parent',
         flexDirection: 'column',
-        // A square has room to breathe, so the reading sits at the top and the
-        // provenance line holds the bottom edge rather than trailing after it.
+        // There is room to breathe at both sizes, so the reading sits at the
+        // top and the provenance line holds the bottom edge.
         justifyContent: 'space-between',
         backgroundColor: ground,
-        borderRadius: 22,
-        paddingHorizontal: 14,
-        paddingVertical: 13,
+        borderRadius: s.radius,
+        paddingHorizontal: s.pad,
+        paddingVertical: s.padY,
       }}
     >
       <FlexWidget style={{ flexDirection: 'column' }}>
         <TextWidget
           text={showDistance ? 'NEAREST ZONE' : 'PUBLISHED ZONES'}
-          style={{ fontSize: 9, letterSpacing: 1.2, color: faint, fontFamily: 'Lora' }}
+          style={{ fontSize: s.kicker, letterSpacing: 1.2, color: faint, fontFamily: 'Lora' }}
         />
         <TextWidget
           text={headline}
-          style={{ fontSize: 38, color: ink, fontFamily: 'CormorantGaramond', marginTop: 2 }}
+          style={{ fontSize: s.headline, color: ink, fontFamily: 'CormorantGaramond', marginTop: 2 }}
         />
         <TextWidget
           text={caption}
           maxLines={3}
-          style={{ fontSize: 11, color: muted, fontFamily: 'Lora', marginTop: 2 }}
+          style={{ fontSize: s.caption, color: muted, fontFamily: 'Lora', marginTop: 2 }}
         />
       </FlexWidget>
       <TextWidget
@@ -94,7 +108,7 @@ export function VergeWidget({
             : 'camera not confirmed'
         }
         maxLines={2}
-        style={{ fontSize: 9, color: faint, fontFamily: 'Lora', marginTop: 6 }}
+        style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora', marginTop: s.gap }}
       />
     </FlexWidget>
   );
