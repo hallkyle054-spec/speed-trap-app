@@ -4,6 +4,7 @@ import { requestWidgetUpdate } from 'react-native-android-widget';
 
 import { VergeWidget } from './VergeWidget';
 import { WIDGET_NAME, variantForHeight } from './names';
+import { RefreshState, shouldRefresh } from './refresh';
 import { widgetIsDark } from './theme';
 
 import { LatLng, offsetMetres } from '../data/geo';
@@ -37,22 +38,28 @@ export function useWidgetSummary({
   originIsReal: boolean;
   theme: Theme;
 }) {
-  const lastWrite = useRef(0);
-  const lastMetres = useRef<number | null>(null);
+  const last = useRef<RefreshState | null>(null);
 
   useEffect(() => {
     const nearest = zones.length ? nearestZone(zones, origin) : null;
     const metres = nearest ? distanceTo(nearest, origin) : null;
+    /** Everything the widget shows that does not move with the driver. */
+    const signature = `${zones.length}|${listedOn ?? ''}|${theme}|${originIsReal}`;
 
-    const movedEnough =
-      lastMetres.current == null ||
-      metres == null ||
-      Math.abs(metres - lastMetres.current) >= MIN_MOVE_M;
-    const dueAnyway = Date.now() - lastWrite.current >= MIN_INTERVAL_MS;
-    if (lastWrite.current && !movedEnough && !dueAnyway) return;
-
-    lastWrite.current = Date.now();
-    lastMetres.current = metres;
+    const now = Date.now();
+    if (
+      !shouldRefresh({
+        last: last.current,
+        now,
+        metres,
+        signature,
+        minIntervalMs: MIN_INTERVAL_MS,
+        minMoveM: MIN_MOVE_M,
+      })
+    ) {
+      return;
+    }
+    last.current = { at: now, metres, signature };
 
     // The ground around the driver, as offsets. Nearest first, so the cap
     // drops the far ones rather than whichever happened to be listed last.

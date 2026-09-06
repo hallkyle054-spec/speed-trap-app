@@ -86,63 +86,86 @@ export function VergeWidget({
 
   if (variant === 'cover') {
     const limit = summary?.nearestLimitMph;
+    const stamp = summary && showDistance ? ` · as of ${clock(summary.at)}` : '';
     return (
       <FlexWidget
+        clickAction="OPEN_APP"
         style={{
           height: 'match_parent',
           width: 'match_parent',
           flexDirection: 'column',
-          justifyContent: 'space-between',
+          // Everything hangs from the top. The cover screen does not give a
+          // widget its whole declared height — the bottom band is spoken for,
+          // and anything put there is unreadable and cannot be tapped. So the
+          // slack goes at the bottom, where losing it costs nothing.
+          justifyContent: 'flex-start',
           backgroundColor: ground,
           borderRadius: s.radius,
           paddingHorizontal: s.pad,
           paddingVertical: s.padY,
         }}
       >
-        {/* Tapping the reading opens the app too — the button is for finding, */}
-        {/* not for gatekeeping. */}
-        <FlexWidget clickAction="OPEN_APP" style={{ flexDirection: 'column', width: 'match_parent' }}>
+        {/* The way into the app sits on the top line, the one place on a cover */}
+        {/* screen guaranteed to be both visible and reachable. */}
+        <FlexWidget
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: 'match_parent',
+          }}
+        >
           <TextWidget
             text={showDistance ? 'NEAREST ZONE' : 'PUBLISHED ZONES'}
             style={{ fontSize: s.kicker, letterSpacing: 1.4, color: faint, fontFamily: 'Lora' }}
           />
-          <TextWidget
-            text={headline}
-            style={{ fontSize: s.headline, color: ink, fontFamily: 'CormorantGaramond', marginTop: 2 }}
-          />
-          <TextWidget
-            text={caption}
-            maxLines={2}
-            style={{ fontSize: s.caption, color: muted, fontFamily: 'Lora', marginTop: 4 }}
-          />
-          {limit ? (
+          <FlexWidget
+            clickAction="OPEN_APP"
+            style={{
+              paddingHorizontal: 18,
+              paddingVertical: 11,
+              borderRadius: 22,
+              backgroundColor: accentWash,
+            }}
+          >
             <TextWidget
-              text={`${limit} MPH limit`}
-              style={{ fontSize: s.caption, color: muted, fontFamily: 'Lora', marginTop: 2 }}
+              text="OPEN"
+              style={{ fontSize: s.kicker, letterSpacing: 1.6, color: ink, fontFamily: 'Lora' }}
             />
-          ) : (
-            <FlexWidget style={{ width: 0, height: 0 }} />
-          )}
+          </FlexWidget>
         </FlexWidget>
 
+        <TextWidget
+          text={headline}
+          style={{ fontSize: s.headline, color: ink, fontFamily: 'CormorantGaramond', marginTop: 4 }}
+        />
+        <TextWidget
+          text={caption}
+          maxLines={2}
+          style={{ fontSize: s.caption, color: muted, fontFamily: 'Lora', marginTop: 2 }}
+        />
+        <TextWidget
+          text={`${limit ? `${limit} MPH · ` : ''}possible mobile camera${stamp}`}
+          maxLines={2}
+          style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora', marginTop: 4 }}
+        />
+
         {/*
-          The ground around you: zones as marks, you at the centre, two range
-          rings. Drawn from what the app already knows rather than fetched, so
-          it costs nothing and works with no signal.
+          Last, because it is the one thing that still reads when its bottom
+          edge is lost: a diagram missing its outer ring is still a diagram.
         */}
         {summary && summary.nearby.length ? (
           <FlexWidget
-            clickAction="OPEN_APP"
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               width: 'match_parent',
-              marginTop: 6,
+              marginTop: 8,
             }}
           >
             <SvgWidget
               svg={localitySvg(summary.nearby, { mark: markInk, ring: ringInk, ink })}
-              style={{ width: 108, height: 108 }}
+              style={{ width: 104, height: 104 }}
             />
             <FlexWidget style={{ flexDirection: 'column', marginLeft: 14 }}>
               <TextWidget
@@ -162,47 +185,6 @@ export function VergeWidget({
         ) : (
           <FlexWidget style={{ width: 0, height: 0 }} />
         )}
-
-        <FlexWidget
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            width: 'match_parent',
-          }}
-        >
-          <FlexWidget style={{ flexDirection: 'column', flexGap: 0, width: 'wrap_content' }}>
-            <TextWidget
-              text="possible mobile camera"
-              style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora' }}
-            />
-            {summary && showDistance ? (
-              <TextWidget
-                text={`as of ${clock(summary.at)}`}
-                style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora', marginTop: 1 }}
-              />
-            ) : (
-              <FlexWidget style={{ width: 0, height: 0 }} />
-            )}
-          </FlexWidget>
-
-          {/* A real target rather than a hint: the whole point of the widget is */}
-          {/* getting to the live map without unfolding the phone. */}
-          <FlexWidget
-            clickAction="OPEN_APP"
-            style={{
-              paddingHorizontal: 16,
-              paddingVertical: 10,
-              borderRadius: 20,
-              backgroundColor: accentWash,
-            }}
-          >
-            <TextWidget
-              text="OPEN"
-              style={{ fontSize: s.kicker, letterSpacing: 1.6, color: ink, fontFamily: 'Lora' }}
-            />
-          </FlexWidget>
-        </FlexWidget>
       </FlexWidget>
     );
   }

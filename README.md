@@ -246,6 +246,12 @@ with real space around them.
 At panel size the widget carries the drive HUD's reading — distance, road,
 limit — a **locality diagram**, and an **OPEN** button.
 
+Everything hangs from the top, and **OPEN sits on the first line**. The cover
+screen does not give a widget its whole declared height: the bottom band is
+spoken for, and anything put there is unreadable and cannot be tapped. So the
+slack goes at the bottom where losing it costs nothing, and the diagram goes
+last because it is the one element that still reads with its outer ring cut off.
+
 The diagram (`widgets/locality.ts`) is not a street map, deliberately. An
 Android widget draws a static image, so a real map would be a photograph of
 somewhere you *were*, and a photograph of a map reads as live in a way a diagram
@@ -255,7 +261,11 @@ radius in words beside it. It costs nothing, needs no signal, and is rendered as
 an SVG string the widget toolkit turns into the bitmap.
 
 The palette comes from the app's Appearance setting rather than the system
-(`widgets/theme.ts`), so a widget matches the app that owns it. `system` is
+(`widgets/theme.ts`), so a widget matches the app that owns it. Getting that to
+*arrive* needed `widgets/refresh.ts`: the summary's writes are throttled because
+a driving fix lands every second, but that throttle is about position and must
+not gate anything else. It did, and a changed Appearance sat unseen until the
+driver moved a hundred metres. `system` is
 resolved when the widget renders, not when the summary is written — the phone
 can switch to dark hours after the app was last open, and the widget follows it
 there.
