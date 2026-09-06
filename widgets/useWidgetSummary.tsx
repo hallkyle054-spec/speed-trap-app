@@ -3,7 +3,7 @@ import { Appearance, Platform } from 'react-native';
 import { requestWidgetUpdate } from 'react-native-android-widget';
 
 import { VergeWidget } from './VergeWidget';
-import { WIDGETS } from './names';
+import { COMPACT_UNDER_DP, WIDGET_NAME } from './names';
 
 import { LatLng } from '../data/geo';
 import { Zone, distanceTo, nearestZone, zoneTitle } from '../data/zones';
@@ -59,15 +59,18 @@ export function useWidgetSummary({
     void writeSummary(summary).then(() => {
       if (Platform.OS !== 'android') return;
       const isDark = Appearance.getColorScheme() === 'dark';
-      // Best effort, and for both sizes: with neither widget placed these are
-      // simply no-ops.
+      // Best effort: with no widget placed this is simply a no-op. Each placed
+      // widget reports its own size, so a 2x1 on a cover screen and a 2x2 on
+      // the home screen get the layout each has room for.
       requestWidgetUpdate({
-        widgetName: WIDGETS.tile,
-        renderWidget: () => <VergeWidget summary={summary} isDark={isDark} variant="tile" />,
-      });
-      requestWidgetUpdate({
-        widgetName: WIDGETS.cover,
-        renderWidget: () => <VergeWidget summary={summary} isDark={isDark} variant="cover" />,
+        widgetName: WIDGET_NAME,
+        renderWidget: info => (
+          <VergeWidget
+            summary={summary}
+            isDark={isDark}
+            variant={info.height < COMPACT_UNDER_DP ? 'compact' : 'tile'}
+          />
+        ),
       });
     });
   }, [zones, listedOn, origin, originIsReal]);

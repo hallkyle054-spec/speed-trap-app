@@ -7,9 +7,8 @@ import { ZoneMarks } from '../components/ZoneMarks';
 import { SavedRoute } from '../data/routes';
 import { dayLabel } from '../data/dates';
 import { Sync, syncLabel } from '../data/feed';
-import { LatLng, formatDistance } from '../data/geo';
+import { LatLng, Region, formatDistance } from '../data/geo';
 import {
-  COUNTY_REGION,
   Zone,
   ZoneStatus,
   distanceTo,
@@ -37,6 +36,12 @@ type Props = {
   onRefresh: () => void;
   onOpenZone: (zone: Zone) => void;
   onStartDrive: (zone: Zone) => void;
+  /**
+   * Where the map was last left. The screen unmounts on every tab change, so
+   * without this the camera resets to the county on each return.
+   */
+  initialRegion: Region;
+  onRegionChange: (region: Region) => void;
   topInset: number;
 };
 
@@ -53,6 +58,8 @@ export function MapScreen({
   onRefresh,
   onOpenZone,
   onStartDrive,
+  initialRegion,
+  onRegionChange,
   topInset,
 }: Props) {
   const { t, isDark } = useTheme();
@@ -108,7 +115,8 @@ export function MapScreen({
           // styles below are written to port.
           provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
           customMapStyle={isDark ? darkMapStyle : lightMapStyle}
-          initialRegion={COUNTY_REGION}
+          initialRegion={initialRegion}
+          onRegionChangeComplete={onRegionChange}
           showsUserLocation={originIsReal}
           showsMyLocationButton={false}
           showsPointsOfInterests={false}

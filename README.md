@@ -174,46 +174,59 @@ canvas is just empty.
 A Flip's cover display is small in both directions, so `App.tsx` measures the
 window rather than the model — under 600dp on the long edge and Verge renders
 `CoverDrive` and nothing else: a full-bleed following map, the distance to the
-next published zone, and two zoom bubbles. Tracking starts on its own there,
-because unfolding the phone to press **Start drive** would defeat the point.
+next published zone, two zoom bubbles, and a **ROUTE** button. Tracking starts on
+its own there, because unfolding the phone to press **Start drive** would defeat
+the point.
 
-`plugins/with-cover-screen.js` carries the Android and Samsung-specific parts,
-all of it from Samsung's published Flex Window guidance:
+Routing from the cover screen asks one question — where to. The start is
+wherever the driver is, which is the only sensible answer with the phone shut
+and the engine running, so `components/CoverRoute.tsx` takes a destination and
+nothing else. The route it draws is deliberately not saved: it means where you
+are going now, from where you are now, and stops meaning anything when either
+changes. The button waits for a real fix rather than offering to route from a
+position nobody has measured.
+
+`plugins/with-cover-screen.js` carries the Android and Samsung-specific parts:
 
 - **The app fills the cover display.** `android:resizeableActivity="true"` on the
   main activity plus the `android.supports_size_changes` flag. Without them
   Android puts the activity in device-compatibility mode and draws it in a
   fixed-size box in the middle of the screen.
-- **The cover widget is offered on the Flex Window at all.** Samsung does not
-  place arbitrary widgets there. A widget opts in with a
+- **The widget is declared to Samsung.** Samsung's documented opt-in is a
   `com.samsung.android.appwidget.provider` meta-data pointing at a
-  `<samsung-appwidget-provider display="sub_screen">` resource, and its ordinary
-  provider must be categorised `keyguard` rather than `home_screen`.
-  react-native-android-widget knows about neither and hardcodes `home_screen`,
-  so the plugin writes the Samsung resource and rewrites the category — for the
-  cover widget only.
+  `<samsung-appwidget-provider display="sub_screen">` resource, alongside the
+  `keyguard` widget category. react-native-android-widget knows about neither
+  and hardcodes `home_screen`, so the plugin writes the Samsung resource and
+  makes the category `home_screen|keyguard` — the Flip 7's cover screen draws
+  from the home-screen widget set rather than the full-screen panels
+  `sub_screen` was written for, so the widget has to be both.
 
-There are two widgets, because one shape cannot serve both surfaces
-(`widgets/names.ts` holds the names, which are also the generated provider class
-names):
+  **This is the whole of the documented opt-in, and on a Flip 7 it may not be
+  enough.** Samsung dropped the full-screen cover panels the `sub_screen`
+  mechanism was designed for, and reporting on the replacement says the cover
+  screen only offers a curated set of widgets — largely Samsung's own, plus a
+  few blessed third parties. There is no published way for an app to get onto
+  that list. If the widget is not offered, no further manifest change will do
+  it; CoverWidgets or Good Lock's MultiStar are the routes left.
 
-- **`Verge`** — a 2x2 home-screen tile.
-- **`VergeCover`** — 352x339dp, Samsung's own dimensions for a Flex Window
-  widget, which the cover screen treats as one full-bleed widget rather than a
-  grid of cells.
+There is one widget, `Verge` (`widgets/names.ts` holds the name, which is also
+the generated provider class name). It is declared 2x1 — the size a cover screen
+places — and is resizable up to the 2x2 a home screen has room for. Android
+reports the size it actually gave the widget on every redraw, so `VergeWidget`
+picks its layout from that: a one-line strip under 90dp tall, the fuller tile
+above it. Tapping it opens the app.
 
-Both render from `VergeWidget` at different scales and both open the app when
-tapped. **`assets/widget-preview*.png`** are what the picker draws: the widget's
-own layout (`@layout/rn_widget`, from the library) is a transparent frame that
-the app fills with a bitmap at runtime, so without a preview the picker shows an
-empty tile — present, but easy to scroll straight past. Regenerate them to match
-the design rather than screenshotting a device.
+**`assets/widget-preview.png`** is what the picker draws: the widget's own layout
+(`@layout/rn_widget`, from the library) is a transparent frame that the app fills
+with a bitmap at runtime, so without a preview the picker shows an empty tile —
+present, but easy to scroll straight past. Regenerate it to match the design
+rather than screenshotting a device.
 
 One known gap: the library opens the app from a broadcast receiver with a plain
 `startActivity` and no `ActivityOptions`, so nothing tells Android which display
 to launch on. Samsung's guidance is to set `launchDisplayId` on the
-`PendingIntent` (0 main, 1 cover). If a tap on the cover widget opens the app on
-the main screen, that is why.
+`PendingIntent` (0 main, 1 cover). If a tap on the widget opens the app on the
+main screen, that is why.
 
 None of this has been checked on a device — there isn't one here.
 

@@ -1,5 +1,5 @@
 import { shortDayLabel } from './dates';
-import { LatLng, distanceToPath, pathLength } from './geo';
+import { LatLng, Region, distanceToPath, pathLength } from './geo';
 
 /**
  * The premise the whole interface is built on: the partnership publishes
@@ -225,7 +225,7 @@ function daysAgo(n: number): string {
 export const FALLBACK_ORIGIN: LatLng = { latitude: 51.77, longitude: -4.32 };
 
 /** Frames the county on first paint. */
-export const COUNTY_REGION = {
+export const COUNTY_REGION: Region = {
   latitude: 51.83,
   longitude: -4.18,
   latitudeDelta: 0.42,

@@ -22,7 +22,9 @@ import {
   ageInDays,
   useZoneFeed,
 } from './data/feed';
+import { Region } from './data/geo';
 import {
+  COUNTY_REGION,
   Zone,
   distanceTo,
   latestListing,
@@ -122,6 +124,17 @@ function Verge() {
   const savedRoutes = useSavedRoutes();
 
   const sheetZone = useMemo(() => zones.find(z => z.id === sheetId) ?? null, [zones, sheetId]);
+
+  /**
+   * Where the map was left. The map screen unmounts on every tab change, so
+   * the camera has to live above it — in a ref rather than state, because a
+   * pan reports continuously and re-rendering the whole app on each frame
+   * would make dragging the map stutter.
+   */
+  const mapRegion = useRef<Region>(COUNTY_REGION);
+  const rememberRegion = useCallback((region: Region) => {
+    mapRegion.current = region;
+  }, []);
 
   const openZone = useCallback((zone: Zone) => setSheetId(zone.id), []);
   const closeSheet = useCallback(() => setSheetId(null), []);
@@ -223,6 +236,8 @@ function Verge() {
           onRefresh={refresh}
           onOpenZone={openZone}
           onStartDrive={startDrive}
+          initialRegion={mapRegion.current}
+          onRegionChange={rememberRegion}
           topInset={screenInset}
         />
       ) : null}

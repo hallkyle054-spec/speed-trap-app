@@ -3,7 +3,7 @@ import { Appearance } from 'react-native';
 import type { WidgetTaskHandlerProps } from 'react-native-android-widget';
 
 import { VergeWidget } from './VergeWidget';
-import { WIDGETS } from './names';
+import { COMPACT_UNDER_DP } from './names';
 import { readSummary } from './summary';
 
 /**
@@ -14,9 +14,9 @@ import { readSummary } from './summary';
 export async function widgetTaskHandler(props: WidgetTaskHandlerProps) {
   const summary = await readSummary();
   const isDark = Appearance.getColorScheme() === 'dark';
-  // Two widgets share this handler: the home-screen tile and the one sized for
-  // a Flip's Flex Window. Anything unrecognised reads as the tile.
-  const variant = props.widgetInfo.widgetName === WIDGETS.cover ? 'cover' : 'tile';
+  // Android reports the size it actually gave the widget, so the layout comes
+  // from that rather than from the size the manifest asked for.
+  const variant = props.widgetInfo.height < COMPACT_UNDER_DP ? 'compact' : 'tile';
   const view = <VergeWidget summary={summary} isDark={isDark} variant={variant} />;
 
   switch (props.widgetAction) {

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { AndroidConfig, withAndroidManifest, withDangerousMod } = require('@expo/config-plugins');
 
-const COVER_WIDGET = 'VergeCover';
+const WIDGET = 'Verge';
 /** The generated provider XML this widget's file is named after. */
 const providerXml = name => `widgetprovider_${name.toLowerCase()}.xml`;
 const samsungXml = name => `samsung_widgetprovider_${name.toLowerCase()}.xml`;
@@ -25,14 +25,21 @@ const samsungXml = name => `samsung_widgetprovider_${name.toLowerCase()}.xml`;
  *    activity does not get its orientation request honoured on a display the
  *    system manages for it, which is the behaviour we want on the cover screen.
  *
- * 2. The cover widget is offered on the Flex Window at all. Samsung does not
- *    place arbitrary widgets there: a widget opts in with a
- *    `com.samsung.android.appwidget.provider` meta-data pointing at a
- *    `<samsung-appwidget-provider display="sub_screen">` resource, and its
- *    ordinary provider must be categorised `keyguard` rather than
- *    `home_screen`. react-native-android-widget knows nothing about either —
- *    it hardcodes `home_screen` — so both are applied here, to the cover widget
- *    only. The 2x2 home-screen tile is left exactly as the library wrote it.
+ * 2. The widget is declared to Samsung as a cover-screen widget. Samsung's
+ *    documented opt-in is a `com.samsung.android.appwidget.provider` meta-data
+ *    pointing at a `<samsung-appwidget-provider display="sub_screen">`
+ *    resource, alongside the `keyguard` widget category.
+ *    react-native-android-widget knows nothing about either and hardcodes
+ *    `home_screen`, so both are applied here. The category keeps `home_screen`
+ *    as well: on a Flip 7 the cover screen draws from the home-screen widget
+ *    set rather than the full-screen panels the `sub_screen` mechanism was
+ *    written for, so the widget has to be both.
+ *
+ *    Whether this is enough is Samsung's call, not ours. Reporting on the
+ *    Flip 7 says the cover screen only offers a curated set of widgets —
+ *    largely Samsung's own — regardless of what an app declares. This is the
+ *    whole of the documented opt-in; if the widget still is not offered, no
+ *    further manifest change will do it.
  */
 module.exports = function withCoverScreen(config) {
   config = withAndroidManifest(config, cfg => {
@@ -47,11 +54,11 @@ module.exports = function withCoverScreen(config) {
     );
 
     const receiver = (application.receiver ?? []).find(r =>
-      (r.$['android:name'] ?? '').endsWith(`.${COVER_WIDGET}`),
+      (r.$['android:name'] ?? '').endsWith(`.${WIDGET}`),
     );
     if (!receiver) {
       throw new Error(
-        `withCoverScreen: no receiver for the ${COVER_WIDGET} widget. It must be declared in ` +
+        `withCoverScreen: no receiver for the ${WIDGET} widget. It must be declared in ` +
           'app.config.ts, and this plugin must be listed after react-native-android-widget.',
       );
     }
@@ -64,7 +71,7 @@ module.exports = function withCoverScreen(config) {
     receiver['meta-data'].push({
       $: {
         'android:name': 'com.samsung.android.appwidget.provider',
-        'android:resource': `@xml/${samsungXml(COVER_WIDGET).replace(/\.xml$/, '')}`,
+        'android:resource': `@xml/${samsungXml(WIDGET).replace(/\.xml$/, '')}`,
       },
     });
 
@@ -78,7 +85,7 @@ module.exports = function withCoverScreen(config) {
       fs.mkdirSync(xmlDir, { recursive: true });
 
       fs.writeFileSync(
-        path.join(xmlDir, samsungXml(COVER_WIDGET)),
+        path.join(xmlDir, samsungXml(WIDGET)),
         '<?xml version="1.0" encoding="utf-8"?>\n' +
           '<samsung-appwidget-provider\n    display="sub_screen">\n' +
           '</samsung-appwidget-provider>\n',
@@ -86,15 +93,15 @@ module.exports = function withCoverScreen(config) {
 
       // The library writes this file itself with widgetCategory hardcoded to
       // home_screen. Samsung wants keyguard for a Flex Window widget.
-      const generated = path.join(xmlDir, providerXml(COVER_WIDGET));
+      const generated = path.join(xmlDir, providerXml(WIDGET));
       const before = fs.readFileSync(generated, 'utf8');
       const after = before.replace(
         'android:widgetCategory="home_screen"',
-        'android:widgetCategory="keyguard"',
+        'android:widgetCategory="home_screen|keyguard"',
       );
       if (after === before) {
         throw new Error(
-          `withCoverScreen: could not set widgetCategory in ${providerXml(COVER_WIDGET)}. ` +
+          `withCoverScreen: could not set widgetCategory in ${providerXml(WIDGET)}. ` +
             'react-native-android-widget may have changed how it writes the provider XML.',
         );
       }

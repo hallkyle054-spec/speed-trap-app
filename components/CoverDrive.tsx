@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
 
+import { Place, ROUTING_CONFIGURED, Route } from '../data/directions';
 import { LatLng, formatDistance } from '../data/geo';
 import { SavedRoute } from '../data/routes';
 import { Zone, ZoneStatus } from '../data/zones';
@@ -9,6 +10,7 @@ import { ZoneMark } from '../state/settingsSchema';
 import { useTheme } from '../theme/ThemeProvider';
 import { darkMapStyle, lightMapStyle } from '../theme/mapStyle';
 import { body, display, kicker, tnum } from '../theme/type';
+import { CoverRoute } from './CoverRoute';
 import { ZoneMarks } from './ZoneMarks';
 
 /**
@@ -48,6 +50,14 @@ export function CoverDrive({
   const { t, isDark } = useTheme();
   const mapRef = useRef<MapView>(null);
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
+
+  /**
+   * A route set from here, and the panel for setting one. It is deliberately
+   * not saved: this is where the driver is going now, from where they are now,
+   * and it stops meaning anything the moment either changes.
+   */
+  const [routing, setRouting] = useState(false);
+  const [route, setRoute] = useState<{ route: Route; to: Place } | null>(null);
 
   // Follow the fix. At two a second this is the only thing moving on screen.
   useEffect(() => {
@@ -93,6 +103,15 @@ export function CoverDrive({
             lineJoin="round"
           />
         ))}
+        {route ? (
+          <Polyline
+            coordinates={route.route.path}
+            strokeColor={t.accentInk}
+            strokeWidth={6}
+            lineCap="round"
+            lineJoin="round"
+          />
+        ) : null}
         {zones.map(z => (
           <ZoneMarks key={z.id} zone={z} status={statusOf(z)} mark={mark} onPress={() => {}} />
         ))}
@@ -109,12 +128,52 @@ export function CoverDrive({
         <Text style={[display(26, -0.02), tnum, styles.distance, { color: chiming ? t.accentInk : t.ink }]}>
           {distance == null ? '—' : formatDistance(distance)}
         </Text>
+        {route ? (
+          <Text numberOfLines={1} style={[body(9), styles.heading, { color: t.ink55 }]}>
+            {`${route.to.name} · ${route.route.minutes} min`}
+          </Text>
+        ) : null}
       </View>
 
       <View style={[styles.zoom, { bottom: insets.bottom + 10 }]}>
         <Bubble label="+" onPress={() => nudgeZoom(1)} disabled={zoom >= MAX_ZOOM} />
         <Bubble label="–" onPress={() => nudgeZoom(-1)} disabled={zoom <= MIN_ZOOM} />
       </View>
+
+      {/*
+        Routing needs somewhere to route from, so the button waits for a fix
+        rather than offering something that cannot work.
+      */}
+      {ROUTING_CONFIGURED && position ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={route ? 'Clear route' : 'Set a route'}
+          onPress={() => (route ? setRoute(null) : setRouting(true))}
+          style={({ pressed }) => [
+            styles.routeButton,
+            {
+              bottom: insets.bottom + 10,
+              left: 8,
+              backgroundColor: pressed ? t.accentTint : t.legendBg,
+              borderColor: t.rule2,
+            },
+          ]}
+        >
+          <Text style={[kicker(9, 0.14), { color: t.ink }]}>{route ? 'CLEAR' : 'ROUTE'}</Text>
+        </Pressable>
+      ) : null}
+
+      {routing && position ? (
+        <CoverRoute
+          origin={position}
+          insets={insets}
+          onCancel={() => setRouting(false)}
+          onRouted={(found, to) => {
+            setRoute({ route: found, to });
+            setRouting(false);
+          }}
+        />
+      ) : null}
 
       {position ? null : (
         <View style={[styles.locating, { backgroundColor: t.legendBg, borderColor: t.rule }]}>
@@ -166,7 +225,19 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   distance: { marginTop: 1 },
+  heading: { marginTop: 1 },
   zoom: { position: 'absolute', right: 8, gap: 8 },
+  // Same 44 dp target as the zoom bubbles, opposite corner.
+  routeButton: {
+    position: 'absolute',
+    minHeight: 44,
+    minWidth: 64,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderRadius: 22,
+  },
   // 44 dp, reachable one-handed on a four-inch panel.
   bubble: {
     width: 44,

@@ -1,5 +1,12 @@
 export type LatLng = { latitude: number; longitude: number };
 
+/**
+ * A map camera: where it is centred and how much ground it covers. Shaped to
+ * match `react-native-maps`' Region so it can be handed straight to a MapView,
+ * but declared here so nothing needs the native module just to remember one.
+ */
+export type Region = LatLng & { latitudeDelta: number; longitudeDelta: number };
+
 const R = 6_371_008.8; // mean Earth radius, metres
 const rad = (deg: number) => (deg * Math.PI) / 180;
 
