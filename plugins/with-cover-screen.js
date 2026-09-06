@@ -6,6 +6,7 @@ const WIDGET = 'Verge';
 /** The generated provider XML this widget's file is named after. */
 const providerXml = name => `widgetprovider_${name.toLowerCase()}.xml`;
 const samsungXml = name => `samsung_widgetprovider_${name.toLowerCase()}.xml`;
+const previewLayout = name => `widgetpreview_${name.toLowerCase()}.xml`;
 
 /**
  * Two Samsung-specific things, both from Samsung's own Flex Window guidance.
@@ -41,6 +42,13 @@ const samsungXml = name => `samsung_widgetprovider_${name.toLowerCase()}.xml`;
  *    to it. The receiver only acts on its own `<package>.WIDGET…` actions and
  *    the worst another app can do with it is ask for a redraw, so the exposure
  *    is small and it is the price of being listed.
+ *
+ *    A `previewLayout` goes with them. The cover-screen picker draws a live,
+ *    panel-sized preview of each widget rather than a thumbnail, and a widget
+ *    offering only a `previewImage` gives it nothing to draw with. The library
+ *    only supports `previewImage`, so this generates a one-view layout that
+ *    renders that same image and points `previewLayout` at it — both are then
+ *    present and both show the same artwork.
  */
 module.exports = function withCoverScreen(config) {
   config = withAndroidManifest(config, cfg => {
@@ -96,14 +104,40 @@ module.exports = function withCoverScreen(config) {
           '</samsung-appwidget-provider>\n',
       );
 
+      // A layout whose whole job is to draw the preview artwork, so the
+      // picker has something to render at panel size.
+      const layoutDir = path.join(cfg.modRequest.platformProjectRoot, 'app/src/main/res/layout');
+      fs.mkdirSync(layoutDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(layoutDir, previewLayout(WIDGET)),
+        '<?xml version="1.0" encoding="utf-8"?>\n' +
+          '<ImageView xmlns:android="http://schemas.android.com/apk/res/android"\n' +
+          '    android:layout_width="match_parent"\n' +
+          '    android:layout_height="match_parent"\n' +
+          '    android:scaleType="centerCrop"\n' +
+          `    android:src="@drawable/${WIDGET.toLowerCase()}_preview" />\n`,
+      );
+
       // The library writes this file itself with widgetCategory hardcoded to
       // home_screen. Samsung wants keyguard for a Flex Window widget.
       const generated = path.join(xmlDir, providerXml(WIDGET));
       const before = fs.readFileSync(generated, 'utf8');
-      const after = before.replace(
-        'android:widgetCategory="home_screen"',
-        'android:widgetCategory="home_screen|keyguard"',
-      );
+      const after = before
+        .replace(
+          'android:widgetCategory="home_screen"',
+          'android:widgetCategory="home_screen|keyguard"',
+        )
+        .replace(
+          `android:previewImage="@drawable/${WIDGET.toLowerCase()}_preview"`,
+          `android:previewImage="@drawable/${WIDGET.toLowerCase()}_preview"\n` +
+            `    android:previewLayout="@layout/${previewLayout(WIDGET).replace(/\.xml$/, '')}"`,
+        );
+      if (!after.includes('android:previewLayout')) {
+        throw new Error(
+          'withCoverScreen: could not add previewLayout. The widget must declare a ' +
+            'previewImage in app.config.ts for this to hang off.',
+        );
+      }
       if (after === before) {
         throw new Error(
           `withCoverScreen: could not set widgetCategory in ${providerXml(WIDGET)}. ` +
