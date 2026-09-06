@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Place, ROUTING_CONFIGURED, RoutingError, routeBetween, searchPlaces } from '../data/directions';
+import { LatLng } from '../data/geo';
 import { SavedRoute } from '../data/routes';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius } from '../theme/tokens';
@@ -24,14 +25,26 @@ import { Button } from './Button';
 
 type Field = 'from' | 'to';
 
+/**
+ * The id that marks the driver's own position as the start of a route. A route
+ * built from it is temporary — see `SavedRoute.temporary`.
+ */
+export const HERE_ID = 'here';
+
 export function AddRouteSheet({
   visible,
   onClose,
   onSave,
+  origin,
+  originIsReal,
 }: {
   visible: boolean;
   onClose: () => void;
   onSave: (route: SavedRoute) => void;
+  /** The driver's current position, offered as the start of a route. */
+  origin: LatLng;
+  /** False before a fix has arrived, when routing from `origin` would be fiction. */
+  originIsReal: boolean;
 }) {
   const { t } = useTheme();
   const insets = useSafeAreaInsets();
@@ -116,17 +129,27 @@ export function AddRouteSheet({
     }
   };
 
+  /** The driver's own position, shaped as a place so it can be an end of a route. */
+  const here: Place = {
+    id: HERE_ID,
+    name: 'My location',
+    address: 'Wherever you are when the route is worked out',
+    location: origin,
+  };
+
   const save = async () => {
     if (!from || !to) return;
     setSaving(true);
     setError(null);
     try {
       const route = await routeBetween(from, to);
+      const temporary = from.id === HERE_ID;
       onSave({
         id: `r-${Date.now()}`,
         title: `${from.name} → ${to.name}`,
         sub: `${route.summary} · ${route.minutes} min`,
         path: route.path,
+        ...(temporary ? { temporary: true } : null),
       });
       onClose();
     } catch (e) {
@@ -201,6 +224,30 @@ export function AddRouteSheet({
             ]}
           />
         </View>
+
+        {/*
+          A peer of the search field rather than the first row of its results:
+          "start from where I am" is an alternative to searching, not one of the
+          things a search turns up. Offered only for the start, and only once
+          there is a real fix — routing from a position nobody has measured
+          would draw a route from the middle of the county.
+        */}
+        {field === 'from' && originIsReal ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => choose(here)}
+            style={({ pressed }) => [
+              styles.here,
+              { borderColor: t.tempRoute, backgroundColor: pressed ? t.hover : 'transparent' },
+            ]}
+          >
+            <Text style={[heading(14), { color: t.tempRoute }]}>{here.name}</Text>
+            <Text style={[body(10.5), styles.hereHint, { color: t.ink55 }]}>
+              Starts where you are. Kept until you close the app, and drawn apart from
+              your saved routes.
+            </Text>
+          </Pressable>
+        ) : null}
 
         {error ? (
           <View style={[styles.error, { borderLeftColor: t.accent }]}>
@@ -301,6 +348,16 @@ const styles = StyleSheet.create({
   searchRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 10, marginTop: 14 },
   input: { flex: 1, paddingVertical: 10, borderBottomWidth: 1 },
   searchButton: { flexShrink: 0, minHeight: 44, paddingHorizontal: 16 },
+  here: {
+    marginTop: 12,
+    minHeight: 44,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: radius.md,
+    paddingHorizontal: 11,
+    paddingVertical: 8,
+  },
+  hereHint: { marginTop: 1 },
   results: { flexShrink: 1, marginTop: 6 },
   spinner: { marginTop: 12 },
   result: { paddingVertical: 12, minHeight: 48, justifyContent: 'center', borderBottomWidth: 1 },

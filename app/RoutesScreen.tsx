@@ -3,6 +3,7 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 
 import { AddRouteSheet } from '../components/AddRouteSheet';
 import { Button } from '../components/Button';
+import { LatLng } from '../data/geo';
 import { SavedRoute, zonesOnRoute } from '../data/routes';
 import { Zone } from '../data/zones';
 import { useTheme } from '../theme/ThemeProvider';
@@ -14,11 +15,22 @@ type Props = {
   zones: Zone[];
   onAdd: (route: SavedRoute) => void;
   onRemove: (id: string) => void;
+  /** Offered as the start of a route, so one can be built from where you are. */
+  origin: LatLng;
+  originIsReal: boolean;
   topInset: number;
 };
 
 /** Saved commutes with a zone count for today. */
-export function RoutesScreen({ routes, zones, onAdd, onRemove, topInset }: Props) {
+export function RoutesScreen({
+  routes,
+  zones,
+  onAdd,
+  onRemove,
+  origin,
+  originIsReal,
+  topInset,
+}: Props) {
   const { t } = useTheme();
   const [adding, setAdding] = useState(false);
 
@@ -41,7 +53,10 @@ export function RoutesScreen({ routes, zones, onAdd, onRemove, topInset }: Props
                   { text: 'Remove', style: 'destructive', onPress: () => onRemove(route.id) },
                 ])
               }
-              style={[styles.card, { borderColor: t.rule }]}
+              style={[
+                styles.card,
+                { borderColor: route.temporary ? t.tempRoute : t.rule },
+              ]}
             >
               <View style={styles.cardTop}>
                 <Text numberOfLines={2} style={[heading(20), styles.cardTitle, { color: t.ink }]}>
@@ -59,6 +74,11 @@ export function RoutesScreen({ routes, zones, onAdd, onRemove, topInset }: Props
                 </Text>
               </View>
               <Text style={[body(11.5), styles.sub, { color: t.ink60 }]}>{route.sub}</Text>
+              {route.temporary ? (
+                <Text style={[kicker(9, 0.14), styles.temp, { color: t.tempRoute }]}>
+                  FROM WHERE YOU WERE · NOT KEPT
+                </Text>
+              ) : null}
               <View style={[styles.divider, { backgroundColor: t.rule }]} />
               {onRoute.length ? (
                 <Text style={[body(11), styles.zoneList, { color: t.ink60 }]}>
@@ -85,7 +105,13 @@ export function RoutesScreen({ routes, zones, onAdd, onRemove, topInset }: Props
         </Text>
       </ScrollView>
 
-      <AddRouteSheet visible={adding} onClose={() => setAdding(false)} onSave={onAdd} />
+      <AddRouteSheet
+        visible={adding}
+        onClose={() => setAdding(false)}
+        onSave={onAdd}
+        origin={origin}
+        originIsReal={originIsReal}
+      />
     </View>
   );
 }
@@ -104,6 +130,7 @@ const styles = StyleSheet.create({
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 },
   cardTitle: { flexShrink: 1 },
   cardCount: { flexShrink: 0 },
+  temp: { marginTop: 3 },
   sub: { marginTop: 1 },
   divider: { height: 1, marginVertical: 11 },
   zoneList: { lineHeight: 11 * 1.7 },

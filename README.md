@@ -267,6 +267,31 @@ number) live in `theme/type.ts`.
 
 ---
 
+## Routes
+
+A route is either kept or temporary.
+
+A kept route is what the Routes tab has always held: two searched places, saved
+to the device, drawn in the accent. A **temporary** route starts from wherever
+the driver is — `My location` in the route sheet, or the cover screen's **ROUTE**
+button — and is the answer to "where am I going now". It lives in the same list,
+counts its zones the same way and can be removed the same way, but
+`routesToPersist` filters it out on the way to storage: surviving a restart
+would make it a lie about where you started. There is only ever one; a second
+replaces the first.
+
+It is drawn in `tempRoute` — a violet set against the accent rather than a
+shade of it, because "this one is temporary" is a different fact about a route,
+not a weaker version of the same one. The same colour marks its card and the
+option that creates it, so the thing you pressed and the line on the map are
+recognisably the same idea.
+
+Both ends need somewhere real to start: the option only appears once there is an
+actual fix, because routing from an unmeasured position would draw a route from
+the middle of the county.
+
+---
+
 ## What is derived rather than stored
 
 The prototype hard-coded a few values that a real app has to work out. These are

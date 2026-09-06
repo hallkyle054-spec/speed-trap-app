@@ -106,7 +106,7 @@ export function CoverDrive({
         {route ? (
           <Polyline
             coordinates={route.route.path}
-            strokeColor={t.accentInk}
+            strokeColor={t.tempRoute}
             strokeWidth={6}
             lineCap="round"
             lineJoin="round"

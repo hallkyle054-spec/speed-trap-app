@@ -129,13 +129,17 @@ export function MapScreen({
             Saved routes sit beneath the zone marks: thin and quiet, so they
             read as context for the counts on the Routes tab rather than
             competing with the zones themselves.
+
+            A temporary route — one started from where the driver is — is drawn
+            against the accent rather than in it, and a little heavier: there is
+            only ever one, and it is the one you are actually on.
           */}
           {routes.map(route => (
             <Polyline
               key={route.id}
               coordinates={route.path}
-              strokeColor={t.accent}
-              strokeWidth={3}
+              strokeColor={route.temporary ? t.tempRoute : t.accent}
+              strokeWidth={route.temporary ? 4 : 3}
               lineCap="round"
               lineJoin="round"
             />

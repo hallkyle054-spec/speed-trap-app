@@ -258,6 +258,8 @@ function Verge() {
           zones={zones}
           onAdd={savedRoutes.add}
           onRemove={savedRoutes.remove}
+          origin={origin}
+          originIsReal={isReal}
           topInset={screenInset}
         />
       ) : null}

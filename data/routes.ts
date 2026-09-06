@@ -8,6 +8,13 @@ export type SavedRoute = {
   sub: string;
   /** The corridor the route follows, used to decide which zones sit on it. */
   path: LatLng[];
+  /**
+   * Set when the route starts from wherever the driver happened to be. It is
+   * never written to storage: it means "from here to there, now", and stops
+   * meaning anything once you have moved. Drawn against the accent rather than
+   * in it, so a glance at the map tells the two apart.
+   */
+  temporary?: boolean;
 };
 
 /** Drops anything malformed rather than counting zones against broken geometry. */
@@ -31,6 +38,14 @@ export function parseRoutes(raw: unknown): SavedRoute[] {
     );
   });
 }
+
+/**
+ * What of the route list is written to storage. A temporary route is dropped:
+ * it means "from where I am now to there", so surviving a restart would make it
+ * a lie about where you started.
+ */
+export const routesToPersist = (routes: readonly SavedRoute[]): SavedRoute[] =>
+  routes.filter(r => !r.temporary);
 
 /** How close a zone has to come to the corridor to count as on the route. */
 const CORRIDOR_M = 500;

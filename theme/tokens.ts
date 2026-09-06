@@ -47,6 +47,12 @@ export type Tokens = {
   accentTint: string;
   accentTint2: string;
   mark: string;
+  /**
+   * A route that is not being kept — set against the accent rather than a
+   * shade of it, because "this one is temporary" is a different fact about a
+   * route, not a weaker version of the same one.
+   */
+  tempRoute: string;
   legendBg: string;
   shadow: string;
 };
@@ -76,6 +82,7 @@ export const light: Tokens = {
   accentTint: 'rgba(182,130,53,0.09)',
   accentTint2: 'rgba(182,130,53,0.14)',
   mark: '#a06f24',
+  tempRoute: '#6d4d9c',
   legendBg: 'rgba(243,242,242,0.9)',
   shadow: 'rgba(45,43,43,0.18)',
 };
@@ -105,6 +112,7 @@ export const dark: Tokens = {
   accentTint: 'rgba(225,173,102,0.14)',
   accentTint2: 'rgba(225,173,102,0.2)',
   mark: '#e1ad66',
+  tempRoute: '#b79ce0',
   legendBg: 'rgba(32,31,29,0.9)',
   shadow: 'rgba(0,0,0,0.4)',
 };
