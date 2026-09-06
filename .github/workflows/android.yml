@@ -10,6 +10,7 @@ on:
     paths-ignore:
       - 'ingest/**'
       - '.github/workflows/ingest-probe.yml'
+      - '.github/workflows/flex-window-probe.yml'
       - 'README.md'
       - 'design_reference/**'
       # feed/zones.json is deliberately NOT ignored: the list ships inside the
