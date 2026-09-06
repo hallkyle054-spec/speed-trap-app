@@ -1,7 +1,7 @@
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { BackHandler, StyleSheet, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { BackHandler, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AlertsScreen } from './app/AlertsScreen';
@@ -10,6 +10,7 @@ import { RoutesScreen } from './app/RoutesScreen';
 import { TodayScreen } from './app/TodayScreen';
 import { DriveHud } from './components/DriveHud';
 import { OfflineBanner } from './components/OfflineBanner';
+import { CoverDrive } from './components/CoverDrive';
 import { DataNoticeBanner } from './components/DataNoticeBanner';
 import { TabBar, TabId } from './components/TabBar';
 import { ZoneSheet } from './components/ZoneSheet';
@@ -20,7 +21,13 @@ import {
   ageInDays,
   useZoneFeed,
 } from './data/feed';
-import { Zone, distanceTo, latestListing, statusOf as statusOfZone } from './data/zones';
+import {
+  Zone,
+  distanceTo,
+  latestListing,
+  nearestZone,
+  statusOf as statusOfZone,
+} from './data/zones';
 import { useDrive } from './state/drive';
 import { SavedRoutesProvider, useSavedRoutes } from './state/savedRoutes';
 import { SettingsProvider, useSettings } from './state/settings';
@@ -42,7 +49,15 @@ function Verge() {
   const { t, isDark } = useTheme();
   const { settings, set, toggle } = useSettings();
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
   const now = useMinuteClock();
+
+  /**
+   * A Flip's cover screen is small in both directions; a phone never is, even
+   * in landscape. Measuring the window rather than the model keeps this working
+   * on any small display without a device list to maintain.
+   */
+  const isCoverScreen = Math.max(width, height) < 600;
 
   const { zones: allZones, sync, fetchedAt, refresh, simulateOffline } = useZoneFeed();
   const { origin, isReal } = useLocation();
@@ -110,6 +125,20 @@ function Verge() {
     [drive],
   );
 
+  /**
+   * On the cover screen the app is only ever one thing: a live map. Tracking
+   * starts on its own, because unfolding the phone to press Start drive would
+   * defeat the point of it.
+   */
+  const coverStarted = useRef(false);
+  useEffect(() => {
+    if (!isCoverScreen || coverStarted.current || drive.zone || !zones.length) return;
+    const target = nearestZone(zones, origin);
+    if (!target) return;
+    coverStarted.current = true;
+    drive.start(target);
+  }, [isCoverScreen, zones, origin, drive]);
+
   const goToTab = useCallback((next: TabId) => {
     setTab(next);
     setSheetId(null);
@@ -144,6 +173,24 @@ function Verge() {
     setTab('map');
   }, [simulateOffline]);
 
+
+  if (isCoverScreen) {
+    return (
+      <View style={[styles.frame, { backgroundColor: t.bg }]}>
+        <StatusBar style={isDark ? 'light' : 'dark'} />
+        <CoverDrive
+          zones={zones}
+          routes={savedRoutes.routes}
+          statusOf={statusOf}
+          mark={settings.mark}
+          position={drive.position}
+          distance={drive.zone ? drive.distance : null}
+          chiming={drive.chiming}
+          insets={{ top: insets.top, bottom: insets.bottom }}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.frame, { backgroundColor: t.bg }]}>

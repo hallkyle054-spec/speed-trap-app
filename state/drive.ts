@@ -160,8 +160,11 @@ export function useDrive(
           watcher.current = await Location.watchPositionAsync(
             {
               accuracy: Location.Accuracy.BestForNavigation,
-              timeInterval: 1000,
-              distanceInterval: 5,
+              // Twice a second, and no distance floor: on the cover screen the
+              // map is the whole display, and a position that lurches once a
+              // second reads as broken. Only ever while a drive is running.
+              timeInterval: 500,
+              distanceInterval: 0,
             },
             position => {
               setSource('gps');

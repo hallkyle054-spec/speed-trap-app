@@ -1,0 +1,188 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import MapView, { PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
+
+import { LatLng, formatDistance } from '../data/geo';
+import { SavedRoute } from '../data/routes';
+import { Zone, ZoneStatus } from '../data/zones';
+import { ZoneMark } from '../state/settingsSchema';
+import { useTheme } from '../theme/ThemeProvider';
+import { darkMapStyle, lightMapStyle } from '../theme/mapStyle';
+import { body, display, kicker, tnum } from '../theme/type';
+import { ZoneMarks } from './ZoneMarks';
+
+/**
+ * The cover-screen view: a map, and almost nothing else.
+ *
+ * A Flip's Flex Window is about four inches and is read at a glance with one
+ * hand on the wheel, so this drops everything the phone screen carries except
+ * the two things that matter — where you are, and how far the next published
+ * zone is. Two zoom bubbles, because that is the one adjustment worth making
+ * without unfolding the phone.
+ */
+
+const MIN_ZOOM = 11;
+const MAX_ZOOM = 17;
+const DEFAULT_ZOOM = 15;
+
+export function CoverDrive({
+  zones,
+  routes,
+  statusOf,
+  mark,
+  position,
+  distance,
+  chiming,
+  insets,
+}: {
+  zones: Zone[];
+  routes: SavedRoute[];
+  statusOf: (zone: Zone) => ZoneStatus;
+  mark: ZoneMark;
+  position: LatLng | null;
+  /** Metres to the nearest zone, or null before a fix. */
+  distance: number | null;
+  chiming: boolean;
+  insets: { top: number; bottom: number };
+}) {
+  const { t, isDark } = useTheme();
+  const mapRef = useRef<MapView>(null);
+  const [zoom, setZoom] = useState(DEFAULT_ZOOM);
+
+  // Follow the fix. At two a second this is the only thing moving on screen.
+  useEffect(() => {
+    if (!position) return;
+    mapRef.current?.animateCamera({ center: position, zoom }, { duration: 400 });
+  }, [position?.latitude, position?.longitude, zoom]);
+
+  const nudgeZoom = (by: number) =>
+    setZoom(current => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, current + by)));
+
+  return (
+    <View style={[styles.root, { backgroundColor: t.bg }]}>
+      <MapView
+        ref={mapRef}
+        style={StyleSheet.absoluteFill}
+        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
+        customMapStyle={isDark ? darkMapStyle : lightMapStyle}
+        initialRegion={{
+          latitude: position?.latitude ?? 51.83,
+          longitude: position?.longitude ?? -4.18,
+          latitudeDelta: 0.03,
+          longitudeDelta: 0.03,
+        }}
+        showsUserLocation
+        showsMyLocationButton={false}
+        showsPointsOfInterests={false}
+        showsBuildings={false}
+        showsTraffic={false}
+        showsCompass={false}
+        toolbarEnabled={false}
+        scrollEnabled={false}
+        rotateEnabled={false}
+        pitchEnabled={false}
+        zoomEnabled={false}
+      >
+        {routes.map(route => (
+          <Polyline
+            key={route.id}
+            coordinates={route.path}
+            strokeColor={t.accent}
+            strokeWidth={4}
+            lineCap="round"
+            lineJoin="round"
+          />
+        ))}
+        {zones.map(z => (
+          <ZoneMarks key={z.id} zone={z} status={statusOf(z)} mark={mark} onPress={() => {}} />
+        ))}
+      </MapView>
+
+      {/* Distance to the next published zone, over the map. */}
+      <View
+        style={[
+          styles.readout,
+          { backgroundColor: t.legendBg, borderColor: chiming ? t.accent : t.rule, top: insets.top + 8 },
+        ]}
+      >
+        <Text style={[kicker(8.5, 0.14), { color: t.ink50 }]}>NEXT ZONE</Text>
+        <Text style={[display(26, -0.02), tnum, styles.distance, { color: chiming ? t.accentInk : t.ink }]}>
+          {distance == null ? '—' : formatDistance(distance)}
+        </Text>
+      </View>
+
+      <View style={[styles.zoom, { bottom: insets.bottom + 10 }]}>
+        <Bubble label="+" onPress={() => nudgeZoom(1)} disabled={zoom >= MAX_ZOOM} />
+        <Bubble label="–" onPress={() => nudgeZoom(-1)} disabled={zoom <= MIN_ZOOM} />
+      </View>
+
+      {position ? null : (
+        <View style={[styles.locating, { backgroundColor: t.legendBg, borderColor: t.rule }]}>
+          <Text style={[body(10), { color: t.ink60 }]}>Waiting for a fix…</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+function Bubble({
+  label,
+  onPress,
+  disabled,
+}: {
+  label: string;
+  onPress: () => void;
+  disabled: boolean;
+}) {
+  const { t } = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label === '+' ? 'Zoom in' : 'Zoom out'}
+      onPress={onPress}
+      disabled={disabled}
+      style={({ pressed }) => [
+        styles.bubble,
+        {
+          backgroundColor: pressed ? t.accentTint : t.legendBg,
+          borderColor: t.rule2,
+          opacity: disabled ? 0.4 : 1,
+        },
+      ]}
+    >
+      <Text style={[display(20), { color: t.ink }]}>{label}</Text>
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  root: { flex: 1 },
+  readout: {
+    position: 'absolute',
+    left: 8,
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: 9,
+    paddingVertical: 6,
+  },
+  distance: { marginTop: 1 },
+  zoom: { position: 'absolute', right: 8, gap: 8 },
+  // 44 dp, reachable one-handed on a four-inch panel.
+  bubble: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  locating: {
+    position: 'absolute',
+    alignSelf: 'center',
+    bottom: 12,
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+});
