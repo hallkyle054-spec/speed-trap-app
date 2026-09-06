@@ -243,6 +243,23 @@ host's background shows through — the widget stops meeting the edges. The
 smaller variants keep a corner radius, because those sit on a home-screen grid
 with real space around them.
 
+At panel size the widget carries the drive HUD's reading — distance, road,
+limit — a **locality diagram**, and an **OPEN** button.
+
+The diagram (`widgets/locality.ts`) is not a street map, deliberately. An
+Android widget draws a static image, so a real map would be a photograph of
+somewhere you *were*, and a photograph of a map reads as live in a way a diagram
+does not. This draws only what the app already knows and can state honestly: you
+at the centre, the published zones around you as marks, two range rings, and the
+radius in words beside it. It costs nothing, needs no signal, and is rendered as
+an SVG string the widget toolkit turns into the bitmap.
+
+The palette comes from the app's Appearance setting rather than the system
+(`widgets/theme.ts`), so a widget matches the app that owns it. `system` is
+resolved when the widget renders, not when the summary is written — the phone
+can switch to dark hours after the app was last open, and the widget follows it
+there.
+
 **`assets/widget-preview.png`** is what the picker draws: the widget's own layout
 (`@layout/rn_widget`, from the library) is a transparent frame that the app fills
 with a bitmap at runtime, so without a preview the picker shows an empty tile —

@@ -67,6 +67,19 @@ export function pathLength(path: readonly LatLng[]): number {
  * Distance as the UI writes it: metres below a kilometre, one decimal above.
  * Tabular figures, so the width is stable as it counts down.
  */
+/**
+ * How far `to` lies east and north of `from`, in metres. Equirectangular, which
+ * is exact enough over the few kilometres a driver can see ahead and costs one
+ * cosine rather than a haversine per point.
+ */
+export function offsetMetres(from: LatLng, to: LatLng): { east: number; north: number } {
+  const lat = (from.latitude * Math.PI) / 180;
+  return {
+    east: (to.longitude - from.longitude) * 111_320 * Math.cos(lat),
+    north: (to.latitude - from.latitude) * 110_540,
+  };
+}
+
 export function formatDistance(metres: number): string {
   if (!Number.isFinite(metres)) return '—';
   if (metres < 1000) return `${Math.round(metres)} m`;

@@ -1,10 +1,11 @@
 import React from 'react';
-import { FlexWidget, TextWidget } from 'react-native-android-widget';
+import { FlexWidget, SvgWidget, TextWidget } from 'react-native-android-widget';
 
 import { formatDistance } from '../data/geo';
 import { shortDate } from '../data/zones';
 import { flatten } from '../theme/mapStyle';
 import { dark, light } from '../theme/tokens';
+import { localityScale, localityRadius, localitySvg } from './locality';
 import { WidgetVariant } from './names';
 import { WidgetSummary } from './summary';
 
@@ -66,6 +67,8 @@ export function VergeWidget({
   const muted = hex(t.ink55, t.bg);
   const faint = hex(t.ink45, t.bg);
   const accentWash = hex(t.accentTint2, t.bg);
+  const markInk = t.mark as Hex;
+  const ringInk = hex(t.ink40, t.bg);
 
   // With no position yet the count is the honest headline; a distance would be
   // inventing a proximity nobody measured.
@@ -121,6 +124,44 @@ export function VergeWidget({
             <FlexWidget style={{ width: 0, height: 0 }} />
           )}
         </FlexWidget>
+
+        {/*
+          The ground around you: zones as marks, you at the centre, two range
+          rings. Drawn from what the app already knows rather than fetched, so
+          it costs nothing and works with no signal.
+        */}
+        {summary && summary.nearby.length ? (
+          <FlexWidget
+            clickAction="OPEN_APP"
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              width: 'match_parent',
+              marginTop: 6,
+            }}
+          >
+            <SvgWidget
+              svg={localitySvg(summary.nearby, { mark: markInk, ring: ringInk, ink })}
+              style={{ width: 108, height: 108 }}
+            />
+            <FlexWidget style={{ flexDirection: 'column', marginLeft: 14 }}>
+              <TextWidget
+                text={`${summary.nearby.length}`}
+                style={{ fontSize: 30, color: ink, fontFamily: 'CormorantGaramond' }}
+              />
+              <TextWidget
+                text={summary.nearby.length === 1 ? 'zone within' : 'zones within'}
+                style={{ fontSize: s.foot, color: muted, fontFamily: 'Lora' }}
+              />
+              <TextWidget
+                text={localityScale(localityRadius(summary.nearby))}
+                style={{ fontSize: s.caption, color: ink, fontFamily: 'Lora', marginTop: 2 }}
+              />
+            </FlexWidget>
+          </FlexWidget>
+        ) : (
+          <FlexWidget style={{ width: 0, height: 0 }} />
+        )}
 
         <FlexWidget
           style={{

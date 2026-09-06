@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { Theme } from '../state/settingsSchema';
+
 /**
  * The small amount of state the cover-screen widget shows.
  *
@@ -22,6 +24,14 @@ export type WidgetSummary = {
   nearestMetres: number | null;
   /** Its posted limit in mph, when the list gives one. */
   nearestLimitMph: number | null;
+  /**
+   * Nearby zones as metres east and north of the driver, for the locality the
+   * widget draws. Offsets rather than coordinates: the widget only ever shows
+   * them relative to the centre, and offsets cannot be mistaken for a position.
+   */
+  nearby: { east: number; north: number }[];
+  /** The app's Appearance setting, so the widget draws in the chosen palette. */
+  theme: Theme;
   /** When this was written, as an ISO timestamp. */
   at: string;
   /** False when the position was the fallback origin rather than a real fix. */
@@ -49,6 +59,16 @@ export async function readSummary(): Promise<WidgetSummary | null> {
       nearestMetres: typeof parsed.nearestMetres === 'number' ? parsed.nearestMetres : null,
       nearestLimitMph:
         typeof parsed.nearestLimitMph === 'number' ? parsed.nearestLimitMph : null,
+      nearby: Array.isArray(parsed.nearby)
+        ? parsed.nearby.filter(
+            (n): n is { east: number; north: number } =>
+              typeof n?.east === 'number' && typeof n?.north === 'number',
+          )
+        : [],
+      theme:
+        parsed.theme === 'light' || parsed.theme === 'dark' || parsed.theme === 'system'
+          ? parsed.theme
+          : 'system',
       at: parsed.at,
       fromRealFix: parsed.fromRealFix === true,
     };

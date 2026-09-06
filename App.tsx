@@ -81,7 +81,13 @@ function Verge() {
   const statusOf = useCallback((zone: Zone) => statusOfZone(zone, listedOn), [listedOn]);
 
   // Keep the cover-screen widget fed with what the app currently knows.
-  useWidgetSummary({ zones: allZones, listedOn, origin, originIsReal: isReal });
+  useWidgetSummary({
+    zones: allZones,
+    listedOn,
+    origin,
+    originIsReal: isReal,
+    theme: settings.theme,
+  });
 
   /**
    * The one notice worth interrupting the design for: the list is invented, or
