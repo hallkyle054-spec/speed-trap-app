@@ -188,6 +188,11 @@ Two pieces make it reachable from the closed phone:
   is a tap target that opens the app. Samsung curates which third-party widgets
   it will place on the cover screen, so this is necessary but may not be
   sufficient; MultiStar's app launcher is the fallback route.
+- **`assets/widget-preview.png`** is what the widget picker draws. The widget's
+  own layout (`@layout/rn_widget`, from the library) is a transparent frame that
+  the app fills with a bitmap at runtime, so without a preview the picker shows
+  an empty tile — present, but easy to scroll straight past. Regenerate it to
+  match the design rather than screenshotting a device.
 
 Neither has been checked on a device — there isn't one here.
 

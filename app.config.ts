@@ -56,6 +56,11 @@ const config: ExpoConfig = {
             targetCellWidth: 2,
             targetCellHeight: 2,
             resizeMode: 'horizontal|vertical',
+            // Without this the picker has nothing to draw: the widget's own
+            // layout is a transparent frame that the app fills with a bitmap at
+            // runtime, so the entry renders as an empty tile and is very easy
+            // to scroll straight past.
+            previewImage: './assets/widget-preview.png',
             // Half an hour is Android's floor for automatic redraws; the app
             // also pushes an update whenever it learns something new.
             updatePeriodMillis: 1800000,
