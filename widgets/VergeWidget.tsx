@@ -5,6 +5,7 @@ import { formatDistance } from '../data/geo';
 import { shortDate } from '../data/zones';
 import { flatten } from '../theme/mapStyle';
 import { dark, light } from '../theme/tokens';
+import { WidgetVariant } from './names';
 import { WidgetSummary } from './summary';
 
 /** Widget styles take a literal hex; the tokens are opaque after flattening. */
@@ -12,26 +13,25 @@ type Hex = `#${string}`;
 const hex = (token: string, ground: string): Hex => flatten(token, ground) as Hex;
 
 /**
- * The widget, in the two shapes Android actually hands it.
+ * The widget, in the three shapes Android actually hands it.
  *
- * `tile` is a 2x2 cell with room for the road. `compact` is the 2x1 strip a
- * Flip's cover screen offers, which has room for one line — so it keeps the
- * distance and the disclaimer and drops the road, because a truncated road name
- * is worth less than either.
+ * `cover` is a Flip's whole Flex Window. `tile` is a home-screen cell with room
+ * for the road. `compact` is a one-row strip, which has room for one line — so
+ * it keeps the distance and the disclaimer and drops the road, because a
+ * truncated road name is worth less than either.
  *
- * Either way it is read at arm's length, in a second, and its whole face is a
- * tap target that opens Verge.
+ * Whichever it is, it is read at arm's length, in a second, and its whole face
+ * is a tap target that opens Verge.
  *
  * Widget styles take plain colours, not the app's translucent ink tokens, so
  * the tokens are composited over the ground first — the same treatment the map
  * style gets.
  */
-export type WidgetVariant = 'tile' | 'compact';
-
 /** One scale per variant rather than a multiplier: these are read, not derived. */
 const SIZES = {
-  tile: { pad: 14, padY: 13, radius: 22, kicker: 9, headline: 38, caption: 11, foot: 9, gap: 6 },
   compact: { pad: 12, padY: 8, radius: 18, kicker: 8, headline: 26, caption: 9, foot: 8, gap: 8 },
+  tile: { pad: 14, padY: 13, radius: 22, kicker: 9, headline: 38, caption: 11, foot: 9, gap: 6 },
+  cover: { pad: 26, padY: 24, radius: 30, kicker: 13, headline: 78, caption: 18, foot: 12, gap: 10 },
 } as const;
 
 const clock = (iso: string) => {

@@ -53,13 +53,15 @@ const config: ExpoConfig = {
             label: 'Verge · published zones',
             description:
               'The nearest published enforcement zone, and how far it is. Tap to open Verge.',
-            // 2x1, the size a Flip's cover screen places, and resizable up to
-            // the 2x2 the home screen has room for. The widget picks its layout
+            // A Flex Window widget: the cover screen gives it the whole panel.
+            // These are the dimensions of a widget already living on this
+            // phone's cover screen, copied rather than guessed. No
+            // `targetCellWidth`/`targetCellHeight` — declaring cells makes
+            // Android place it on a home-screen grid instead, and the cover
+            // screen is not a grid. It stays resizable, and picks its layout
             // from the size Android actually gives it.
-            minWidth: '110dp',
-            minHeight: '40dp',
-            targetCellWidth: 2,
-            targetCellHeight: 1,
+            minWidth: '339dp',
+            minHeight: '352dp',
             resizeMode: 'horizontal|vertical',
             // Without this the picker has nothing to draw: the widget's own
             // layout is a transparent frame that the app fills with a bitmap at

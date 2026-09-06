@@ -25,21 +25,22 @@ const samsungXml = name => `samsung_widgetprovider_${name.toLowerCase()}.xml`;
  *    activity does not get its orientation request honoured on a display the
  *    system manages for it, which is the behaviour we want on the cover screen.
  *
- * 2. The widget is declared to Samsung as a cover-screen widget. Samsung's
- *    documented opt-in is a `com.samsung.android.appwidget.provider` meta-data
- *    pointing at a `<samsung-appwidget-provider display="sub_screen">`
- *    resource, alongside the `keyguard` widget category.
- *    react-native-android-widget knows nothing about either and hardcodes
- *    `home_screen`, so both are applied here. The category keeps `home_screen`
- *    as well: on a Flip 7 the cover screen draws from the home-screen widget
- *    set rather than the full-screen panels the `sub_screen` mechanism was
- *    written for, so the widget has to be both.
+ * 2. The widget is offered on the Flex Window. Three things together, checked
+ *    against a widget that is already on this phone's cover screen rather than
+ *    worked out from documentation:
  *
- *    Whether this is enough is Samsung's call, not ours. Reporting on the
- *    Flip 7 says the cover screen only offers a curated set of widgets —
- *    largely Samsung's own — regardless of what an app declares. This is the
- *    whole of the documented opt-in; if the widget still is not offered, no
- *    further manifest change will do it.
+ *      - a `com.samsung.android.appwidget.provider` meta-data pointing at a
+ *        `<samsung-appwidget-provider display="sub_screen">` resource,
+ *      - `android:widgetCategory="home_screen|keyguard"`, and
+ *      - an **exported** receiver.
+ *
+ *    react-native-android-widget writes `home_screen` and `exported="false"`
+ *    and knows nothing about the Samsung resource, so all three are applied
+ *    here. Exporting the receiver is what lets Samsung's cover-screen host —
+ *    a separate app — see the provider at all; a non-exported one is invisible
+ *    to it. The receiver only acts on its own `<package>.WIDGET…` actions and
+ *    the worst another app can do with it is ask for a redraw, so the exposure
+ *    is small and it is the price of being listed.
  */
 module.exports = function withCoverScreen(config) {
   config = withAndroidManifest(config, cfg => {
@@ -68,6 +69,10 @@ module.exports = function withCoverScreen(config) {
     receiver['meta-data'] = (
       Array.isArray(existing) ? existing : existing ? [existing] : []
     ).filter(m => m.$['android:name'] !== 'com.samsung.android.appwidget.provider');
+    // Samsung's cover-screen host is a different app, and cannot enumerate a
+    // provider it is not allowed to see.
+    receiver.$['android:exported'] = 'true';
+
     receiver['meta-data'].push({
       $: {
         'android:name': 'com.samsung.android.appwidget.provider',

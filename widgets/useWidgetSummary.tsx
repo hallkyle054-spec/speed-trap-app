@@ -3,7 +3,7 @@ import { Appearance, Platform } from 'react-native';
 import { requestWidgetUpdate } from 'react-native-android-widget';
 
 import { VergeWidget } from './VergeWidget';
-import { COMPACT_UNDER_DP, WIDGET_NAME } from './names';
+import { WIDGET_NAME, variantForHeight } from './names';
 
 import { LatLng } from '../data/geo';
 import { Zone, distanceTo, nearestZone, zoneTitle } from '../data/zones';
@@ -68,7 +68,7 @@ export function useWidgetSummary({
           <VergeWidget
             summary={summary}
             isDark={isDark}
-            variant={info.height < COMPACT_UNDER_DP ? 'compact' : 'tile'}
+            variant={variantForHeight(info.height)}
           />
         ),
       });

@@ -192,29 +192,35 @@ position nobody has measured.
   main activity plus the `android.supports_size_changes` flag. Without them
   Android puts the activity in device-compatibility mode and draws it in a
   fixed-size box in the middle of the screen.
-- **The widget is declared to Samsung.** Samsung's documented opt-in is a
-  `com.samsung.android.appwidget.provider` meta-data pointing at a
-  `<samsung-appwidget-provider display="sub_screen">` resource, alongside the
-  `keyguard` widget category. react-native-android-widget knows about neither
-  and hardcodes `home_screen`, so the plugin writes the Samsung resource and
-  makes the category `home_screen|keyguard` — the Flip 7's cover screen draws
-  from the home-screen widget set rather than the full-screen panels
-  `sub_screen` was written for, so the widget has to be both.
+- **The widget is offered on the Flex Window.** Three things together:
+  a `com.samsung.android.appwidget.provider` meta-data pointing at a
+  `<samsung-appwidget-provider display="sub_screen">` resource,
+  `android:widgetCategory="home_screen|keyguard"`, and an **exported**
+  receiver. react-native-android-widget writes `home_screen` and
+  `exported="false"` and knows nothing about the Samsung resource, so the
+  plugin applies all three.
 
-  **This is the whole of the documented opt-in, and on a Flip 7 it may not be
-  enough.** Samsung dropped the full-screen cover panels the `sub_screen`
-  mechanism was designed for, and reporting on the replacement says the cover
-  screen only offers a curated set of widgets — largely Samsung's own, plus a
-  few blessed third parties. There is no published way for an app to get onto
-  that list. If the widget is not offered, no further manifest change will do
-  it; CoverWidgets or Good Lock's MultiStar are the routes left.
+  Exporting the receiver is the one that is easy to miss. Samsung's
+  cover-screen host is a separate app and cannot enumerate a provider it is not
+  allowed to see, so a non-exported widget is simply invisible to it — it never
+  appears in the list, with no error anywhere. The receiver only acts on its own
+  `<package>.WIDGET…` actions and the worst another app can do with it is ask
+  for a redraw.
+
+  These were read off a widget already living on this phone's cover screen
+  rather than worked out from documentation, after three builds of doing the
+  latter. Samsung's published guidance covers the meta-data and the category
+  and says nothing about the export, and the two attempts that followed only
+  the documentation did not work.
 
 There is one widget, `Verge` (`widgets/names.ts` holds the name, which is also
-the generated provider class name). It is declared 2x1 — the size a cover screen
-places — and is resizable up to the 2x2 a home screen has room for. Android
-reports the size it actually gave the widget on every redraw, so `VergeWidget`
-picks its layout from that: a one-line strip under 90dp tall, the fuller tile
-above it. Tapping it opens the app.
+the generated provider class name). It is declared at 339x352dp — a Flex Window
+panel, not a home-screen cell — with **no** `targetCellWidth`/`targetCellHeight`,
+because declaring cells makes Android place it on a home-screen grid and the
+cover screen is not a grid. It stays resizable, and Android reports the size it
+actually gave the widget on every redraw, so `VergeWidget` picks its layout from
+that: a one-line strip under 90dp, a tile under 200dp, the full panel above it.
+Tapping it opens the app.
 
 **`assets/widget-preview.png`** is what the picker draws: the widget's own layout
 (`@layout/rn_widget`, from the library) is a transparent frame that the app fills

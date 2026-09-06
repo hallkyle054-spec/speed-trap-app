@@ -7,8 +7,15 @@
 export const WIDGET_NAME = 'Verge';
 
 /**
- * Below this height the widget is a 2x1 strip and has room for one line, not
- * three. Android reports the size it actually gave us on every redraw, so the
- * layout is chosen from that rather than from a size we declared and hoped for.
+ * Android reports the size it actually gave the widget on every redraw, so the
+ * layout is chosen from that rather than from the size the manifest asked for.
+ * One declaration has to survive a full cover-screen panel, a home-screen tile
+ * and a strip the user has dragged down to one row.
  */
-export const COMPACT_UNDER_DP = 90;
+export type WidgetVariant = 'compact' | 'tile' | 'cover';
+
+const COMPACT_UNDER_DP = 90;
+const COVER_FROM_DP = 200;
+
+export const variantForHeight = (heightDp: number): WidgetVariant =>
+  heightDp < COMPACT_UNDER_DP ? 'compact' : heightDp < COVER_FROM_DP ? 'tile' : 'cover';
