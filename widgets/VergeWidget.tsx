@@ -27,11 +27,21 @@ const hex = (token: string, ground: string): Hex => flatten(token, ground) as He
  * the tokens are composited over the ground first — the same treatment the map
  * style gets.
  */
-/** One scale per variant rather than a multiplier: these are read, not derived. */
+/**
+ * One scale per variant rather than a multiplier: these are read, not derived.
+ *
+ * `cover` has no corner radius of its own. A Flex Window widget is given the
+ * whole panel and the host rounds it off, so rounding it again only opens a
+ * gap at each corner with the host's own background showing through — the
+ * widget stops meeting the edges. The widget already on this phone's cover
+ * screen draws square and transparent for the same reason. The smaller
+ * variants keep a radius: those sit on a home-screen grid with real space
+ * around them, where a card edge is the point.
+ */
 const SIZES = {
   compact: { pad: 12, padY: 8, radius: 18, kicker: 8, headline: 26, caption: 9, foot: 8, gap: 8 },
   tile: { pad: 14, padY: 13, radius: 22, kicker: 9, headline: 38, caption: 11, foot: 9, gap: 6 },
-  cover: { pad: 26, padY: 24, radius: 30, kicker: 13, headline: 78, caption: 18, foot: 12, gap: 10 },
+  cover: { pad: 26, padY: 24, radius: 0, kicker: 13, headline: 78, caption: 18, foot: 12, gap: 10 },
 } as const;
 
 const clock = (iso: string) => {

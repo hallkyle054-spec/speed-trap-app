@@ -222,6 +222,12 @@ actually gave the widget on every redraw, so `VergeWidget` picks its layout from
 that: a one-line strip under 90dp, a tile under 200dp, the full panel above it.
 Tapping it opens the app.
 
+At the panel size the widget draws square and edge to edge. Samsung rounds the
+panel off itself, so rounding it again only opens a gap at each corner where the
+host's background shows through — the widget stops meeting the edges. The
+smaller variants keep a corner radius, because those sit on a home-screen grid
+with real space around them.
+
 **`assets/widget-preview.png`** is what the picker draws: the widget's own layout
 (`@layout/rn_widget`, from the library) is a transparent frame that the app fills
 with a bitmap at runtime, so without a preview the picker shows an empty tile —
