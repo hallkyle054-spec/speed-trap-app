@@ -33,14 +33,22 @@ export const PANEL_GAP = 14;
  * twenty density-independent pixels that exist in the drawing and nowhere on
  * the screen.
  *
- * It has to be corrected in the **padding**, not only in computed widths. A
- * child asking for `match_parent` — the hairline, a full-width row — sizes
- * itself against the padded bitmap and lands past the edge no matter what
- * numbers the layout worked out. Two builds went by with the headline
- * obediently shrinking and the rule still running off the card, which is what
- * gave this away.
+ * It has to be corrected in the **padding** as well as in computed widths: a
+ * child asking for `match_parent` sizes itself against the padded bitmap, so no
+ * arithmetic the layout does can reach it.
+ *
+ * The number is solved from a build whose code was known, rather than guessed
+ * from a screenshot whose build was not — which is how it came out less than
+ * half its real size twice. On a Flip's cover screen, running the panel with
+ * 22dp of left padding and a hairline set to `reported - 64`:
+ *
+ *     left padding   22dp measured as  57px   ->  2.59 px/dp
+ *     hairline      746px             = 288dp ->  reported = 352dp
+ *     card          803px             = 310dp ->  overhang =  42dp
+ *
+ * Forty-four, for a margin.
  */
-export const HOST_OVERHANG = 20;
+export const HOST_OVERHANG = 44;
 
 /** The part of a reported dimension that actually reaches the screen. */
 export const drawable = (reportedDp: number): number =>

@@ -50,12 +50,12 @@ test('the diagram stays legible without crowding out its caption', () => {
 
 test('the distance fits across the panel and still leaves room beneath it', () => {
   // A real cover screen: about 305 x 297dp.
-  const { inner } = panelBand(305, 22);
-  const size = panelHeadlineSize(inner, 297);
+  const { inner } = panelBand(352, 22);
+  const size = panelHeadlineSize(inner, 343);
   // Cormorant needs roughly 3.4dp per point for a string like "12.4 km".
   assert.ok(size * 3.4 <= inner, `"12.4 km" at ${size}pt must fit ${inner}dp across`);
   // And the line it sets must not eat the panel the rest of the reading needs.
-  assert.ok(size * 1.2 < 297 * 0.3, `${size}pt leaves too little height beneath it`);
+  assert.ok(size * 1.2 < 343 * 0.3, `${size}pt leaves too little height beneath it`);
   // Neither dimension alone decides it.
   assert.ok(panelHeadlineSize(1000, 200) < panelHeadlineSize(1000, 1000), 'height must bind');
   assert.ok(panelHeadlineSize(120, 1000) < panelHeadlineSize(1000, 1000), 'width must bind');
@@ -68,8 +68,10 @@ test('the layout is built from what is drawn, not from what was reported', () =>
   // across. Anything sized to the reported number overhangs, and a widget's
   // overhang is not drawn at all — that is how the hairline ran past the card's
   // own edge and took the OPEN button with it.
-  const REPORTED = 326;
-  const REAL = 306;
+  // Solved off a Flip's cover screen: it reports about 352dp for a card that
+  // is really 310dp across.
+  const REPORTED = 352;
+  const REAL = 310;
   const pad = 22;
   const { inner } = panelBand(REPORTED, pad);
   // The content starts one ordinary pad in and must end inside the card.
@@ -94,8 +96,8 @@ test('the padding carries the overhang, so match_parent children stop in time', 
 
   // A full-width child spans the reported width less both paddings, and that
   // has to land inside the card the host really shows.
-  const REPORTED = 326;
-  const REAL = 306;
+  const REPORTED = 352;
+  const REAL = 310;
   const fullWidth = REPORTED - p.paddingLeft - p.paddingRight;
   assert.ok(
     p.paddingLeft + fullWidth <= REAL - 4,
