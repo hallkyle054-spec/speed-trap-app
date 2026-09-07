@@ -24,6 +24,26 @@ export const variantForHeight = (heightDp: number): WidgetVariant =>
 export const PANEL_GAP = 14;
 
 /**
+ * How far the widget's drawable area sits inside the size Android reports.
+ *
+ * The reported size is the *cell* the host allocated; the view is inset within
+ * it by the platform's own widget padding. Everything sized to the reported
+ * number therefore overhangs, and a widget's overhang is not clipped politely —
+ * it is simply not drawn. This is what took the diagram off the bottom, then
+ * the OPEN button off the right, then ran the hairline out past the card's own
+ * edge, each time looking like a different bug.
+ *
+ * Measured off a Flip's cover screen: a card 800px wide reported as ~856px at
+ * 2.625 px/dp, so about 10dp a side. Twelve, to leave a margin for hosts that
+ * take a little more.
+ */
+export const HOST_INSET = 12;
+
+/** The part of a reported dimension that is actually drawn on. */
+export const drawable = (reportedDp: number): number =>
+  Math.max(0, reportedDp - HOST_INSET * 2);
+
+/**
  * How large the distance can be set: the smaller of what the width allows and
  * what the height can spare.
  *
@@ -35,7 +55,10 @@ export const PANEL_GAP = 14;
  * and a size chosen for one looks wrong on the other.
  */
 export const panelHeadlineSize = (widthDp: number, heightDp: number): number =>
-  Math.max(28, Math.min(76, Math.round(Math.min(widthDp * 0.28, heightDp * 0.2))));
+  Math.max(
+    28,
+    Math.min(76, Math.round(Math.min(widthDp * 0.28, drawable(heightDp) * 0.2))),
+  );
 
 /**
  * How the panel's bottom band divides between the diagram and its caption.
@@ -50,10 +73,10 @@ export const panelHeadlineSize = (widthDp: number, heightDp: number): number =>
  * name like "Model Church in Wales School" sit on one line.
  */
 export function panelBand(
-  widthDp: number,
+  reportedWidthDp: number,
   paddingDp: number,
 ): { inner: number; caption: number; diagram: number } {
-  const inner = Math.max(0, widthDp - paddingDp * 2);
+  const inner = Math.max(0, drawable(reportedWidthDp) - paddingDp * 2);
   const diagram = Math.max(72, Math.min(120, Math.round(inner * 0.3)));
   return { inner, caption: Math.max(0, inner - PANEL_GAP - diagram), diagram };
 }

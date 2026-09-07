@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { PANEL_GAP, panelBand, panelHeadlineSize } from '../widgets/names';
+import { PANEL_GAP, drawable, panelBand, panelHeadlineSize } from '../widgets/names';
 import { widgetIsDark } from '../widgets/theme';
 
 test('the widget draws in the palette the app was set to', () => {
@@ -26,7 +26,7 @@ test('the band and the gap in it fit the width available', () => {
   for (const width of [200, 320, 361, 420, 900]) {
     const pad = 22;
     const { inner, caption, diagram } = panelBand(width, pad);
-    assert.equal(inner, width - pad * 2);
+    assert.equal(inner, drawable(width) - pad * 2);
     assert.equal(
       caption + PANEL_GAP + diagram,
       inner,
@@ -54,4 +54,21 @@ test('the distance fits across the panel and still leaves room beneath it', () =
   assert.ok(panelHeadlineSize(120, 1000) < panelHeadlineSize(1000, 1000), 'width must bind');
   assert.equal(panelHeadlineSize(10, 10), 28);
   assert.equal(panelHeadlineSize(2000, 2000), 76);
+});
+
+test('the layout is built from what is drawn, not from what was reported', () => {
+  // A Flip's cover screen reports about 326dp for a card that is really 305dp
+  // across. Anything sized to the reported number overhangs, and a widget's
+  // overhang is not drawn at all — that is how the hairline ran past the card's
+  // own edge and took the OPEN button with it.
+  const REPORTED = 326;
+  const REAL = 305;
+  const pad = 22;
+  const { inner } = panelBand(REPORTED, pad);
+  assert.ok(
+    inner <= REAL - pad * 2,
+    `${inner}dp of content must fit the ${REAL - pad * 2}dp actually drawable`,
+  );
+  assert.equal(drawable(REPORTED), 302);
+  assert.equal(drawable(10), 0, 'a tiny widget must not report negative room');
 });

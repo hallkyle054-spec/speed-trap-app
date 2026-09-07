@@ -262,11 +262,21 @@ edge. That is how the diagram once left the widget altogether, with an
 unconstrained road name beside it taking the lot. `panelBand` divides the
 padded width; the tests hold it to adding up.
 
-`panelHeadlineSize` takes the smaller of what the width allows and what the
+**The size Android reports is not the size it draws.** The reported number is
+the cell the host allocated; the view sits inset within it by the platform's own
+widget padding, and a widget's overhang is not clipped politely — it is simply
+never drawn. That one fact caused what looked like three separate bugs in three
+separate builds: the diagram off the bottom, the OPEN button off the right, and
+the hairline running out past the card's own edge. `drawable()` takes
+`HOST_INSET` off each side first, and everything is laid out from what is left.
+The inset is measured, not guessed: a cover-screen card 800px wide reported as
+about 856px at 2.625 px/dp, so roughly 10dp a side, and twelve is used to leave
+a margin.
+
+`panelHeadlineSize` then takes the smaller of what the width allows and what the
 height can spare — width because Cormorant needs roughly 3.4dp per point for a
 string like "12.4 km" and it must not wrap, height because everything under it
-needs room. Both are measured off a real cover screen, which is about
-305 x 297dp — considerably smaller than the editor's preview card suggests.
+needs room.
 
 **`assets/widget-preview.png`** is what the picker draws: the widget's own layout
 (`@layout/rn_widget`, from the library) is a transparent frame that the app fills
