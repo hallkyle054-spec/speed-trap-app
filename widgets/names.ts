@@ -24,32 +24,36 @@ export const variantForHeight = (heightDp: number): WidgetVariant =>
 export const PANEL_GAP = 14;
 
 /**
- * How the panel's width is divided between the reading and the diagram.
+ * How large the distance can be set: the smaller of what the width allows and
+ * what the height can spare.
+ *
+ * Width, because Cormorant sets a string like "12.4 km" at roughly 3.4dp per
+ * point and it must not wrap — measured off a real cover screen. Height,
+ * because everything under it needs room too, and a number that fits across
+ * but eats the panel pushes the diagram out of the bottom. Derived rather than
+ * fixed: the same layout serves a cover panel and a large home-screen widget,
+ * and a size chosen for one looks wrong on the other.
+ */
+export const panelHeadlineSize = (widthDp: number, heightDp: number): number =>
+  Math.max(28, Math.min(76, Math.round(Math.min(widthDp * 0.28, heightDp * 0.2))));
+
+/**
+ * How the panel's bottom band divides between the diagram and its caption.
  *
  * The toolkit has no flex weights — a row lays its children out at whatever
  * width they ask for, and the first child asking for more than there is pushes
- * the rest off the edge. A road name is exactly that: left unconstrained,
- * "Model Church in Wales School" sets itself on one long line and the diagram
- * leaves the widget entirely. So both columns are given an explicit width and
- * the text wraps inside its own.
- */
-/**
- * How large the distance can be set without wrapping in its column.
+ * the rest off the edge. That is how the diagram left the widget entirely once:
+ * an unconstrained road name beside it took the lot. So both get a width.
  *
- * Measured off a real cover screen: Cormorant sets a string like "12.4 km" at
- * roughly 3.4dp of width per point of size, so a third of the column is the
- * ceiling and a little under is the safe number. Derived rather than fixed
- * because the same layout has to serve a cover panel and a large home-screen
- * widget, and a size chosen for one looks wrong on the other.
+ * The reading itself no longer shares a row with anything. It runs the full
+ * width of the panel, which is what lets the distance be set large and a road
+ * name like "Model Church in Wales School" sit on one line.
  */
-export const panelHeadlineSize = (readingDp: number): number =>
-  Math.max(30, Math.min(72, Math.round(readingDp * 0.28)));
-
-export function panelColumns(
+export function panelBand(
   widthDp: number,
   paddingDp: number,
-): { reading: number; diagram: number } {
+): { inner: number; caption: number; diagram: number } {
   const inner = Math.max(0, widthDp - paddingDp * 2);
-  const diagram = Math.max(80, Math.min(130, Math.round(inner * 0.32)));
-  return { reading: Math.max(0, inner - PANEL_GAP - diagram), diagram };
+  const diagram = Math.max(72, Math.min(120, Math.round(inner * 0.3)));
+  return { inner, caption: Math.max(0, inner - PANEL_GAP - diagram), diagram };
 }

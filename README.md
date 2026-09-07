@@ -246,26 +246,27 @@ with real space around them.
 At panel size the widget carries the drive HUD's reading — distance, road,
 limit — a **locality diagram**, and an **OPEN** button.
 
-It is laid out as **two columns** — the reading left, the locality right —
-because a single stack ran off the bottom.
+The panel is a **stack, not a split**: kicker and **OPEN** on the top line, then
+the distance, the road and the provenance each running the full width, then a
+hairline and the locality in a band beneath it.
 
-**Both columns are given an explicit width**, and that is the whole trick. The
-toolkit has no flex weights: a row hands each child whatever width it asks for,
-and the first child asking for more than there is pushes the rest off the edge.
-A road name is exactly that. Left unconstrained, "Model Church in Wales School"
-set itself on one long line and shoved the diagram clean out of the widget. So
-`panelColumns` divides the padded width between the two and the text wraps
-inside its own column.
+Giving the reading its own full-width rows is what makes it read. Sharing a row
+with the diagram forced the distance small and broke a road name across two
+lines; alone, "Model Church in Wales School" sits on one and the number is half
+again as large.
 
-The distance is sized the same way. `panelHeadlineSize` derives it from the
-reading column rather than fixing it, because the panel is narrower than it
-looks — a live cover widget measured about 305dp across, not the ~400dp the
-editor's preview card suggests — and a size that fits a wide widget wraps on a
-narrow one. Cormorant needs roughly 3.4dp of width per point for a string like
-"12.4 km"; the tests hold the layout to that.
+Only the band splits, and there **both children are given an explicit width**.
+The toolkit has no flex weights: a row hands each child whatever width it asks
+for, and the first child asking for more than there is pushes the rest off the
+edge. That is how the diagram once left the widget altogether, with an
+unconstrained road name beside it taking the lot. `panelBand` divides the
+padded width; the tests hold it to adding up.
 
-**OPEN leads the top line**, hard against the left margin, where it is
-unmissable and cannot be pushed anywhere by the content beside it.
+`panelHeadlineSize` takes the smaller of what the width allows and what the
+height can spare — width because Cormorant needs roughly 3.4dp per point for a
+string like "12.4 km" and it must not wrap, height because everything under it
+needs room. Both are measured off a real cover screen, which is about
+305 x 297dp — considerably smaller than the editor's preview card suggests.
 
 **`assets/widget-preview.png`** is what the picker draws: the widget's own layout
 (`@layout/rn_widget`, from the library) is a transparent frame that the app fills

@@ -99,6 +99,7 @@ export function useWidgetSummary({
             isDark={isDark}
             variant={variantForHeight(info.height)}
             width={info.width}
+            height={info.height}
           />
         ),
       });

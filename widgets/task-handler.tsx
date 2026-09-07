@@ -25,6 +25,7 @@ export async function widgetTaskHandler(props: WidgetTaskHandlerProps) {
       isDark={isDark}
       variant={variant}
       width={props.widgetInfo.width}
+      height={props.widgetInfo.height}
     />
   );
 

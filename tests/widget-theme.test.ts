@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { PANEL_GAP, panelColumns, panelHeadlineSize } from '../widgets/names';
+import { PANEL_GAP, panelBand, panelHeadlineSize } from '../widgets/names';
 import { widgetIsDark } from '../widgets/theme';
 
 test('the widget draws in the palette the app was set to', () => {
@@ -20,36 +20,38 @@ test('a summary written before the setting existed still renders', () => {
   assert.equal(widgetIsDark(undefined, false), false);
 });
 
-test('the two columns and the gap between them fit the width available', () => {
-  // The bug this guards: an unconstrained reading column set a long road name
-  // on one line and pushed the diagram off the right edge of the widget.
+test('the band and the gap in it fit the width available', () => {
+  // The bug this guards: an unconstrained sibling set a long road name on one
+  // line and pushed the diagram off the right edge of the widget.
   for (const width of [200, 320, 361, 420, 900]) {
     const pad = 22;
-    const { reading, diagram } = panelColumns(width, pad);
+    const { inner, caption, diagram } = panelBand(width, pad);
+    assert.equal(inner, width - pad * 2);
     assert.equal(
-      reading + PANEL_GAP + diagram,
-      width - pad * 2,
-      `columns must exactly fill the padded width at ${width}dp`,
+      caption + PANEL_GAP + diagram,
+      inner,
+      `the band must exactly fill the padded width at ${width}dp`,
     );
-    assert.ok(reading > 0 && diagram > 0, `both columns need room at ${width}dp`);
+    assert.ok(caption > 0 && diagram > 0, `both need room at ${width}dp`);
   }
 });
 
-test('the diagram stays legible without crowding out the reading', () => {
-  assert.equal(panelColumns(120, 22).diagram, 80);
-  assert.equal(panelColumns(2000, 22).diagram, 130);
-  // On a real cover screen the reading keeps the larger share.
-  const { reading, diagram } = panelColumns(361, 22);
-  assert.ok(reading > diagram, 'the distance is the point; the diagram supports it');
+test('the diagram stays legible without crowding out its caption', () => {
+  assert.equal(panelBand(120, 22).diagram, 72);
+  assert.equal(panelBand(2000, 22).diagram, 120);
 });
 
-test('the distance is sized to fit its column rather than wrapping', () => {
-  // A real cover screen: ~305dp wide, so a reading column near 167dp.
-  const { reading } = panelColumns(305, 22);
-  const size = panelHeadlineSize(reading);
+test('the distance fits across the panel and still leaves room beneath it', () => {
+  // A real cover screen: about 305 x 297dp.
+  const { inner } = panelBand(305, 22);
+  const size = panelHeadlineSize(inner, 297);
   // Cormorant needs roughly 3.4dp per point for a string like "12.4 km".
-  assert.ok(size * 3.4 <= reading, `"12.4 km" at ${size}pt must fit ${reading}dp`);
-  // And it does not collapse on a tiny widget or run away on a large one.
-  assert.equal(panelHeadlineSize(10), 30);
-  assert.equal(panelHeadlineSize(1000), 72);
+  assert.ok(size * 3.4 <= inner, `"12.4 km" at ${size}pt must fit ${inner}dp across`);
+  // And the line it sets must not eat the panel the rest of the reading needs.
+  assert.ok(size * 1.2 < 297 * 0.3, `${size}pt leaves too little height beneath it`);
+  // Neither dimension alone decides it.
+  assert.ok(panelHeadlineSize(1000, 200) < panelHeadlineSize(1000, 1000), 'height must bind');
+  assert.ok(panelHeadlineSize(120, 1000) < panelHeadlineSize(1000, 1000), 'width must bind');
+  assert.equal(panelHeadlineSize(10, 10), 28);
+  assert.equal(panelHeadlineSize(2000, 2000), 76);
 });

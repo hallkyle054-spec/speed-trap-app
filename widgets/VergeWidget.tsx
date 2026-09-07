@@ -6,7 +6,7 @@ import { shortDate } from '../data/zones';
 import { flatten } from '../theme/mapStyle';
 import { dark, light } from '../theme/tokens';
 import { localityScale, localityRadius, localitySvg } from './locality';
-import { PANEL_GAP, WidgetVariant, panelColumns, panelHeadlineSize } from './names';
+import { PANEL_GAP, WidgetVariant, panelBand, panelHeadlineSize } from './names';
 import { WidgetSummary } from './summary';
 
 /** Widget styles take a literal hex; the tokens are opaque after flattening. */
@@ -56,12 +56,14 @@ export function VergeWidget({
   isDark,
   variant = 'tile',
   width,
+  height,
 }: {
   summary: WidgetSummary | null;
   isDark: boolean;
   variant?: WidgetVariant;
-  /** The width Android gave the widget, in dp. Splits the panel's two columns. */
+  /** The size Android gave the widget, in dp. The panel is laid out from it. */
   width?: number;
+  height?: number;
 }) {
   const t = isDark ? dark : light;
   const s = SIZES[variant];
@@ -72,6 +74,7 @@ export function VergeWidget({
   const accentWash = hex(t.accentTint2, t.bg);
   const markInk = t.mark as Hex;
   const ringInk = hex(t.ink40, t.bg);
+  const ruleInk = hex(t.rule, t.bg);
 
   // With no position yet the count is the honest headline; a distance would be
   // inventing a proximity nobody measured.
@@ -91,12 +94,8 @@ export function VergeWidget({
     const limit = summary?.nearestLimitMph;
     const stamp = summary && showDistance ? ` · as of ${clock(summary.at)}` : '';
     const marks = summary?.nearby ?? [];
-    // A cover screen is wider than it is tall, so the panel is two columns.
-    // Stacking them ran the diagram off the bottom edge.
-    const col = panelColumns(width ?? 360, s.pad);
-    // Sized to the column it sits in: a fixed size that fits a wide widget
-    // wraps on a narrow one, and this panel is narrower than it looks.
-    const headlineSize = panelHeadlineSize(col.reading);
+    const band = panelBand(width ?? 320, s.pad);
+    const headlineSize = panelHeadlineSize(band.inner, height ?? 300);
 
     return (
       <FlexWidget
@@ -110,27 +109,29 @@ export function VergeWidget({
           borderRadius: s.radius,
           paddingHorizontal: s.pad,
           paddingTop: s.padY,
-          // Only the bottom keeps slack: the content is top-anchored and a host
-          // that gives less height than it promised should lose empty space.
-          paddingBottom: s.padY * 2,
+          paddingBottom: s.padY,
         }}
       >
-        {/*
-          OPEN leads the top line, hard against the left margin. The top left is
-          the one corner a cropped bitmap always keeps — it is where the drawing
-          starts — and this button spent a build in the opposite corner, where
-          the cover screen cut it in half. The kicker follows it and may
-          truncate, which costs a label rather than the way into the app.
-        */}
-        <FlexWidget style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <FlexWidget
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: band.inner,
+          }}
+        >
+          <TextWidget
+            text={showDistance ? 'NEAREST ZONE' : 'PUBLISHED ZONES'}
+            maxLines={1}
+            style={{ fontSize: s.kicker, letterSpacing: 1.5, color: faint, fontFamily: 'Lora' }}
+          />
           <FlexWidget
             clickAction="OPEN_APP"
             style={{
-              paddingHorizontal: 18,
-              paddingVertical: 10,
-              borderRadius: 20,
+              paddingHorizontal: 16,
+              paddingVertical: 9,
+              borderRadius: 18,
               backgroundColor: accentWash,
-              marginRight: 12,
             }}
           >
             <TextWidget
@@ -138,64 +139,70 @@ export function VergeWidget({
               style={{ fontSize: s.kicker, letterSpacing: 1.6, color: ink, fontFamily: 'Lora' }}
             />
           </FlexWidget>
-          <TextWidget
-            text={showDistance ? 'NEAREST ZONE' : 'PUBLISHED ZONES'}
-            maxLines={1}
-            style={{ fontSize: s.kicker, letterSpacing: 1.4, color: faint, fontFamily: 'Lora' }}
-          />
         </FlexWidget>
 
-        <FlexWidget
+        {/*
+          The reading runs the full width of the panel and shares its rows with
+          nothing. That is what lets the distance be set large and a road name
+          like "Model Church in Wales School" sit on one line.
+        */}
+        <TextWidget
+          text={headline}
+          maxLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            width: 'match_parent',
-            marginTop: 4,
+            fontSize: headlineSize,
+            color: ink,
+            fontFamily: 'CormorantGaramond',
+            marginTop: 6,
           }}
-        >
-          <FlexWidget style={{ flexDirection: 'column', width: col.reading }}>
-            <TextWidget
-              text={headline}
-              maxLines={1}
-              style={{ fontSize: headlineSize, color: ink, fontFamily: 'CormorantGaramond' }}
-            />
-            <TextWidget
-              text={caption}
-              maxLines={2}
-              style={{ fontSize: s.caption, color: muted, fontFamily: 'Lora', marginTop: 2 }}
-            />
-            <TextWidget
-              text={`${limit ? `${limit} MPH · ` : ''}possible mobile camera${stamp}`}
-              maxLines={2}
-              style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora', marginTop: 3 }}
-            />
-          </FlexWidget>
+        />
+        <TextWidget
+          text={caption}
+          maxLines={1}
+          style={{ fontSize: s.caption, color: muted, fontFamily: 'Lora', marginTop: 2 }}
+        />
+        <TextWidget
+          text={`${limit ? `${limit} MPH · ` : ''}possible mobile camera${stamp}`}
+          maxLines={1}
+          style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora', marginTop: 3 }}
+        />
 
-          {marks.length ? (
+        {marks.length ? (
+          <FlexWidget style={{ flexDirection: 'column', width: band.inner }}>
+            {/* A hairline, as everywhere else in the app, so the locality reads
+                as its own band rather than more of the same paragraph. */}
             <FlexWidget
               style={{
-                flexDirection: 'column',
-                alignItems: 'center',
-                width: col.diagram,
-                marginLeft: PANEL_GAP,
+                width: band.inner,
+                height: 1,
+                backgroundColor: ruleInk,
+                marginTop: 12,
+                marginBottom: 10,
               }}
-            >
+            />
+            <FlexWidget style={{ flexDirection: 'row', alignItems: 'center', width: band.inner }}>
               <SvgWidget
                 svg={localitySvg(marks, { mark: markInk, ring: ringInk, ink })}
-                style={{ width: col.diagram, height: col.diagram }}
+                style={{ width: band.diagram, height: band.diagram }}
               />
-              <TextWidget
-                text={`${marks.length} ${marks.length === 1 ? 'zone' : 'zones'} within ${localityScale(localityRadius(marks))}`}
-                // Two lines: there is vertical room, and truncating this to one
-                // would drop the scale, which is what makes the diagram legible.
-                maxLines={2}
-                style={{ fontSize: s.foot, color: muted, fontFamily: 'Lora', marginTop: 2 }}
-              />
+              <FlexWidget
+                style={{ flexDirection: 'column', width: band.caption, marginLeft: PANEL_GAP }}
+              >
+                <TextWidget
+                  text={`${marks.length}`}
+                  style={{ fontSize: s.caption * 2, color: ink, fontFamily: 'CormorantGaramond' }}
+                />
+                <TextWidget
+                  text={`${marks.length === 1 ? 'zone' : 'zones'} within ${localityScale(localityRadius(marks))}`}
+                  maxLines={2}
+                  style={{ fontSize: s.foot, color: muted, fontFamily: 'Lora', marginTop: 1 }}
+                />
+              </FlexWidget>
             </FlexWidget>
-          ) : (
-            <FlexWidget style={{ width: 0, height: 0 }} />
-          )}
-        </FlexWidget>
+          </FlexWidget>
+        ) : (
+          <FlexWidget style={{ width: 0, height: 0 }} />
+        )}
       </FlexWidget>
     );
   }
