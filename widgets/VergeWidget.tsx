@@ -6,7 +6,7 @@ import { shortDate } from '../data/zones';
 import { flatten } from '../theme/mapStyle';
 import { dark, light } from '../theme/tokens';
 import { localityScale, localityRadius, localitySvg } from './locality';
-import { WidgetVariant, diagramColumnWidth } from './names';
+import { PANEL_GAP, WidgetVariant, panelColumns, panelHeadlineSize } from './names';
 import { WidgetSummary } from './summary';
 
 /** Widget styles take a literal hex; the tokens are opaque after flattening. */
@@ -42,7 +42,7 @@ const hex = (token: string, ground: string): Hex => flatten(token, ground) as He
 const SIZES = {
   compact: { pad: 12, padY: 8, radius: 18, kicker: 8, headline: 26, caption: 9, foot: 8, gap: 8 },
   tile: { pad: 14, padY: 13, radius: 22, kicker: 9, headline: 38, caption: 11, foot: 9, gap: 6 },
-  cover: { pad: 22, padY: 18, radius: 0, kicker: 13, headline: 64, caption: 17, foot: 12, gap: 10 },
+  cover: { pad: 22, padY: 18, radius: 0, kicker: 13, headline: 56, caption: 16, foot: 11.5, gap: 10 },
 } as const;
 
 const clock = (iso: string) => {
@@ -93,7 +93,10 @@ export function VergeWidget({
     const marks = summary?.nearby ?? [];
     // A cover screen is wider than it is tall, so the panel is two columns.
     // Stacking them ran the diagram off the bottom edge.
-    const diagram = diagramColumnWidth(width ?? 360);
+    const col = panelColumns(width ?? 360, s.pad);
+    // Sized to the column it sits in: a fixed size that fits a wide widget
+    // wraps on a narrow one, and this panel is narrower than it looks.
+    const headlineSize = panelHeadlineSize(col.reading);
 
     return (
       <FlexWidget
@@ -105,11 +108,10 @@ export function VergeWidget({
           justifyContent: 'flex-start',
           backgroundColor: ground,
           borderRadius: s.radius,
-          paddingLeft: s.pad,
+          paddingHorizontal: s.pad,
           paddingTop: s.padY,
-          // The far edges carry the crop guard, so nothing is placed where the
-          // host may decline to draw it.
-          paddingRight: s.pad * 2,
+          // Only the bottom keeps slack: the content is top-anchored and a host
+          // that gives less height than it promised should lose empty space.
           paddingBottom: s.padY * 2,
         }}
       >
@@ -151,10 +153,11 @@ export function VergeWidget({
             marginTop: 4,
           }}
         >
-          <FlexWidget style={{ flexDirection: 'column' }}>
+          <FlexWidget style={{ flexDirection: 'column', width: col.reading }}>
             <TextWidget
               text={headline}
-              style={{ fontSize: s.headline, color: ink, fontFamily: 'CormorantGaramond' }}
+              maxLines={1}
+              style={{ fontSize: headlineSize, color: ink, fontFamily: 'CormorantGaramond' }}
             />
             <TextWidget
               text={caption}
@@ -170,11 +173,16 @@ export function VergeWidget({
 
           {marks.length ? (
             <FlexWidget
-              style={{ flexDirection: 'column', alignItems: 'center', width: diagram, marginLeft: 16 }}
+              style={{
+                flexDirection: 'column',
+                alignItems: 'center',
+                width: col.diagram,
+                marginLeft: PANEL_GAP,
+              }}
             >
               <SvgWidget
                 svg={localitySvg(marks, { mark: markInk, ring: ringInk, ink })}
-                style={{ width: diagram, height: diagram }}
+                style={{ width: col.diagram, height: col.diagram }}
               />
               <TextWidget
                 text={`${marks.length} ${marks.length === 1 ? 'zone' : 'zones'} within ${localityScale(localityRadius(marks))}`}

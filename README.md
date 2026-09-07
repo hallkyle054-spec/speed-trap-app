@@ -246,41 +246,26 @@ with real space around them.
 At panel size the widget carries the drive HUD's reading — distance, road,
 limit — a **locality diagram**, and an **OPEN** button.
 
-It is laid out as **two columns**, because a Flip's cover screen is wider than
-it is tall — 1048x948 — and a single stack ran off the bottom edge. The reading
-sits left, the locality right.
+It is laid out as **two columns** — the reading left, the locality right —
+because a single stack ran off the bottom.
 
-**Both far edges are treated as unsafe.** The widget's bitmap is painted from
-the top left and anything past the view's right or bottom edge is cropped, not
-scaled, so a host that reports a size larger than it will really show silently
-eats the far corner. A Flip's cover screen does that in both directions: it took
-the diagram off the bottom and then, in the next build, the OPEN button off the
-right. There is no way to ask how much is lost, so `SAFE_FRACTION` keeps the
-layout a tenth clear of it, the far padding is doubled, and **OPEN leads the top
-line hard against the left margin** — the one corner a cropped bitmap always
-keeps, because it is where the drawing starts. The kicker follows it and may
-truncate, which costs a label rather than the way into the app.
+**Both columns are given an explicit width**, and that is the whole trick. The
+toolkit has no flex weights: a row hands each child whatever width it asks for,
+and the first child asking for more than there is pushes the rest off the edge.
+A road name is exactly that. Left unconstrained, "Model Church in Wales School"
+set itself on one long line and shoved the diagram clean out of the widget. So
+`panelColumns` divides the padded width between the two and the text wraps
+inside its own column.
 
-`diagramColumnWidth` splits the columns from the width Android reports, less
-that allowance, rather than from a number picked in advance.
+The distance is sized the same way. `panelHeadlineSize` derives it from the
+reading column rather than fixing it, because the panel is narrower than it
+looks — a live cover widget measured about 305dp across, not the ~400dp the
+editor's preview card suggests — and a size that fits a wide widget wraps on a
+narrow one. Cormorant needs roughly 3.4dp of width per point for a string like
+"12.4 km"; the tests hold the layout to that.
 
-The diagram (`widgets/locality.ts`) is not a street map, deliberately. An
-Android widget draws a static image, so a real map would be a photograph of
-somewhere you *were*, and a photograph of a map reads as live in a way a diagram
-does not. This draws only what the app already knows and can state honestly: you
-at the centre, the published zones around you as marks, two range rings, and the
-radius in words beside it. It costs nothing, needs no signal, and is rendered as
-an SVG string the widget toolkit turns into the bitmap.
-
-The palette comes from the app's Appearance setting rather than the system
-(`widgets/theme.ts`), so a widget matches the app that owns it. Getting that to
-*arrive* needed `widgets/refresh.ts`: the summary's writes are throttled because
-a driving fix lands every second, but that throttle is about position and must
-not gate anything else. It did, and a changed Appearance sat unseen until the
-driver moved a hundred metres. `system` is
-resolved when the widget renders, not when the summary is written — the phone
-can switch to dark hours after the app was last open, and the widget follows it
-there.
+**OPEN leads the top line**, hard against the left margin, where it is
+unmissable and cannot be pushed anywhere by the content beside it.
 
 **`assets/widget-preview.png`** is what the picker draws: the widget's own layout
 (`@layout/rn_widget`, from the library) is a transparent frame that the app fills
