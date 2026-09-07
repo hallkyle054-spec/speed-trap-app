@@ -24,24 +24,38 @@ export const variantForHeight = (heightDp: number): WidgetVariant =>
 export const PANEL_GAP = 14;
 
 /**
- * How far the widget's drawable area sits inside the size Android reports.
+ * How much of the reported size hangs off the far edge and is never shown.
  *
- * The reported size is the *cell* the host allocated; the view is inset within
- * it by the platform's own widget padding. Everything sized to the reported
- * number therefore overhangs, and a widget's overhang is not clipped politely —
- * it is simply not drawn. This is what took the diagram off the bottom, then
- * the OPEN button off the right, then ran the hairline out past the card's own
- * edge, each time looking like a different bug.
+ * Android reports the cell the host allocated. The bitmap is painted at that
+ * size and then drawn from the top left, so whatever exceeds the view is simply
+ * missing — no clipping, no scaling, no error. On a Flip's cover screen the
+ * card measures 803px while the reported size implies 856px at 2.625 px/dp:
+ * twenty density-independent pixels that exist in the drawing and nowhere on
+ * the screen.
  *
- * Measured off a Flip's cover screen: a card 800px wide reported as ~856px at
- * 2.625 px/dp, so about 10dp a side. Twelve, to leave a margin for hosts that
- * take a little more.
+ * It has to be corrected in the **padding**, not only in computed widths. A
+ * child asking for `match_parent` — the hairline, a full-width row — sizes
+ * itself against the padded bitmap and lands past the edge no matter what
+ * numbers the layout worked out. Two builds went by with the headline
+ * obediently shrinking and the rule still running off the card, which is what
+ * gave this away.
  */
-export const HOST_INSET = 12;
+export const HOST_OVERHANG = 20;
 
-/** The part of a reported dimension that is actually drawn on. */
+/** The part of a reported dimension that actually reaches the screen. */
 export const drawable = (reportedDp: number): number =>
-  Math.max(0, reportedDp - HOST_INSET * 2);
+  Math.max(0, reportedDp - HOST_OVERHANG);
+
+/**
+ * Padding for the panel: ordinary on the near edges, plus the overhang on the
+ * far ones, so `match_parent` children stop where the card does.
+ */
+export const panelPadding = (padDp: number, padYDp: number) => ({
+  paddingLeft: padDp,
+  paddingRight: padDp + HOST_OVERHANG,
+  paddingTop: padYDp,
+  paddingBottom: padYDp + HOST_OVERHANG,
+});
 
 /**
  * How large the distance can be set: the smaller of what the width allows and
@@ -76,6 +90,7 @@ export function panelBand(
   reportedWidthDp: number,
   paddingDp: number,
 ): { inner: number; caption: number; diagram: number } {
+  // Matches the padding above: one ordinary pad each side, and the overhang.
   const inner = Math.max(0, drawable(reportedWidthDp) - paddingDp * 2);
   const diagram = Math.max(72, Math.min(120, Math.round(inner * 0.3)));
   return { inner, caption: Math.max(0, inner - PANEL_GAP - diagram), diagram };

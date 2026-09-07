@@ -6,7 +6,7 @@ import { shortDate } from '../data/zones';
 import { flatten } from '../theme/mapStyle';
 import { dark, light } from '../theme/tokens';
 import { localityScale, localityRadius, localitySvg } from './locality';
-import { PANEL_GAP, WidgetVariant, panelBand, panelHeadlineSize } from './names';
+import { PANEL_GAP, WidgetVariant, panelBand, panelHeadlineSize, panelPadding } from './names';
 import { WidgetSummary } from './summary';
 
 /** Widget styles take a literal hex; the tokens are opaque after flattening. */
@@ -107,9 +107,9 @@ export function VergeWidget({
           justifyContent: 'flex-start',
           backgroundColor: ground,
           borderRadius: s.radius,
-          paddingHorizontal: s.pad,
-          paddingTop: s.padY,
-          paddingBottom: s.padY,
+          // The far edges carry the overhang, so a `match_parent` child stops
+          // where the card does rather than where the bitmap does.
+          ...panelPadding(s.pad, s.padY),
         }}
       >
         <FlexWidget

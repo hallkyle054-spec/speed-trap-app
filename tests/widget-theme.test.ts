@@ -1,7 +1,14 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { PANEL_GAP, drawable, panelBand, panelHeadlineSize } from '../widgets/names';
+import {
+  HOST_OVERHANG,
+  PANEL_GAP,
+  drawable,
+  panelBand,
+  panelHeadlineSize,
+  panelPadding,
+} from '../widgets/names';
 import { widgetIsDark } from '../widgets/theme';
 
 test('the widget draws in the palette the app was set to', () => {
@@ -62,13 +69,38 @@ test('the layout is built from what is drawn, not from what was reported', () =>
   // overhang is not drawn at all — that is how the hairline ran past the card's
   // own edge and took the OPEN button with it.
   const REPORTED = 326;
-  const REAL = 305;
+  const REAL = 306;
   const pad = 22;
   const { inner } = panelBand(REPORTED, pad);
+  // The content starts one ordinary pad in and must end inside the card.
   assert.ok(
-    inner <= REAL - pad * 2,
-    `${inner}dp of content must fit the ${REAL - pad * 2}dp actually drawable`,
+    pad + inner <= REAL,
+    `content ending at ${pad + inner}dp must fit the ${REAL}dp the card really is`,
   );
-  assert.equal(drawable(REPORTED), 302);
+  assert.equal(drawable(REPORTED), REPORTED - HOST_OVERHANG);
   assert.equal(drawable(10), 0, 'a tiny widget must not report negative room');
+});
+
+test('the padding carries the overhang, so match_parent children stop in time', () => {
+  // The bug this guards: the hairline is a childless view whose explicit width
+  // the toolkit ignores, so it fills the padded bitmap. Two builds shrank every
+  // computed width and it still ran off the card, because only the padding
+  // decides where a full-width child ends.
+  const pad = 22;
+  const p = panelPadding(pad, 18);
+  assert.equal(p.paddingLeft, pad);
+  assert.equal(p.paddingRight, pad + HOST_OVERHANG);
+  assert.equal(p.paddingBottom, 18 + HOST_OVERHANG);
+
+  // A full-width child spans the reported width less both paddings, and that
+  // has to land inside the card the host really shows.
+  const REPORTED = 326;
+  const REAL = 306;
+  const fullWidth = REPORTED - p.paddingLeft - p.paddingRight;
+  assert.ok(
+    p.paddingLeft + fullWidth <= REAL - 4,
+    `a full-width child ending at ${p.paddingLeft + fullWidth}dp must fit ${REAL}dp`,
+  );
+  // And it agrees with what the band works out independently.
+  assert.equal(panelBand(REPORTED, pad).inner, fullWidth);
 });

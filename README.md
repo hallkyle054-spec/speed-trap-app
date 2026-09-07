@@ -262,16 +262,21 @@ edge. That is how the diagram once left the widget altogether, with an
 unconstrained road name beside it taking the lot. `panelBand` divides the
 padded width; the tests hold it to adding up.
 
-**The size Android reports is not the size it draws.** The reported number is
-the cell the host allocated; the view sits inset within it by the platform's own
-widget padding, and a widget's overhang is not clipped politely — it is simply
-never drawn. That one fact caused what looked like three separate bugs in three
-separate builds: the diagram off the bottom, the OPEN button off the right, and
-the hairline running out past the card's own edge. `drawable()` takes
-`HOST_INSET` off each side first, and everything is laid out from what is left.
-The inset is measured, not guessed: a cover-screen card 800px wide reported as
-about 856px at 2.625 px/dp, so roughly 10dp a side, and twelve is used to leave
-a margin.
+**The size Android reports is not the size it draws.** The bitmap is painted at
+the reported size and drawn from the top left, so whatever exceeds the view is
+simply missing — no clipping, no scaling, no error. On a Flip's cover screen the
+card measures 803px while the reported size implies 856px at 2.625 px/dp:
+`HOST_OVERHANG`, twenty density-independent pixels that exist in the drawing and
+nowhere on the screen.
+
+It has to be corrected in the **padding**, not only in computed widths, and that
+took two builds to see. `panelPadding` puts the overhang on the right and bottom
+only. A child asking for `match_parent` — the hairline, a full-width row — sizes
+itself against the padded bitmap, so no arithmetic the layout does can save it;
+only the padding decides where it ends. Two builds went by with the headline
+obediently shrinking and the rule still running off the card before that was
+obvious. `drawable()` applies the same allowance to the computed widths so the
+two agree.
 
 `panelHeadlineSize` then takes the smaller of what the width allows and what the
 height can spare — width because Cormorant needs roughly 3.4dp per point for a
