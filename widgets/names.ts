@@ -19,3 +19,15 @@ const COVER_FROM_DP = 200;
 
 export const variantForHeight = (heightDp: number): WidgetVariant =>
   heightDp < COMPACT_UNDER_DP ? 'compact' : heightDp < COVER_FROM_DP ? 'tile' : 'cover';
+
+/**
+ * How wide the diagram's column gets at panel size.
+ *
+ * A Flip's cover screen is wider than it is tall, so the panel reads as two
+ * columns — the reading on the left, the locality on the right — rather than
+ * one stack that runs off the bottom. The toolkit has no flex weights, only
+ * fixed sizes, so the split is computed from the width Android actually
+ * reports rather than guessed and hard-coded.
+ */
+export const diagramColumnWidth = (widthDp: number): number =>
+  Math.max(92, Math.min(150, Math.round(widthDp * 0.34)));

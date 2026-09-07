@@ -6,7 +6,7 @@ import { shortDate } from '../data/zones';
 import { flatten } from '../theme/mapStyle';
 import { dark, light } from '../theme/tokens';
 import { localityScale, localityRadius, localitySvg } from './locality';
-import { WidgetVariant } from './names';
+import { WidgetVariant, diagramColumnWidth } from './names';
 import { WidgetSummary } from './summary';
 
 /** Widget styles take a literal hex; the tokens are opaque after flattening. */
@@ -42,7 +42,7 @@ const hex = (token: string, ground: string): Hex => flatten(token, ground) as He
 const SIZES = {
   compact: { pad: 12, padY: 8, radius: 18, kicker: 8, headline: 26, caption: 9, foot: 8, gap: 8 },
   tile: { pad: 14, padY: 13, radius: 22, kicker: 9, headline: 38, caption: 11, foot: 9, gap: 6 },
-  cover: { pad: 26, padY: 24, radius: 0, kicker: 13, headline: 78, caption: 18, foot: 12, gap: 10 },
+  cover: { pad: 22, padY: 18, radius: 0, kicker: 13, headline: 64, caption: 17, foot: 12, gap: 10 },
 } as const;
 
 const clock = (iso: string) => {
@@ -55,10 +55,13 @@ export function VergeWidget({
   summary,
   isDark,
   variant = 'tile',
+  width,
 }: {
   summary: WidgetSummary | null;
   isDark: boolean;
   variant?: WidgetVariant;
+  /** The width Android gave the widget, in dp. Splits the panel's two columns. */
+  width?: number;
 }) {
   const t = isDark ? dark : light;
   const s = SIZES[variant];
@@ -87,6 +90,11 @@ export function VergeWidget({
   if (variant === 'cover') {
     const limit = summary?.nearestLimitMph;
     const stamp = summary && showDistance ? ` · as of ${clock(summary.at)}` : '';
+    const marks = summary?.nearby ?? [];
+    // A cover screen is wider than it is tall, so the panel is two columns.
+    // Stacking them ran the diagram off the bottom edge.
+    const diagram = diagramColumnWidth(width ?? 360);
+
     return (
       <FlexWidget
         clickAction="OPEN_APP"
@@ -94,10 +102,6 @@ export function VergeWidget({
           height: 'match_parent',
           width: 'match_parent',
           flexDirection: 'column',
-          // Everything hangs from the top. The cover screen does not give a
-          // widget its whole declared height — the bottom band is spoken for,
-          // and anything put there is unreadable and cannot be tapped. So the
-          // slack goes at the bottom, where losing it costs nothing.
           justifyContent: 'flex-start',
           backgroundColor: ground,
           borderRadius: s.radius,
@@ -123,8 +127,8 @@ export function VergeWidget({
             clickAction="OPEN_APP"
             style={{
               paddingHorizontal: 18,
-              paddingVertical: 11,
-              borderRadius: 22,
+              paddingVertical: 10,
+              borderRadius: 20,
               backgroundColor: accentWash,
             }}
           >
@@ -135,56 +139,48 @@ export function VergeWidget({
           </FlexWidget>
         </FlexWidget>
 
-        <TextWidget
-          text={headline}
-          style={{ fontSize: s.headline, color: ink, fontFamily: 'CormorantGaramond', marginTop: 4 }}
-        />
-        <TextWidget
-          text={caption}
-          maxLines={2}
-          style={{ fontSize: s.caption, color: muted, fontFamily: 'Lora', marginTop: 2 }}
-        />
-        <TextWidget
-          text={`${limit ? `${limit} MPH · ` : ''}possible mobile camera${stamp}`}
-          maxLines={2}
-          style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora', marginTop: 4 }}
-        />
-
-        {/*
-          Last, because it is the one thing that still reads when its bottom
-          edge is lost: a diagram missing its outer ring is still a diagram.
-        */}
-        {summary && summary.nearby.length ? (
-          <FlexWidget
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              width: 'match_parent',
-              marginTop: 8,
-            }}
-          >
-            <SvgWidget
-              svg={localitySvg(summary.nearby, { mark: markInk, ring: ringInk, ink })}
-              style={{ width: 104, height: 104 }}
+        <FlexWidget
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: 'match_parent',
+            marginTop: 4,
+          }}
+        >
+          <FlexWidget style={{ flexDirection: 'column' }}>
+            <TextWidget
+              text={headline}
+              style={{ fontSize: s.headline, color: ink, fontFamily: 'CormorantGaramond' }}
             />
-            <FlexWidget style={{ flexDirection: 'column', marginLeft: 14 }}>
-              <TextWidget
-                text={`${summary.nearby.length}`}
-                style={{ fontSize: 30, color: ink, fontFamily: 'CormorantGaramond' }}
+            <TextWidget
+              text={caption}
+              maxLines={2}
+              style={{ fontSize: s.caption, color: muted, fontFamily: 'Lora', marginTop: 2 }}
+            />
+            <TextWidget
+              text={`${limit ? `${limit} MPH · ` : ''}possible mobile camera${stamp}`}
+              maxLines={2}
+              style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora', marginTop: 3 }}
+            />
+          </FlexWidget>
+
+          {marks.length ? (
+            <FlexWidget style={{ flexDirection: 'column', alignItems: 'center', width: diagram }}>
+              <SvgWidget
+                svg={localitySvg(marks, { mark: markInk, ring: ringInk, ink })}
+                style={{ width: diagram, height: diagram }}
               />
               <TextWidget
-                text={summary.nearby.length === 1 ? 'zone within' : 'zones within'}
-                style={{ fontSize: s.foot, color: muted, fontFamily: 'Lora' }}
-              />
-              <TextWidget
-                text={localityScale(localityRadius(summary.nearby))}
-                style={{ fontSize: s.caption, color: ink, fontFamily: 'Lora', marginTop: 2 }}
+                text={`${marks.length} ${marks.length === 1 ? 'zone' : 'zones'} within ${localityScale(localityRadius(marks))}`}
+                maxLines={1}
+                style={{ fontSize: s.foot, color: muted, fontFamily: 'Lora', marginTop: 2 }}
               />
             </FlexWidget>
-          </FlexWidget>
-        ) : (
-          <FlexWidget style={{ width: 0, height: 0 }} />
-        )}
+          ) : (
+            <FlexWidget style={{ width: 0, height: 0 }} />
+          )}
+        </FlexWidget>
       </FlexWidget>
     );
   }

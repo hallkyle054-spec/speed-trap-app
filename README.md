@@ -246,11 +246,14 @@ with real space around them.
 At panel size the widget carries the drive HUD's reading — distance, road,
 limit — a **locality diagram**, and an **OPEN** button.
 
-Everything hangs from the top, and **OPEN sits on the first line**. The cover
-screen does not give a widget its whole declared height: the bottom band is
-spoken for, and anything put there is unreadable and cannot be tapped. So the
-slack goes at the bottom where losing it costs nothing, and the diagram goes
-last because it is the one element that still reads with its outer ring cut off.
+It is laid out as **two columns**, because a Flip's cover screen is wider than
+it is tall — 1048x948 — and a single stack ran off the bottom edge. The reading
+sits left, the locality right, and **OPEN on the first line**, which is the one
+place on a cover screen guaranteed to be both visible and reachable. The
+toolkit has no flex weights, only fixed sizes, so `diagramColumnWidth` splits
+the two from the width Android actually reports rather than a number picked in
+advance. Content hangs from the top and the slack sits at the bottom, where
+losing it to a host that gives less room than it promised costs nothing.
 
 The diagram (`widgets/locality.ts`) is not a street map, deliberately. An
 Android widget draws a static image, so a real map would be a photograph of

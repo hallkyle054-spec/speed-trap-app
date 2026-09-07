@@ -19,7 +19,14 @@ export async function widgetTaskHandler(props: WidgetTaskHandlerProps) {
   // made hours after the app was last open.
   const isDark = widgetIsDark(summary?.theme, Appearance.getColorScheme() === 'dark');
   const variant = variantForHeight(props.widgetInfo.height);
-  const view = <VergeWidget summary={summary} isDark={isDark} variant={variant} />;
+  const view = (
+    <VergeWidget
+      summary={summary}
+      isDark={isDark}
+      variant={variant}
+      width={props.widgetInfo.width}
+    />
+  );
 
   switch (props.widgetAction) {
     case 'WIDGET_ADDED':
