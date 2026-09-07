@@ -228,14 +228,14 @@ because declaring cells makes Android place it on a home-screen grid and the
 cover screen is not a grid. It stays resizable, and Android reports the size it
 actually gave the widget on every redraw, so `VergeWidget` picks its layout from
 that: a one-line strip under 90dp, a tile under 200dp, the full panel above it.
-Tapping it opens the app — on the screen you tapped it from. The library routes
-every widget tap through a broadcast receiver and then calls a bare
-`startActivity`, which carries no display id, so a tap on the cover screen would
-have opened the app on the main one behind a closed phone. The config plugin
-replaces the generated provider class with one that sets `launchDisplayId` to
-whichever display is currently awake: shut, that is the cover screen; open, the
-main one. Every step of it is guarded — an app that cannot open on the right
-screen should still open on the wrong one rather than not at all.
+Tapping it opens the app. Which screen it opens on is Android's decision, not
+ours — and an attempt to make it ours cost a working button. Samsung's guidance
+is to set `launchDisplayId` on the launch, so the plugin generated a provider
+class that targeted whichever display was awake. Setting that to a display the
+app does not own does not throw: the system simply declines the launch. The
+result was a tap with no effect, nothing thrown to catch and nothing logged. It
+has been taken out. A tap that opens the app on the wrong screen beats a tap
+that does nothing.
 
 At the panel size the widget draws square and edge to edge. Samsung rounds the
 panel off itself, so rounding it again only opens a gap at each corner where the
