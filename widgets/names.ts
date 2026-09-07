@@ -21,13 +21,29 @@ export const variantForHeight = (heightDp: number): WidgetVariant =>
   heightDp < COMPACT_UNDER_DP ? 'compact' : heightDp < COVER_FROM_DP ? 'tile' : 'cover';
 
 /**
+ * How much of the reported size can actually be drawn on.
+ *
+ * The widget's bitmap is painted from the top left and whatever falls past the
+ * view's right or bottom edge is cropped, not scaled — so a host that hands
+ * back a size larger than it will really show silently eats the far corner. A
+ * Flip's cover screen does exactly that, in both directions: it took the OPEN
+ * button off the right and the diagram off the bottom.
+ *
+ * There is no way to ask how much is lost, so the layout keeps clear of both
+ * edges instead. A tenth is enough for what has been seen and cheap if the
+ * host was honest all along.
+ */
+export const SAFE_FRACTION = 0.9;
+export const safeSize = (dp: number): number => Math.floor(dp * SAFE_FRACTION);
+
+/**
  * How wide the diagram's column gets at panel size.
  *
  * A Flip's cover screen is wider than it is tall, so the panel reads as two
  * columns — the reading on the left, the locality on the right — rather than
  * one stack that runs off the bottom. The toolkit has no flex weights, only
- * fixed sizes, so the split is computed from the width Android actually
- * reports rather than guessed and hard-coded.
+ * fixed sizes, so the split is computed from the width Android reports, less
+ * the edge that may never be drawn.
  */
 export const diagramColumnWidth = (widthDp: number): number =>
-  Math.max(92, Math.min(150, Math.round(widthDp * 0.34)));
+  Math.max(84, Math.min(140, Math.round(safeSize(widthDp) * 0.34)));

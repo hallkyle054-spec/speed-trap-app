@@ -105,24 +105,22 @@ export function VergeWidget({
           justifyContent: 'flex-start',
           backgroundColor: ground,
           borderRadius: s.radius,
-          paddingHorizontal: s.pad,
-          paddingVertical: s.padY,
+          paddingLeft: s.pad,
+          paddingTop: s.padY,
+          // The far edges carry the crop guard, so nothing is placed where the
+          // host may decline to draw it.
+          paddingRight: s.pad * 2,
+          paddingBottom: s.padY * 2,
         }}
       >
-        {/* The way into the app sits on the top line, the one place on a cover */}
-        {/* screen guaranteed to be both visible and reachable. */}
-        <FlexWidget
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            width: 'match_parent',
-          }}
-        >
-          <TextWidget
-            text={showDistance ? 'NEAREST ZONE' : 'PUBLISHED ZONES'}
-            style={{ fontSize: s.kicker, letterSpacing: 1.4, color: faint, fontFamily: 'Lora' }}
-          />
+        {/*
+          OPEN leads the top line, hard against the left margin. The top left is
+          the one corner a cropped bitmap always keeps — it is where the drawing
+          starts — and this button spent a build in the opposite corner, where
+          the cover screen cut it in half. The kicker follows it and may
+          truncate, which costs a label rather than the way into the app.
+        */}
+        <FlexWidget style={{ flexDirection: 'row', alignItems: 'center' }}>
           <FlexWidget
             clickAction="OPEN_APP"
             style={{
@@ -130,6 +128,7 @@ export function VergeWidget({
               paddingVertical: 10,
               borderRadius: 20,
               backgroundColor: accentWash,
+              marginRight: 12,
             }}
           >
             <TextWidget
@@ -137,13 +136,17 @@ export function VergeWidget({
               style={{ fontSize: s.kicker, letterSpacing: 1.6, color: ink, fontFamily: 'Lora' }}
             />
           </FlexWidget>
+          <TextWidget
+            text={showDistance ? 'NEAREST ZONE' : 'PUBLISHED ZONES'}
+            maxLines={1}
+            style={{ fontSize: s.kicker, letterSpacing: 1.4, color: faint, fontFamily: 'Lora' }}
+          />
         </FlexWidget>
 
         <FlexWidget
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'space-between',
             width: 'match_parent',
             marginTop: 4,
           }}
@@ -166,14 +169,18 @@ export function VergeWidget({
           </FlexWidget>
 
           {marks.length ? (
-            <FlexWidget style={{ flexDirection: 'column', alignItems: 'center', width: diagram }}>
+            <FlexWidget
+              style={{ flexDirection: 'column', alignItems: 'center', width: diagram, marginLeft: 16 }}
+            >
               <SvgWidget
                 svg={localitySvg(marks, { mark: markInk, ring: ringInk, ink })}
                 style={{ width: diagram, height: diagram }}
               />
               <TextWidget
                 text={`${marks.length} ${marks.length === 1 ? 'zone' : 'zones'} within ${localityScale(localityRadius(marks))}`}
-                maxLines={1}
+                // Two lines: there is vertical room, and truncating this to one
+                // would drop the scale, which is what makes the diagram legible.
+                maxLines={2}
                 style={{ fontSize: s.foot, color: muted, fontFamily: 'Lora', marginTop: 2 }}
               />
             </FlexWidget>

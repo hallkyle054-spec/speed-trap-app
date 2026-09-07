@@ -248,12 +248,21 @@ limit — a **locality diagram**, and an **OPEN** button.
 
 It is laid out as **two columns**, because a Flip's cover screen is wider than
 it is tall — 1048x948 — and a single stack ran off the bottom edge. The reading
-sits left, the locality right, and **OPEN on the first line**, which is the one
-place on a cover screen guaranteed to be both visible and reachable. The
-toolkit has no flex weights, only fixed sizes, so `diagramColumnWidth` splits
-the two from the width Android actually reports rather than a number picked in
-advance. Content hangs from the top and the slack sits at the bottom, where
-losing it to a host that gives less room than it promised costs nothing.
+sits left, the locality right.
+
+**Both far edges are treated as unsafe.** The widget's bitmap is painted from
+the top left and anything past the view's right or bottom edge is cropped, not
+scaled, so a host that reports a size larger than it will really show silently
+eats the far corner. A Flip's cover screen does that in both directions: it took
+the diagram off the bottom and then, in the next build, the OPEN button off the
+right. There is no way to ask how much is lost, so `SAFE_FRACTION` keeps the
+layout a tenth clear of it, the far padding is doubled, and **OPEN leads the top
+line hard against the left margin** — the one corner a cropped bitmap always
+keeps, because it is where the drawing starts. The kicker follows it and may
+truncate, which costs a label rather than the way into the app.
+
+`diagramColumnWidth` splits the columns from the width Android reports, less
+that allowance, rather than from a number picked in advance.
 
 The diagram (`widgets/locality.ts`) is not a street map, deliberately. An
 Android widget draws a static image, so a real map would be a photograph of
