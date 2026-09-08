@@ -23,6 +23,7 @@ import {
   useZoneFeed,
 } from './data/feed';
 import { countiesIn, inSelectedCounties } from './data/counties';
+import { coverageLabel } from './data/forces';
 import { Region } from './data/geo';
 import {
   COUNTY_REGION,
@@ -139,6 +140,12 @@ function Verge() {
     originIsReal: isReal,
     theme: settings.theme,
   });
+
+  /** Names what the map is actually showing, so the header cannot outlive the feed. */
+  const coverage = useMemo(
+    () => coverageLabel(settings.counties, counties),
+    [settings.counties, counties],
+  );
 
   const drive = useDrive(settings, zones, origin);
   const savedRoutes = useSavedRoutes();
@@ -258,6 +265,7 @@ function Verge() {
           onStartDrive={startDrive}
           initialRegion={mapRegion.current}
           onRegionChange={rememberRegion}
+          coverage={coverage}
           topInset={screenInset}
         />
       ) : null}

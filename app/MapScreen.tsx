@@ -42,6 +42,8 @@ type Props = {
    */
   initialRegion: Region;
   onRegionChange: (region: Region) => void;
+  /** What the map is showing, e.g. 'Cymru · Wales' or 'Dyfed-Powys'. */
+  coverage: string;
   topInset: number;
 };
 
@@ -60,6 +62,7 @@ export function MapScreen({
   onStartDrive,
   initialRegion,
   onRegionChange,
+  coverage,
   topInset,
 }: Props) {
   const { t, isDark } = useTheme();
@@ -73,8 +76,8 @@ export function MapScreen({
     <View style={styles.root}>
       <View style={[styles.header, { paddingTop: 16 + topInset, borderBottomColor: t.rule }]}>
         <View style={styles.kickerRow}>
-          <Text style={[kicker(9.5, 0.14), { color: t.ink50 }]}>
-            Sir Gaerfyrddin · Carmarthenshire
+          <Text style={[kicker(9.5, 0.14), { color: t.ink50 }]} numberOfLines={1}>
+            {coverage}
           </Text>
           <Text style={[kicker(9.5, 0.12), tnum, { color: t.ink50 }]}>{dateLabel}</Text>
         </View>

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { countyIsOn, setCounties } from '../data/counties';
-import { FORCES, UNGROUPED, forceFor, groupByForce } from '../data/forces';
+import { FORCES, UNGROUPED, coverageLabel, forceFor, groupByForce } from '../data/forces';
 
 /**
  * The publisher's own list, as its search box prints it — short forms and all.
@@ -109,4 +109,26 @@ test('the last county on cannot be turned off', () => {
 test('a stored county the feed has dropped does not block the way back to all', () => {
   const stale = [...WALES.filter(c => c !== 'Powys'), 'Somewhere That Left'];
   assert.deepEqual(setCounties(stale, WALES, ['Powys'], true), []);
+});
+
+test('the header names what the map is actually showing', () => {
+  // The default and "everything ticked" are the same picture, so the same label.
+  assert.equal(coverageLabel([], WALES), 'Cymru · Wales');
+  assert.equal(coverageLabel([...WALES], WALES), 'Cymru · Wales');
+
+  // A whole force reads as the force, not as four county names.
+  const dp = ['Carmarthenshire', 'Ceredigion', 'Pembrokeshire', 'Powys'];
+  assert.equal(coverageLabel(dp, WALES), 'Dyfed-Powys');
+  assert.equal(coverageLabel([...dp, 'Blaenau', 'Caerphilly', 'Monmouthshire', 'Newport', 'Torfaen'], WALES),
+    'Dyfed-Powys · Gwent');
+
+  // One county is its own name; a selection that straddles forces is counted,
+  // because a kicker is one line and a list of twelve is not.
+  assert.equal(coverageLabel(['Powys'], WALES), 'Powys');
+  assert.equal(coverageLabel(['Powys', 'Cardiff'], WALES), '2 counties');
+  assert.equal(coverageLabel([...dp, 'Cardiff'], WALES), '5 counties');
+});
+
+test('an empty feed does not leave the header blank', () => {
+  assert.equal(coverageLabel([], []), 'Cymru · Wales');
 });

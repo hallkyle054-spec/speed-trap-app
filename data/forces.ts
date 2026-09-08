@@ -76,3 +76,25 @@ export const groupByForce = (counties: readonly string[]): ForceGroup[] => {
   if (rest.length) groups.push({ force: UNGROUPED, counties: [...rest] });
   return groups;
 };
+
+/**
+ * What the map is showing, for the kicker above the title.
+ *
+ * The header used to name one county because the feed only carried one. It
+ * carries the country now, so the label has to follow the selection or it
+ * states something the map is not doing. A whole force reads as the force; a
+ * selection that does not land on force boundaries is counted rather than
+ * listed, because a kicker is one line and twelve county names is not one line.
+ */
+export function coverageLabel(selected: readonly string[], all: readonly string[]): string {
+  if (all.length === 0 || selected.length === 0 || selected.length >= all.length) {
+    return 'Cymru · Wales';
+  }
+  if (selected.length === 1) return selected[0];
+
+  const touched = groupByForce(all).filter(g => g.counties.some(c => selected.includes(c)));
+  const whole = touched.every(g => g.counties.every(c => selected.includes(c)));
+  if (whole && touched.length <= 2) return touched.map(g => g.force).join(' · ');
+
+  return `${selected.length} counties`;
+}
