@@ -49,10 +49,31 @@ async function readExisting() {
   }
 }
 
+/**
+ * Fetches the page, retrying a connection that never landed.
+ *
+ * A run that dies on one blip costs a whole day of the feed, and `fetch failed`
+ * — no status, no body — is exactly the failure a second attempt fixes. A real
+ * refusal, which arrives with a status, is not retried: the site saying no
+ * twice as fast is not an improvement.
+ */
+async function fetchSource(attempts = 3) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const res = await fetch(SOURCE, { headers: { 'user-agent': UA } });
+      if (!res.ok) throw new Error(`source responded ${res.status}`);
+      return await res.text();
+    } catch (err) {
+      if (attempt >= attempts || /responded \d/.test(String(err.message))) throw err;
+      const wait = 2000 * attempt;
+      console.log(`attempt ${attempt} failed (${err.message}); retrying in ${wait}ms`);
+      await new Promise(r => setTimeout(r, wait));
+    }
+  }
+}
+
 async function main() {
-  const res = await fetch(SOURCE, { headers: { 'user-agent': UA } });
-  if (!res.ok) throw new Error(`source responded ${res.status}`);
-  const html = await res.text();
+  const html = await fetchSource();
   console.log(`fetched ${html.length} bytes from ${SOURCE}`);
 
   const literal = extractArrayLiteral(html, 'pois');
@@ -64,7 +85,7 @@ async function main() {
   console.log(`parsed ${rows.length} sites across Wales`);
 
   const { sites, rejected } = toSites(rows, { authorities: AUTHORITIES });
-  console.log(`kept ${sites.length} in ${AUTHORITIES.join(', ')}`);
+  console.log(`kept ${sites.length} in ${AUTHORITIES.join(', ') || 'every authority listed'}`);
   for (const r of rejected) console.log(`  rejected: ${r.row} (${r.problems.join('; ')})`);
 
   if (sites.length < MIN_EXPECTED) {

@@ -81,15 +81,6 @@ function Verge() {
   const listedOn = useMemo(() => latestListing(allZones), [allZones]);
   const statusOf = useCallback((zone: Zone) => statusOfZone(zone, listedOn), [listedOn]);
 
-  // Keep the cover-screen widget fed with what the app currently knows.
-  useWidgetSummary({
-    zones: allZones,
-    listedOn,
-    origin,
-    originIsReal: isReal,
-    theme: settings.theme,
-  });
-
   /**
    * The one notice worth interrupting the design for: the list is invented, or
    * it is old enough that a driver should not lean on it.
@@ -137,6 +128,17 @@ function Verge() {
       ),
     [allZones, settings.showStale, settings.counties, statusOf],
   );
+
+  // Keep the cover-screen widget fed with what the app currently knows — the
+  // filtered list, not the whole feed. A county switched off in More has to be
+  // off on the cover screen too, or the widget contradicts the app it belongs to.
+  useWidgetSummary({
+    zones,
+    listedOn,
+    origin,
+    originIsReal: isReal,
+    theme: settings.theme,
+  });
 
   const drive = useDrive(settings, zones, origin);
   const savedRoutes = useSavedRoutes();

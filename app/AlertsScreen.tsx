@@ -1,11 +1,13 @@
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../components/Button';
 import { InfoNote } from '../components/InfoNote';
 import { Segmented } from '../components/Segmented';
 import { Switch } from '../components/Switch';
+import { countyIsOn, setCounties } from '../data/counties';
 import { PUBLISHER, Sync, syncLabel } from '../data/feed';
+import { ForceGroup, groupByForce } from '../data/forces';
 import { Settings, Theme, WarnAt, ZoneMark } from '../state/settings';
 import { useTheme } from '../theme/ThemeProvider';
 import { body, display, kicker } from '../theme/type';
@@ -129,48 +131,22 @@ export function AlertsScreen({
           </InfoNote>
         </View>
 
-        <SectionLabel>Counties</SectionLabel>
+        <SectionLabel>Coverage</SectionLabel>
         <View style={styles.themeBlock}>
-          <InfoNote about="counties">
-            The list covers the whole of Wales. Ticking none of them is not the same as ticking
-            none of them off — leave them all clear and you get the whole country, which is what a
-            new install does.
+          <InfoNote about="coverage">
+            Wales, by force. Each one opens onto its counties if you want to be finer than that.
+            Leave everything on and you get the whole country, which is what a new install does;
+            one county always stays on, because a map filtered down to nothing is not a map.
           </InfoNote>
         </View>
-        {counties.map(county => {
-          const on = settings.counties.length === 0 || settings.counties.includes(county);
-          return (
-            <Row
-              key={county}
-              label={county}
-              sub={
-                settings.counties.length === 0
-                  ? 'Included — nothing is filtered out'
-                  : on
-                    ? 'Included'
-                    : 'Hidden from the map, the list and the alerts'
-              }
-              control={
-                <Switch
-                  value={on}
-                  label={county}
-                  onChange={() => {
-                    // The first tap has to turn "everywhere" into a real list,
-                    // or unticking one county would read as unticking all.
-                    const current =
-                      settings.counties.length === 0 ? counties : settings.counties;
-                    const next = current.includes(county)
-                      ? current.filter(c => c !== county)
-                      : [...current, county];
-                    // Back to every county is back to the default, so a county
-                    // the source adds later still arrives on its own.
-                    set('counties', next.length === counties.length ? [] : next);
-                  }}
-                />
-              }
-            />
-          );
-        })}
+        {groupByForce(counties).map(group => (
+          <ForceSection
+            key={group.force}
+            group={group}
+            selected={settings.counties}
+            onSet={(changing, on) => set('counties', setCounties(settings.counties, counties, changing, on))}
+          />
+        ))}
 
         <SectionLabel>Data</SectionLabel>
         <Row
@@ -237,6 +213,93 @@ function SectionLabel({ children, first }: { children: React.ReactNode; first?: 
   );
 }
 
+/**
+ * One force, with its counties folded away underneath.
+ *
+ * The force is the control a driver actually reaches for — four rows against
+ * twenty-two, and "the patch I drive" is a force far more often than it is a
+ * county. The counties are still there for anyone who wants to be finer than
+ * that, but they are opened, not scrolled past.
+ *
+ * The switch reads "this force puts anything on the map", so a force with some
+ * of its counties on shows on, with the count saying how many. Turning it off
+ * takes the whole force off; turning it on brings the whole force back.
+ */
+function ForceSection({
+  group,
+  selected,
+  onSet,
+}: {
+  group: ForceGroup;
+  selected: readonly string[];
+  onSet: (changing: string[], on: boolean) => void;
+}) {
+  const { t } = useTheme();
+  const [open, setOpen] = useState(false);
+
+  const on = group.counties.filter(c => countyIsOn(c, selected));
+  const all = on.length === group.counties.length;
+  const total = group.counties.length;
+
+  return (
+    <View>
+      <Row
+        label={group.force}
+        sub={
+          all
+            ? `All ${total} ${total === 1 ? 'county' : 'counties'}`
+            : on.length === 0
+              ? 'Off — nothing from this force is plotted'
+              : `${on.length} of ${total} counties`
+        }
+        control={
+          <View style={styles.forceControl}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ expanded: open }}
+              accessibilityLabel={
+                open ? `Hide the counties in ${group.force}` : `Show the counties in ${group.force}`
+              }
+              onPress={() => setOpen(o => !o)}
+              hitSlop={10}
+            >
+              <Text style={[kicker(9.5, 0.12), { color: open ? t.accentInk : t.ink50 }]}>
+                {open ? 'Hide' : 'Counties'}
+              </Text>
+            </Pressable>
+            <Switch
+              value={on.length > 0}
+              label={group.force}
+              onChange={() => onSet([...group.counties], on.length === 0)}
+            />
+          </View>
+        }
+      />
+
+      {open
+        ? group.counties.map(county => {
+            const county_on = countyIsOn(county, selected);
+            return (
+              <View key={county} style={styles.nested}>
+                <Row
+                  label={county}
+                  sub={county_on ? 'Included' : 'Hidden from the map, the list and the alerts'}
+                  control={
+                    <Switch
+                      value={county_on}
+                      label={county}
+                      onChange={() => onSet([county], !county_on)}
+                    />
+                  }
+                />
+              </View>
+            );
+          })
+        : null}
+    </View>
+  );
+}
+
 function Row({
   label,
   sub,
@@ -280,6 +343,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   rowText: { flexShrink: 1, gap: 1 },
+  forceControl: { flexDirection: 'row', alignItems: 'center', gap: 14, flexShrink: 0 },
+  // Indented rather than boxed: the counties are the same list one level in,
+  // and a border around them would read as a different kind of setting.
+  nested: { paddingLeft: 16 },
   controlBlock: { paddingTop: 13, paddingBottom: 4 },
   controlLabel: { marginBottom: 8 },
   themeBlock: { paddingTop: 4, paddingBottom: 6 },

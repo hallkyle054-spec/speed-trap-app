@@ -29,9 +29,11 @@ jobs:
         with:
           node-version: 22
 
+      # No ZONE_AUTHORITIES: the publisher covers Wales and nothing else, so
+      # taking every authority it lists is the same set as taking Wales. Which
+      # counties a driver wants is settled in the app, where it can change
+      # without a build.
       - name: Build the feed
-        env:
-          ZONE_AUTHORITIES: Carmarthenshire
         run: node ingest/build-feed.mjs
 
       - name: Commit it if it changed
