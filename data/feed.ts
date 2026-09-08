@@ -55,6 +55,7 @@ export function parseZones(raw: unknown): Zone[] {
       typeof c.road === 'string' &&
       typeof c.name === 'string' &&
       (c.limitMph === null || typeof c.limitMph === 'number') &&
+      (c.authority == null || typeof c.authority === 'string') &&
       typeof c.note === 'string' &&
       typeof c.firstListed === 'string' &&
       (c.sourceUrl == null || typeof c.sourceUrl === 'string') &&

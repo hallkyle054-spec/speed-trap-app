@@ -2,6 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../components/Button';
+import { InfoNote } from '../components/InfoNote';
 import { Segmented } from '../components/Segmented';
 import { Switch } from '../components/Switch';
 import { PUBLISHER, Sync, syncLabel } from '../data/feed';
@@ -18,6 +19,8 @@ type Props = {
   now: Date;
   onRefresh: () => void;
   onSimulateOffline: () => void;
+  /** Every county the feed carries, in the order the picker should list them. */
+  counties: string[];
   topInset: number;
 };
 
@@ -53,6 +56,7 @@ export function AlertsScreen({
   now,
   onRefresh,
   onSimulateOffline,
+  counties,
   topInset,
 }: Props) {
   const { t } = useTheme();
@@ -61,7 +65,7 @@ export function AlertsScreen({
     <View style={styles.root}>
       <View style={[styles.header, { paddingTop: 16 + topInset, borderBottomColor: t.rule }]}>
         <Text style={[kicker(9.5, 0.14), { color: t.ink50 }]}>Settings</Text>
-        <Text style={[display(31, -0.02), styles.h1, { color: t.ink }]}>Alerts</Text>
+        <Text style={[display(31, -0.02), styles.h1, { color: t.ink }]}>More</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.body}>
@@ -105,9 +109,10 @@ export function AlertsScreen({
             value={settings.theme}
             onChange={value => set('theme', value)}
           />
-          <Text style={[body(11), styles.controlSub, { color: t.ink55 }]}>
-            System follows your phone&rsquo;s light or dark setting.
-          </Text>
+          <InfoNote about="appearance">
+            System follows your phone&rsquo;s light or dark setting. The cover-screen widget
+            follows whichever you pick here rather than the phone, so the two always match.
+          </InfoNote>
         </View>
 
         <SectionLabel>Map</SectionLabel>
@@ -118,11 +123,54 @@ export function AlertsScreen({
             value={settings.mark}
             onChange={value => set('mark', value)}
           />
-          <Text style={[body(11), styles.controlSub, { color: t.ink55 }]}>
+          <InfoNote about="the zone mark">
             How a zone is drawn. The source publishes a single point per zone, so Radius shows
             roughly where it is rather than implying the point is the whole of it.
-          </Text>
+          </InfoNote>
         </View>
+
+        <SectionLabel>Counties</SectionLabel>
+        <View style={styles.themeBlock}>
+          <InfoNote about="counties">
+            The list covers the whole of Wales. Ticking none of them is not the same as ticking
+            none of them off — leave them all clear and you get the whole country, which is what a
+            new install does.
+          </InfoNote>
+        </View>
+        {counties.map(county => {
+          const on = settings.counties.length === 0 || settings.counties.includes(county);
+          return (
+            <Row
+              key={county}
+              label={county}
+              sub={
+                settings.counties.length === 0
+                  ? 'Included — nothing is filtered out'
+                  : on
+                    ? 'Included'
+                    : 'Hidden from the map, the list and the alerts'
+              }
+              control={
+                <Switch
+                  value={on}
+                  label={county}
+                  onChange={() => {
+                    // The first tap has to turn "everywhere" into a real list,
+                    // or unticking one county would read as unticking all.
+                    const current =
+                      settings.counties.length === 0 ? counties : settings.counties;
+                    const next = current.includes(county)
+                      ? current.filter(c => c !== county)
+                      : [...current, county];
+                    // Back to every county is back to the default, so a county
+                    // the source adds later still arrives on its own.
+                    set('counties', next.length === counties.length ? [] : next);
+                  }}
+                />
+              }
+            />
+          );
+        })}
 
         <SectionLabel>Data</SectionLabel>
         <Row
@@ -167,10 +215,12 @@ export function AlertsScreen({
           />
         ) : null}
 
-        <Text style={[body(11), styles.closing, { color: t.ink50 }]}>
-          Verge reads the zone list {PUBLISHER} publishes and plots it. It does not detect cameras,
-          and a published zone is not a promise that enforcement is taking place.
-        </Text>
+        <View style={styles.closing}>
+          <InfoNote about="where this data comes from">
+            Verge reads the zone list {PUBLISHER} publishes and plots it. It does not detect
+            cameras, and a published zone is not a promise that enforcement is taking place.
+          </InfoNote>
+        </View>
       </ScrollView>
     </View>
   );

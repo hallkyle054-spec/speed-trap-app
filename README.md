@@ -302,7 +302,7 @@ None of this has been checked on a device — there isn't one here.
 ## Layout
 
 ```
-app/           MapScreen · TodayScreen · RoutesScreen · AlertsScreen
+app/           MapScreen · TodayScreen · RoutesScreen · AlertsScreen (the More tab)
 components/    ZoneMarks · ZoneSheet · DriveHud · OfflineBanner · Switch · Segmented · Button · TabBar
 theme/         tokens.ts (light + dark maps) · type.ts · mapStyle.ts · ThemeProvider.tsx
 data/          zones.ts (types, fixture, phase derivation) · feed.ts (fetch + cache + stamp) · routes.ts · geo.ts
@@ -316,9 +316,22 @@ App.tsx        tab state, the three overlays, providers
 ```
 
 `theme/tokens.ts` is the whole colour system — one value per theme, and every
-colour in the UI comes from it. Type rules (Cormorant for headings and figures,
-Lora for body, no bold anywhere, tabular figures wherever a number stands as a
-number) live in `theme/type.ts`.
+colour in the UI comes from it. `theme/type.ts` holds the type.
+
+**One family, three weights: IBM Plex Sans.** The design this grew from paired
+Cormorant Garamond with Lora — a display serif for every figure, a book serif
+for the rest. It read as a magazine, and this is an instrument: a number glanced
+at through a windscreen, on a four-inch panel, at speed. Plex is drawn for
+interfaces and technical documents, its figures stay unambiguous small and solid
+large, and weight carries the hierarchy so nothing changes family to change
+emphasis. The names in `font` are the font *file* stems on purpose — the app
+loads them under those names and the widget matches its bundled assets by the
+same prefix, so the two cannot drift.
+
+It is also nearly a third wider than the serif: Plex sets "12.4 km" at 3.754dp
+per point against Cormorant's 2.870. The widget's headline sizing is calibrated
+to that measurement, and would have wrapped the distance on the first build if
+it had been carried over unchanged.
 
 ---
 
@@ -344,6 +357,26 @@ recognisably the same idea.
 Both ends need somewhere real to start: the option only appears once there is an
 actual fix, because routing from an unmeasured position would draw a route from
 the middle of the county.
+
+---
+
+## Counties
+
+The feed carries the whole of Wales, because the publisher covers Wales and
+nothing else — naming authorities in the ingest would only make it smaller, and
+which counties a driver wants is a decision the app can change without a new
+build. Each zone carries its `authority` as a field rather than only inside its
+note, so there is something to filter on that is not a sentence.
+
+`data/counties.ts` builds the picker from what the feed actually contains, so a
+county the source starts or stops publishing arrives or leaves on its own.
+
+**An empty selection means everywhere**, and that is the default. It is not the
+same as "none": a driver who has never opened the list gets the whole country,
+and unticking the last county returns to empty rather than to silence. A zone
+with no authority always survives the filter — feeds built before that field
+existed are still good data, and dropping them would empty the map for anyone
+who had picked a county.
 
 ---
 

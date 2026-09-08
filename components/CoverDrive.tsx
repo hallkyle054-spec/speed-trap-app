@@ -25,9 +25,11 @@ import { ZoneMarks } from './ZoneMarks';
  * half a second after you have moved it is a map you cannot look ahead on. The
  * recentre bubble puts it back on you and starts the following again.
  *
- * Pinch stays off. Zoom lives entirely in the two bubbles, so the zoom level
- * this component holds is always what the map is actually showing — a pinch
- * would desynchronise the two and the next follow would snap the zoom back.
+ * Pinch works, and the bubbles stay for when a thumb is all that is free. The
+ * two are kept in step by reading the camera back after a gesture rather than
+ * assuming: this component's idea of the zoom has to match the map's, or the
+ * next time it follows your position it would snap the zoom back to whatever it
+ * last believed.
  */
 
 const MIN_ZOOM = 11;
@@ -108,10 +110,23 @@ export function CoverDrive({
         showsCompass={false}
         toolbarEnabled={false}
         scrollEnabled
+        zoomEnabled
         onPanDrag={() => setFollowing(false)}
+        // Only a real gesture writes back; our own animations report here too,
+        // and taking those would fight the follow.
+        onRegionChangeComplete={(_region, details) => {
+          if (!details?.isGesture) return;
+          mapRef.current
+            ?.getCamera()
+            .then(camera => {
+              if (typeof camera?.zoom === 'number') {
+                setZoom(Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, camera.zoom)));
+              }
+            })
+            .catch(() => {});
+        }}
         rotateEnabled={false}
         pitchEnabled={false}
-        zoomEnabled={false}
       >
         {routes.map(route => (
           <Polyline

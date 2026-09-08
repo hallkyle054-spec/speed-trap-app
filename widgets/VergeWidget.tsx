@@ -8,6 +8,7 @@ import { dark, light } from '../theme/tokens';
 import { localityScale, localityRadius, localitySvg } from './locality';
 import { PANEL_GAP, WidgetVariant, panelBand, panelHeadlineSize, panelPadding } from './names';
 import { WidgetSummary } from './summary';
+import { font } from '../theme/type';
 
 /** Widget styles take a literal hex; the tokens are opaque after flattening. */
 type Hex = `#${string}`;
@@ -123,7 +124,7 @@ export function VergeWidget({
           <TextWidget
             text={showDistance ? 'NEAREST ZONE' : 'PUBLISHED ZONES'}
             maxLines={1}
-            style={{ fontSize: s.kicker, letterSpacing: 1.5, color: faint, fontFamily: 'Lora' }}
+            style={{ fontSize: s.kicker, letterSpacing: 1.5, color: faint, fontFamily: font.body }}
           />
           <FlexWidget
             clickAction="OPEN_APP"
@@ -136,7 +137,7 @@ export function VergeWidget({
           >
             <TextWidget
               text="OPEN"
-              style={{ fontSize: s.kicker, letterSpacing: 1.6, color: ink, fontFamily: 'Lora' }}
+              style={{ fontSize: s.kicker, letterSpacing: 1.6, color: ink, fontFamily: font.body }}
             />
           </FlexWidget>
         </FlexWidget>
@@ -152,19 +153,19 @@ export function VergeWidget({
           style={{
             fontSize: headlineSize,
             color: ink,
-            fontFamily: 'CormorantGaramond',
+            fontFamily: font.display,
             marginTop: 6,
           }}
         />
         <TextWidget
           text={caption}
           maxLines={1}
-          style={{ fontSize: s.caption, color: muted, fontFamily: 'Lora', marginTop: 2 }}
+          style={{ fontSize: s.caption, color: muted, fontFamily: font.body, marginTop: 2 }}
         />
         <TextWidget
           text={`${limit ? `${limit} MPH · ` : ''}possible mobile camera${stamp}`}
           maxLines={1}
-          style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora', marginTop: 3 }}
+          style={{ fontSize: s.foot, color: faint, fontFamily: font.body, marginTop: 3 }}
         />
 
         {marks.length ? (
@@ -190,12 +191,12 @@ export function VergeWidget({
               >
                 <TextWidget
                   text={`${marks.length}`}
-                  style={{ fontSize: s.caption * 2, color: ink, fontFamily: 'CormorantGaramond' }}
+                  style={{ fontSize: s.caption * 2, color: ink, fontFamily: font.display }}
                 />
                 <TextWidget
                   text={`${marks.length === 1 ? 'zone' : 'zones'} within ${localityScale(localityRadius(marks))}`}
                   maxLines={2}
-                  style={{ fontSize: s.foot, color: muted, fontFamily: 'Lora', marginTop: 1 }}
+                  style={{ fontSize: s.foot, color: muted, fontFamily: font.body, marginTop: 1 }}
                 />
               </FlexWidget>
             </FlexWidget>
@@ -224,16 +225,16 @@ export function VergeWidget({
       >
         <TextWidget
           text={headline}
-          style={{ fontSize: s.headline, color: ink, fontFamily: 'CormorantGaramond' }}
+          style={{ fontSize: s.headline, color: ink, fontFamily: font.display }}
         />
         <FlexWidget style={{ flexDirection: 'column', marginLeft: s.gap }}>
           <TextWidget
             text={showDistance ? 'NEAREST ZONE' : 'PUBLISHED ZONES'}
-            style={{ fontSize: s.kicker, letterSpacing: 1.1, color: faint, fontFamily: 'Lora' }}
+            style={{ fontSize: s.kicker, letterSpacing: 1.1, color: faint, fontFamily: font.body }}
           />
           <TextWidget
             text="possible mobile camera"
-            style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora', marginTop: 1 }}
+            style={{ fontSize: s.foot, color: faint, fontFamily: font.body, marginTop: 1 }}
           />
         </FlexWidget>
       </FlexWidget>
@@ -259,16 +260,16 @@ export function VergeWidget({
       <FlexWidget style={{ flexDirection: 'column' }}>
         <TextWidget
           text={showDistance ? 'NEAREST ZONE' : 'PUBLISHED ZONES'}
-          style={{ fontSize: s.kicker, letterSpacing: 1.2, color: faint, fontFamily: 'Lora' }}
+          style={{ fontSize: s.kicker, letterSpacing: 1.2, color: faint, fontFamily: font.body }}
         />
         <TextWidget
           text={headline}
-          style={{ fontSize: s.headline, color: ink, fontFamily: 'CormorantGaramond', marginTop: 2 }}
+          style={{ fontSize: s.headline, color: ink, fontFamily: font.display, marginTop: 2 }}
         />
         <TextWidget
           text={caption}
           maxLines={3}
-          style={{ fontSize: s.caption, color: muted, fontFamily: 'Lora', marginTop: 2 }}
+          style={{ fontSize: s.caption, color: muted, fontFamily: font.body, marginTop: 2 }}
         />
       </FlexWidget>
       <TextWidget
@@ -278,7 +279,7 @@ export function VergeWidget({
             : 'possible mobile camera'
         }
         maxLines={2}
-        style={{ fontSize: s.foot, color: faint, fontFamily: 'Lora', marginTop: s.gap }}
+        style={{ fontSize: s.foot, color: faint, fontFamily: font.body, marginTop: s.gap }}
       />
     </FlexWidget>
   );

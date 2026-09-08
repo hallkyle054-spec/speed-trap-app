@@ -52,8 +52,8 @@ test('the distance fits across the panel and still leaves room beneath it', () =
   // A real cover screen: about 305 x 297dp.
   const { inner } = panelBand(352, 22);
   const size = panelHeadlineSize(inner, 343);
-  // Cormorant needs roughly 3.4dp per point for a string like "12.4 km".
-  assert.ok(size * 3.4 <= inner, `"12.4 km" at ${size}pt must fit ${inner}dp across`);
+  // Measured: IBM Plex Sans Medium sets "12.4 km" at 3.754dp per point.
+  assert.ok(size * 3.76 <= inner, `"12.4 km" at ${size}pt must fit ${inner}dp across`);
   // And the line it sets must not eat the panel the rest of the reading needs.
   assert.ok(size * 1.2 < 343 * 0.3, `${size}pt leaves too little height beneath it`);
   // Neither dimension alone decides it.

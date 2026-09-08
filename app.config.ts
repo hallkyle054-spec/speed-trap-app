@@ -43,9 +43,12 @@ const config: ExpoConfig = {
       // point of it: one tap from a closed phone to the live map.
       'react-native-android-widget',
       {
+        // The widget matches these by filename prefix, and `theme/type.ts`
+        // names the app's fonts identically, so the two cannot drift.
         fonts: [
-          './node_modules/@expo-google-fonts/cormorant-garamond/400Regular/CormorantGaramond_400Regular.ttf',
-          './node_modules/@expo-google-fonts/lora/400Regular/Lora_400Regular.ttf',
+          './node_modules/@expo-google-fonts/ibm-plex-sans/400Regular/IBMPlexSans_400Regular.ttf',
+          './node_modules/@expo-google-fonts/ibm-plex-sans/500Medium/IBMPlexSans_500Medium.ttf',
+          './node_modules/@expo-google-fonts/ibm-plex-sans/600SemiBold/IBMPlexSans_600SemiBold.ttf',
         ],
         widgets: [
           {

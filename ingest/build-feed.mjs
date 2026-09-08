@@ -21,14 +21,23 @@ const OUT = 'feed/zones.json';
 const UA =
   'VergeZoneFeed/0.1 (+https://github.com/hallkyle054-spec/speed-trap-app; daily site-list sync)';
 
-/** Which unitary authorities the app covers. */
-const AUTHORITIES = (process.env.ZONE_AUTHORITIES ?? 'Carmarthenshire')
+/**
+ * Which unitary authorities to take. Empty means all of them, which is the
+ * default: the publisher covers Wales and nothing else, so the whole list is
+ * already the whole country. Naming authorities here would only make the feed
+ * smaller, and which counties a driver wants is a decision for the app, at a
+ * point where it can be changed without a new build.
+ */
+const AUTHORITIES = (process.env.ZONE_AUTHORITIES ?? '')
   .split(',')
   .map(a => a.trim())
   .filter(Boolean);
 
-/** A run that loses most of the list is a parser or site change, not a real drop. */
-const MIN_EXPECTED = Number(process.env.ZONE_MIN_EXPECTED ?? 5);
+/**
+ * A run that loses most of the list is a parser or site change, not a real
+ * drop. The floor is for the whole country now, not one county of it.
+ */
+const MIN_EXPECTED = Number(process.env.ZONE_MIN_EXPECTED ?? 200);
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -76,6 +85,10 @@ async function main() {
       road: site.road,
       name: site.name,
       limitMph: site.limitMph,
+      // Carried as its own field, not only inside the note: the app lets a
+      // driver choose which counties they want and needs something to filter
+      // on that is not a sentence.
+      authority: site.authority,
       note: `Listed by ${site.authority} as a ${site.type.toLowerCase()} enforcement site.`,
       sourceUrl: site.sourceUrl,
       firstListed: before?.firstListed ?? listedOn,
@@ -95,7 +108,9 @@ async function main() {
   const feed = {
     listedOn,
     source: SOURCE,
-    authorities: AUTHORITIES,
+    // What the feed actually contains, rather than what was asked for — with
+    // no filter those are different, and the app reads this to build its list.
+    authorities: [...new Set(zones.map(z => z.authority))].filter(Boolean).sort(),
     generatedAt: new Date().toISOString(),
     zones: [...zones, ...dropped],
   };

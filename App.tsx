@@ -22,6 +22,7 @@ import {
   ageInDays,
   useZoneFeed,
 } from './data/feed';
+import { countiesIn, inSelectedCounties } from './data/counties';
 import { Region } from './data/geo';
 import {
   COUNTY_REGION,
@@ -120,10 +121,21 @@ function Verge() {
   // screen below it must not pad for it a second time.
   const screenInset = notice ? 0 : insets.top;
 
-  /** `Show removed sites` off drops them from the map, the list and the count. */
+  /** Every county the feed carries, for the picker in More. */
+  const counties = useMemo(() => countiesIn(allZones), [allZones]);
+
+  /**
+   * `Show removed sites` off drops them from the map, the list and the count;
+   * the county selection drops everywhere the driver has not asked for.
+   */
   const zones = useMemo(
-    () => (settings.showStale ? allZones : allZones.filter(z => statusOf(z) === 'listed')),
-    [allZones, settings.showStale, statusOf],
+    () =>
+      allZones.filter(
+        z =>
+          (settings.showStale || statusOf(z) === 'listed') &&
+          inSelectedCounties(z, settings.counties),
+      ),
+    [allZones, settings.showStale, settings.counties, statusOf],
   );
 
   const drive = useDrive(settings, zones, origin);
@@ -270,7 +282,7 @@ function Verge() {
         />
       ) : null}
 
-      {tab === 'alerts' ? (
+      {tab === 'more' ? (
         <AlertsScreen
           settings={settings}
           set={set}
@@ -280,6 +292,7 @@ function Verge() {
           now={now}
           onRefresh={refresh}
           onSimulateOffline={goOffline}
+          counties={counties}
           topInset={screenInset}
         />
       ) : null}
@@ -332,11 +345,9 @@ function Verge() {
  * into the bundle.
  */
 const FONTS = {
-  CormorantGaramond_400Regular: require('@expo-google-fonts/cormorant-garamond/400Regular/CormorantGaramond_400Regular.ttf'),
-  CormorantGaramond_600SemiBold: require('@expo-google-fonts/cormorant-garamond/600SemiBold/CormorantGaramond_600SemiBold.ttf'),
-  Lora_400Regular: require('@expo-google-fonts/lora/400Regular/Lora_400Regular.ttf'),
-  Lora_600SemiBold: require('@expo-google-fonts/lora/600SemiBold/Lora_600SemiBold.ttf'),
-  Lora_400Regular_Italic: require('@expo-google-fonts/lora/400Regular_Italic/Lora_400Regular_Italic.ttf'),
+  IBMPlexSans_400Regular: require('@expo-google-fonts/ibm-plex-sans/400Regular/IBMPlexSans_400Regular.ttf'),
+  IBMPlexSans_500Medium: require('@expo-google-fonts/ibm-plex-sans/500Medium/IBMPlexSans_500Medium.ttf'),
+  IBMPlexSans_600SemiBold: require('@expo-google-fonts/ibm-plex-sans/600SemiBold/IBMPlexSans_600SemiBold.ttf'),
 };
 
 /** Fonts are bundled with the app, so this resolves without a network round-trip. */

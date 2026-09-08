@@ -4,13 +4,13 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../theme/ThemeProvider';
 import { heading } from '../theme/type';
 
-export type TabId = 'map' | 'today' | 'routes' | 'alerts';
+export type TabId = 'map' | 'today' | 'routes' | 'more';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'map', label: 'Map' },
   { id: 'today', label: 'Zones' },
   { id: 'routes', label: 'Routes' },
-  { id: 'alerts', label: 'Alerts' },
+  { id: 'more', label: 'More' },
 ];
 
 /**

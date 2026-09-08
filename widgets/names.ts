@@ -69,8 +69,10 @@ export const panelPadding = (padDp: number, padYDp: number) => ({
  * How large the distance can be set: the smaller of what the width allows and
  * what the height can spare.
  *
- * Width, because Cormorant sets a string like "12.4 km" at roughly 3.4dp per
- * point and it must not wrap — measured off a real cover screen. Height,
+ * Width, because the face sets a string like "12.4 km" at roughly 3.75dp per
+ * point and it must not wrap — measured, not assumed: IBM Plex is nearly a
+ * third wider than the serif this replaced, so a factor calibrated for that one
+ * would have wrapped the distance on the first build. Height,
  * because everything under it needs room too, and a number that fits across
  * but eats the panel pushes the diagram out of the bottom. Derived rather than
  * fixed: the same layout serves a cover panel and a large home-screen widget,
@@ -79,7 +81,7 @@ export const panelPadding = (padDp: number, padYDp: number) => ({
 export const panelHeadlineSize = (widthDp: number, heightDp: number): number =>
   Math.max(
     28,
-    Math.min(76, Math.round(Math.min(widthDp * 0.28, drawable(heightDp) * 0.2))),
+    Math.min(76, Math.round(Math.min(widthDp * 0.25, drawable(heightDp) * 0.2))),
   );
 
 /**

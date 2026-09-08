@@ -21,6 +21,13 @@ export type Settings = {
   warnAt: WarnAt;
   mark: ZoneMark;
   theme: Theme;
+  /**
+   * Which unitary authorities to carry, by name. **Empty means all of them** —
+   * which is also the default, and is not the same as "none". A driver who has
+   * never opened the county list gets the whole country, and a county added to
+   * the source later appears without anyone having to opt into it.
+   */
+  counties: string[];
 };
 
 export const defaultSettings: Settings = {
@@ -31,6 +38,7 @@ export const defaultSettings: Settings = {
   /** Draws exactly what the source gives: one point per zone. */
   mark: 'pin',
   theme: 'system',
+  counties: [],
 };
 
 /**
@@ -53,6 +61,16 @@ export function reconcile(raw: unknown): Settings {
 
   for (const key of Object.keys(defaultSettings) as (keyof Settings)[]) {
     const value = stored[key];
+
+    // `typeof` calls an array an object, and would have let `{}` through as a
+    // county list. Arrays are checked as arrays, and their contents too.
+    if (Array.isArray(defaultSettings[key])) {
+      if (Array.isArray(value) && value.every(v => typeof v === 'string')) {
+        (out as Record<string, unknown>)[key] = [...new Set(value as string[])];
+      }
+      continue;
+    }
+
     if (typeof value !== typeof defaultSettings[key]) continue;
 
     const allowed: readonly unknown[] | undefined = (ALLOWED as Record<string, readonly unknown[]>)[

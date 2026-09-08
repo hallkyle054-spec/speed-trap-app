@@ -114,13 +114,16 @@ const isFiniteNumber = n => typeof n === 'number' && Number.isFinite(n);
  * a malformed site is worse than a missing one.
  */
 export function toSites(rows, { authorities }) {
-  const wanted = new Set(authorities.map(a => a.toLowerCase()));
+  // No authorities named means take them all. The publisher covers Wales and
+  // nothing else, so "everything it lists" and "Wales" are the same set — there
+  // is no filter that would make the result more Welsh, only smaller.
+  const wanted = new Set((authorities ?? []).map(a => a.toLowerCase()));
   const sites = [];
   const rejected = [];
 
   for (const row of rows) {
     const [description, lat, lng, type, detail, , authority, id, limit] = row;
-    if (!wanted.has(String(authority ?? '').toLowerCase())) continue;
+    if (wanted.size && !wanted.has(String(authority ?? '').toLowerCase())) continue;
 
     const latitude = Number(lat);
     const longitude = Number(lng);

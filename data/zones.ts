@@ -27,6 +27,13 @@ export type Zone = {
   name: string;
   /** The posted limit, when the source gives one. Never inferred. */
   limitMph: number | null;
+  /**
+   * The unitary authority that published it — 'Carmarthenshire', 'Gwynedd'.
+   * The feed covers all of Wales; this is what a driver filters it down by.
+   * Optional because a feed built before this existed is still perfectly good
+   * data, and a zone with no authority simply belongs to no county filter.
+   */
+  authority?: string;
   /** The sheet's plain-language provenance line. */
   note: string;
   /** The published entry this zone came from, when the source links one. */
