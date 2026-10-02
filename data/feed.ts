@@ -264,7 +264,10 @@ export function syncLabel(sync: Sync, fetchedAt: Date | null, now = new Date()):
       ? `Built-in list · ${PUBLISHER} ${dayLabel(fetchedAt)}`
       : `Built-in list · ${PUBLISHER}`;
   }
-  if (sync === 'offline') return `Offline · list is ${ageLabel(fetchedAt, now)}`;
+  // `ageLabel` already says "list is …" where it applies, and says something
+  // else entirely where it does not. Prefixing it here read "list is list is
+  // from today", and would have read "list is no list cached".
+  if (sync === 'offline') return `Offline · ${ageLabel(fetchedAt, now)}`;
   if (!fetchedAt) return `No list fetched yet · ${PUBLISHER} list`;
   return `Fetched ${clockLabel(fetchedAt)} · ${PUBLISHER} list`;
 }
