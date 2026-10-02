@@ -24,10 +24,25 @@ export const PUBLISHER = 'GoSafe';
  * HTML scraped from the phone. Scraping on-device is brittle, leaks the user's
  * IP to the publisher, and makes offline caching harder.
  *
- * Unset in this repo: the app falls back to the committed fixture so the UI is
- * exercisable, and the ingest job is still to be built.
+ * The default is the feed this repo's own ingest commits every morning, read
+ * straight off the repository. That needs no key, no host and no secret, which
+ * is the point: a feed URL that only exists when someone remembers to set a
+ * build secret is a feed URL that is empty, and an empty one makes `refresh()`
+ * a button that cannot do anything.
+ *
+ * `refs/heads/...` rather than a bare branch name because the branch has
+ * slashes in it, and the short form cannot say where the ref ends and the path
+ * begins. Fetching it requires the repository to be public; while it is not,
+ * the request fails and the app falls back to the list inside the build, which
+ * is the same behaviour as being offline.
  */
-export const FEED_URL = process.env.EXPO_PUBLIC_ZONE_FEED_URL ?? '';
+const PUBLISHED_FEED =
+  'https://raw.githubusercontent.com/hallkyle054-spec/speed-trap-app/' +
+  'refs/heads/claude/claude-design-implementation-sye53r/feed/zones.json';
+
+// `||`, not `??`: the workflow always defines the variable, so an unset secret
+// arrives as an empty string rather than as undefined, and `??` would keep it.
+export const FEED_URL = process.env.EXPO_PUBLIC_ZONE_FEED_URL || PUBLISHED_FEED;
 
 export type Sync = 'ok' | 'syncing' | 'offline';
 

@@ -45,7 +45,7 @@ Both are read from the environment; neither is committed.
 | Variable | What it does |
 | --- | --- |
 | `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` | Android Maps SDK key. Without it the map renders blank. |
-| `EXPO_PUBLIC_ZONE_FEED_URL` | The JSON zone feed. **Unset**, so the app falls back to the committed fixture — see *Ingest*. |
+| `EXPO_PUBLIC_ZONE_FEED_URL` | The JSON zone feed. **Optional** — it defaults to this repo's own published `feed/zones.json`. Set it only to point somewhere else. |
 | `EXPO_PUBLIC_GOOGLE_ROUTES_API_KEY` | Directions + Places, for building saved routes. Needs to be a **second key** — see below. |
 
 > The Maps key is written into `AndroidManifest.xml` at **prebuild** time, not read
@@ -428,15 +428,20 @@ Two consequences worth knowing:
 
 ---
 
-## Ingest — the part that is stubbed
+## Ingest
 
-`data/feed.ts` has the full client side: fetch, validate, cache, stamp, fall back
-to the last good list, and surface its age. What it does not have is a feed to
-point at. `EXPO_PUBLIC_ZONE_FEED_URL` is unset and the app uses the committed
-fixture.
+`ingest/build-feed.mjs` runs daily from GitHub Actions, parses the publisher's
+camera map, and commits `feed/zones.json` — currently 722 zones across all 22
+Welsh unitary authorities. `data/feed.ts` fetches that file over HTTPS, validates
+it, caches it, stamps it, falls back to the last good list, and surfaces its age.
 
-Before wiring a real source, the handoff's sequence still stands and none of it
-is done:
+The app reads the feed straight off this repository by default, so there is no
+host to run and no secret to set. **That requires the repository to be public.**
+While it is private the request fails and the app falls back to the list baked
+into the build, which looks exactly like being offline: the list stops changing
+until a new APK is installed.
+
+The remaining sequence, none of it done:
 
 1. **Confirm the source** and record its URL.
 2. **Read the terms of use and robots.txt**; prefer an official feed, API or
