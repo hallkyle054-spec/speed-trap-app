@@ -46,8 +46,16 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      # `packages: ''` because the action's default list still names `tools`,
+      # which Google has withdrawn from the SDK repository — sdkmanager exits 1
+      # on "Failed to find package 'tools'" and takes every build with it. The
+      # runner image already ships platform-tools and build-tools, and the
+      # action still sets ANDROID_HOME and accepts the licences, so Gradle
+      # fetches whatever else the project actually asks for.
       - name: Set up the Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: ''
 
       - run: npm ci
 
