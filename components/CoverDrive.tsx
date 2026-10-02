@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
 
-import { Place, ROUTING_CONFIGURED, Route } from '../data/directions';
+import { Place, ROUTING_CONFIGURED, Route, routeBetween } from '../data/directions';
 import { LatLng, formatDistance } from '../data/geo';
+import { trackOffRoute } from '../data/reroute';
 import { SavedRoute } from '../data/routes';
 import { Zone, ZoneStatus } from '../data/zones';
 import { ZoneMark } from '../state/settingsSchema';
@@ -69,6 +70,50 @@ export function CoverDrive({
   const [following, setFollowing] = useState(true);
   const [routing, setRouting] = useState(false);
   const [route, setRoute] = useState<{ route: Route; to: Place } | null>(null);
+  const [rerouting, setRerouting] = useState(false);
+
+  /** Off-route bookkeeping, in refs: it changes on every fix and draws nothing. */
+  const strayFixes = useRef(0);
+  const lastRerouteAt = useRef(0);
+  const inFlight = useRef(false);
+
+  /**
+   * Miss a turn and the purple line is redrawn from where you actually are.
+   *
+   * The decision is in `trackOffRoute` so it can be tested without a map: a
+   * single stray fix is GPS noise, a few seconds of them is a missed turn, and
+   * there is a floor under how often a new route may be asked for because each
+   * one is a billed request. A failed attempt keeps the old line rather than
+   * clearing it — a stale route is more use than none.
+   */
+  useEffect(() => {
+    if (!route || !position) {
+      strayFixes.current = 0;
+      return;
+    }
+    const verdict = trackOffRoute({
+      position,
+      path: route.route.path,
+      destination: route.to.location,
+      strayFixes: strayFixes.current,
+      lastRerouteAt: lastRerouteAt.current,
+      now: Date.now(),
+    });
+    strayFixes.current = verdict.strayFixes;
+    if (!verdict.reroute || inFlight.current) return;
+
+    inFlight.current = true;
+    lastRerouteAt.current = Date.now();
+    setRerouting(true);
+    const to = route.to;
+    routeBetween({ id: 'here', name: 'Here', address: '', location: position }, to)
+      .then(found => setRoute(current => (current?.to.id === to.id ? { route: found, to } : current)))
+      .catch(() => {})
+      .finally(() => {
+        inFlight.current = false;
+        setRerouting(false);
+      });
+  }, [position?.latitude, position?.longitude, route]);
 
   // Follow the fix. At two a second this is the only thing moving on screen.
   useEffect(() => {
@@ -165,7 +210,7 @@ export function CoverDrive({
         </Text>
         {route ? (
           <Text numberOfLines={1} style={[body(9), styles.heading, { color: t.ink55 }]}>
-            {`${route.to.name} · ${route.route.minutes} min`}
+            {rerouting ? 'Re-routing…' : `${route.to.name} · ${route.route.minutes} min`}
           </Text>
         ) : null}
       </View>
@@ -190,7 +235,13 @@ export function CoverDrive({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={route ? 'Clear route' : 'Set a route'}
-          onPress={() => (route ? setRoute(null) : setRouting(true))}
+          onPress={() => {
+            if (route) {
+              setRoute(null);
+              strayFixes.current = 0;
+              lastRerouteAt.current = 0;
+            } else setRouting(true);
+          }}
           style={({ pressed }) => [
             styles.routeButton,
             {

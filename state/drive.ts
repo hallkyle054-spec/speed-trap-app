@@ -51,6 +51,13 @@ export function useDrive(
   const banner = useRef<ReturnType<typeof setTimeout> | null>(null);
   const watcher = useRef<Location.LocationSubscription | null>(null);
   const simDistance = useRef(SIM.from);
+  /**
+   * Which drive a late `await` belongs to. Starting a drive bumps it, so a
+   * permission prompt or a location call that resolves after the driver has
+   * already stopped — or started a different drive — knows to drop its result
+   * rather than write it over the current one.
+   */
+  const generation = useRef(0);
   /** Sites already chimed for on this drive; they re-arm once well clear. */
   const alerted = useRef<Set<string>>(new Set());
 
@@ -62,6 +69,7 @@ export function useDrive(
   }, []);
 
   const stopEverything = useCallback(() => {
+    generation.current += 1;
     if (timer.current) clearInterval(timer.current);
     timer.current = null;
     if (banner.current) clearTimeout(banner.current);
@@ -136,10 +144,13 @@ export function useDrive(
   const start = useCallback(
     (target: Zone) => {
       stopEverything();
+      const mine = generation.current;
       alerted.current = new Set();
       setChiming(false);
       setZone(target);
       setPosition(null);
+      // Seeded from the last known fix below, so the cover screen is not left
+      // without a position for the seconds a cold GPS lock takes.
       // Measured from where the driver actually is. This used to measure the
       // zone against its own first point — always zero — so the HUD opened
       // announcing "Now · Zone begins" before a single fix had arrived.
@@ -149,12 +160,30 @@ export function useDrive(
         const { granted } = await Location.requestForegroundPermissionsAsync().catch(() => ({
           granted: false,
         }));
+        if (generation.current !== mine) return;
         if (!granted) {
           runSimulation(target);
           return;
         }
+        // A cold lock at BestForNavigation can take tens of seconds, and until
+        // the first fix lands `position` is null — which on the cover screen
+        // greys out recentre and hides the route button entirely. The last
+        // known fix is a worse position than the next real one and a far better
+        // one than none, so it stands in until the watcher speaks.
         try {
-          watcher.current = await Location.watchPositionAsync(
+          const last = await Location.getLastKnownPositionAsync({ maxAge: 120_000 });
+          if (last && generation.current === mine) {
+            setPosition({
+              latitude: last.coords.latitude,
+              longitude: last.coords.longitude,
+            });
+          }
+        } catch {
+          /* no cached fix — the watcher below is the only source */
+        }
+
+        try {
+          const subscription = await Location.watchPositionAsync(
             {
               accuracy: Location.Accuracy.BestForNavigation,
               // Twice a second, and no distance floor: on the cover screen the
@@ -190,7 +219,11 @@ export function useDrive(
               for (const z of update.toChime) chimeRef.current(z);
             },
           );
+          // The drive may have ended while the subscription was being set up.
+          if (generation.current !== mine) subscription.remove();
+          else watcher.current = subscription;
         } catch {
+          if (generation.current !== mine) return;
           // Provider unavailable — fall back rather than showing a dead HUD.
           runSimulation(target);
         }

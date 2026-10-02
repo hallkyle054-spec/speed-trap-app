@@ -11,7 +11,7 @@ export type Theme = 'system' | 'light' | 'dark';
  * no stretch of road to draw along — the option rendered as a point no matter
  * what, which is a control that lies about having done something.
  */
-export type ZoneMark = 'pin' | 'radius';
+export type ZoneMark = 'pin' | 'radius' | 'both';
 export type WarnAt = 300 | 500 | 800 | 1000;
 
 export type Settings = {
@@ -49,7 +49,7 @@ export const defaultSettings: Settings = {
  */
 const ALLOWED = {
   warnAt: [300, 500, 800, 1000],
-  mark: ['pin', 'radius'],
+  mark: ['pin', 'radius', 'both'],
   theme: ['system', 'light', 'dark'],
 } as const;
 

@@ -40,13 +40,16 @@ const THEME_OPTIONS: { value: Theme; label: string }[] = [
 ];
 
 /**
- * Point draws the published coordinate; Radius draws the uncertainty around it.
- * The design's third treatment, a bar along the road, is not offered: the source
+ * Point draws the published coordinate; Radius draws the uncertainty around it;
+ * Both draws each, because they answer different questions and wanting the
+ * exact published point inside the rough area is not a contradiction. The
+ * design's fourth treatment, a bar along the road, is not offered: the source
  * publishes no extent to draw one from.
  */
 const MARK_OPTIONS: { value: ZoneMark; label: string }[] = [
   { value: 'pin', label: 'Point' },
   { value: 'radius', label: 'Radius' },
+  { value: 'both', label: 'Both' },
 ];
 
 export function AlertsScreen({
@@ -127,7 +130,8 @@ export function AlertsScreen({
           />
           <InfoNote about="the zone mark">
             How a zone is drawn. The source publishes a single point per zone, so Radius shows
-            roughly where it is rather than implying the point is the whole of it.
+            roughly where it is rather than implying the point is the whole of it. Both draws the
+            circle and the point together — the area to watch, and the coordinate as published.
           </InfoNote>
         </View>
 

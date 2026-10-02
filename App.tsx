@@ -148,6 +148,18 @@ function Verge() {
   );
 
   const drive = useDrive(settings, zones, origin);
+
+  /**
+   * Where the map should put you.
+   *
+   * The drive's own watcher is the better source — twice a second, navigation
+   * accuracy — but it starts from nothing each drive and reports nothing at all
+   * if the permission was refused or the provider is dead. The app's own fix is
+   * slower and already running, so it stands in. Without this the cover screen
+   * spends every cold start, and the whole of a simulated drive, with no
+   * position: the recentre bubble greyed out and the route button not drawn.
+   */
+  const mapPosition = drive.position ?? (isReal ? origin : null);
   const savedRoutes = useSavedRoutes();
 
   const sheetZone = useMemo(() => zones.find(z => z.id === sheetId) ?? null, [zones, sheetId]);
@@ -232,7 +244,7 @@ function Verge() {
           routes={savedRoutes.routes}
           statusOf={statusOf}
           mark={settings.mark}
-          position={drive.position}
+          position={mapPosition}
           distance={drive.zone ? drive.distance : null}
           chiming={drive.chiming}
           insets={{ top: insets.top, bottom: insets.bottom }}
@@ -334,7 +346,7 @@ function Verge() {
           routes={savedRoutes.routes}
           statusOf={statusOf}
           mark={settings.mark}
-          position={drive.position}
+          position={mapPosition}
           distance={drive.distance}
           speedMph={drive.speedMph}
           chiming={drive.chiming}

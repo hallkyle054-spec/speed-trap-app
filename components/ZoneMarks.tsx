@@ -64,37 +64,48 @@ export function ZoneMarks({ zone, status, mark, onPress }: Props) {
   const active = status === 'listed';
   const label = zoneTitle(zone);
 
-  if (mark === 'radius') {
-    return (
-      <>
+  const at = midpoint(zone.path);
+  // 'both' draws the circle *and* the point: the circle says roughly where the
+  // zone is, the point says exactly what was published. They answer different
+  // questions, so wanting both on at once is not a contradiction.
+  const showRadius = mark === 'radius' || mark === 'both';
+  const showPin = mark === 'pin' || mark === 'both';
+
+  return (
+    <>
+      {showRadius ? (
         <Circle
-          center={midpoint(zone.path)}
+          center={at}
           radius={RADIUS_M}
           strokeColor={color}
           strokeWidth={1}
           fillColor={t.accentTint}
         />
-        <TapTarget coordinate={midpoint(zone.path)} label={label} onPress={() => onPress(zone)} />
-      </>
-    );
-  }
+      ) : null}
 
-  return (
-    <Marker
-      coordinate={midpoint(zone.path)}
-      anchor={{ x: 0.5, y: 0.5 }}
-      onPress={() => onPress(zone)}
-      accessibilityLabel={label}
-      // Only redraw continuously while a ring is actually animating.
-      tracksViewChanges={active}
-    >
-      <View style={styles.tap}>
-        {active ? <PulseRing color={color} /> : null}
-        <View style={[styles.dotOuter, { backgroundColor: t.bg, borderColor: color }]}>
-          <View style={[styles.dotInner, { backgroundColor: color }]} />
-        </View>
-      </View>
-    </Marker>
+      {showPin ? (
+        <Marker
+          coordinate={at}
+          anchor={{ x: 0.5, y: 0.5 }}
+          onPress={() => onPress(zone)}
+          accessibilityLabel={label}
+          // Only redraw continuously while a ring is actually animating.
+          tracksViewChanges={active}
+        >
+          <View style={styles.tap}>
+            {active ? <PulseRing color={color} /> : null}
+            <View style={[styles.dotOuter, { backgroundColor: t.bg, borderColor: color }]}>
+              <View style={[styles.dotInner, { backgroundColor: color }]} />
+            </View>
+          </View>
+        </Marker>
+      ) : (
+        // A circle alone is not reliably tappable, so it gets an invisible
+        // target. With a point drawn there is already one, and two stacked
+        // markers would make the zone sheet open twice.
+        <TapTarget coordinate={at} label={label} onPress={() => onPress(zone)} />
+      )}
+    </>
   );
 }
 
