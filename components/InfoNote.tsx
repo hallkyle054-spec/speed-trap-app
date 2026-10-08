@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useTheme } from '../theme/ThemeProvider';
+import { usePressScale } from '../theme/motion';
 import { body } from '../theme/type';
 
 /**
@@ -17,6 +18,7 @@ import { body } from '../theme/type';
  */
 export function InfoNote({ about, children }: { about: string; children: React.ReactNode }) {
   const { t } = useTheme();
+  const press = usePressScale(0.88);
   const [open, setOpen] = useState(false);
 
   return (
@@ -29,16 +31,19 @@ export function InfoNote({ about, children }: { about: string; children: React.R
         // The circle is 20dp but the target around it is 44, which is what a
         // thumb needs and what the circle would be too heavy to be.
         hitSlop={12}
+        onPressIn={press.onPressIn}
+        onPressOut={press.onPressOut}
         style={styles.button}
       >
-        <View
+        <Animated.View
           style={[
             styles.circle,
+            press.style,
             { borderColor: open ? t.accent : t.rule2, backgroundColor: open ? t.accentTint : 'transparent' },
           ]}
         >
           <Text style={[body(11), styles.glyph, { color: open ? t.accentInk : t.ink55 }]}>i</Text>
-        </View>
+        </Animated.View>
       </Pressable>
 
       {open ? (

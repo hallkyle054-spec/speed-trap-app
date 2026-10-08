@@ -23,6 +23,8 @@ type Props = {
   onSimulateOffline: () => void;
   /** Every county the feed carries, in the order the picker should list them. */
   counties: string[];
+  /** How many zones the publisher has dropped from its list. */
+  removedCount: number;
   topInset: number;
 };
 
@@ -62,6 +64,7 @@ export function AlertsScreen({
   onRefresh,
   onSimulateOffline,
   counties,
+  removedCount,
   topInset,
 }: Props) {
   const { t } = useTheme();
@@ -155,7 +158,13 @@ export function AlertsScreen({
         <SectionLabel>Data</SectionLabel>
         <Row
           label="Show removed zones"
-          sub="Zones dropped from the most recent published list"
+          sub={
+            removedCount === 0
+              ? 'None yet — nothing has been dropped from the list'
+              : removedCount === 1
+                ? '1 zone has been dropped from the published list'
+                : `${removedCount} zones have been dropped from the published list`
+          }
           control={
             <Switch
               value={settings.showStale}

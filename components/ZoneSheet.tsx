@@ -46,7 +46,7 @@ export function ZoneSheet({ zone, status, distance, onClose, onDrive, bottomInse
         <Text
           style={[
             kicker(9.5, 0.14),
-            { color: status === 'listed' ? t.accentInk : t.ink50 },
+            { color: status === 'listed' ? t.accentInk : t.markRemoved },
           ]}
         >
           {statusLabel(status)}

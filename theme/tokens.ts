@@ -48,6 +48,15 @@ export type Tokens = {
   accentTint2: string;
   mark: string;
   /**
+   * A site the publisher has dropped from its list. Cool against the warm
+   * amber of a live one, because "no longer published" is a different fact
+   * about a zone rather than a fainter version of the same one — which is what
+   * the old grey said. The pulse ring is still the non-colour cue: live marks
+   * breathe, removed ones sit still, so the two do not rely on hue alone.
+   */
+  markRemoved: string;
+  markRemovedTint: string;
+  /**
    * A route that is not being kept — set against the accent rather than a
    * shade of it, because "this one is temporary" is a different fact about a
    * route, not a weaker version of the same one.
@@ -82,6 +91,8 @@ export const light: Tokens = {
   accentTint: 'rgba(182,130,53,0.09)',
   accentTint2: 'rgba(182,130,53,0.14)',
   mark: '#a06f24',
+  markRemoved: '#4a6f78',
+  markRemovedTint: 'rgba(74,111,120,0.10)',
   tempRoute: '#6d4d9c',
   legendBg: 'rgba(243,242,242,0.9)',
   shadow: 'rgba(45,43,43,0.18)',
@@ -112,6 +123,8 @@ export const dark: Tokens = {
   accentTint: 'rgba(225,173,102,0.14)',
   accentTint2: 'rgba(225,173,102,0.2)',
   mark: '#e1ad66',
+  markRemoved: '#7fa9b3',
+  markRemovedTint: 'rgba(127,169,179,0.14)',
   tempRoute: '#b79ce0',
   legendBg: 'rgba(32,31,29,0.9)',
   shadow: 'rgba(0,0,0,0.4)',

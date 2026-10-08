@@ -13,7 +13,8 @@ const TAP = 44;
 /** The radius treatment's honest-about-uncertainty circle. */
 const RADIUS_M = 600;
 
-const markColor = (t: Tokens, status: ZoneStatus) => (status === 'listed' ? t.mark : t.ink45);
+const markColor = (t: Tokens, status: ZoneStatus) =>
+  status === 'listed' ? t.mark : t.markRemoved;
 
 const midpoint = (path: readonly LatLng[]): LatLng => path[Math.floor(path.length / 2)];
 
@@ -79,7 +80,7 @@ export function ZoneMarks({ zone, status, mark, onPress }: Props) {
           radius={RADIUS_M}
           strokeColor={color}
           strokeWidth={1}
-          fillColor={t.accentTint}
+          fillColor={active ? t.accentTint : t.markRemovedTint}
         />
       ) : null}
 

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 
 import bundledFeed from '../feed/zones.json';
-import { dayLabel } from './dates';
+import { dayLabel, stampLabel } from './dates';
 import { LatLng } from './geo';
 import { Zone, fixtureZones } from './zones';
 
@@ -255,7 +255,7 @@ export function useZoneFeed(): FeedState {
   return { zones, sync, fetchedAt, refresh: () => void load(), simulateOffline };
 }
 
-/** 'Fetched 06:42 · GoSafe list' / 'Fetching the list…' / 'Offline · list is 2 days old' */
+/** 'Fetched 8 Oct, 06:42 · GoSafe list' / 'Fetching the list…' / 'Offline · list is 2 days old' */
 export function syncLabel(sync: Sync, fetchedAt: Date | null, now = new Date()): string {
   if (sync === 'syncing') return 'Fetching the published list…';
   if (IS_FIXTURE) return 'Sample data · no feed configured';
@@ -269,11 +269,10 @@ export function syncLabel(sync: Sync, fetchedAt: Date | null, now = new Date()):
   // from today", and would have read "list is no list cached".
   if (sync === 'offline') return `Offline · ${ageLabel(fetchedAt, now)}`;
   if (!fetchedAt) return `No list fetched yet · ${PUBLISHER} list`;
-  return `Fetched ${clockLabel(fetchedAt)} · ${PUBLISHER} list`;
+  return `Fetched ${stampLabel(fetchedAt)} · ${PUBLISHER} list`;
 }
 
-export const clockLabel = (d: Date) =>
-  `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+export { clockLabel, stampLabel } from './dates';
 
 export function ageInDays(fetchedAt: Date | null, now = new Date()): number {
   if (!fetchedAt) return Number.POSITIVE_INFINITY;

@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet } from 'react-native';
 
 import { useTheme } from '../theme/ThemeProvider';
+import { usePressScale } from '../theme/motion';
 
 /** Track 44 × 24, knob 18 × 18, .18s travel. The only motion in the settings list. */
 export function Switch({
@@ -14,6 +15,7 @@ export function Switch({
   label: string;
 }) {
   const { t } = useTheme();
+  const press = usePressScale(0.93);
   const travel = useRef(new Animated.Value(value ? 1 : 0)).current;
 
   useEffect(() => {
@@ -25,16 +27,19 @@ export function Switch({
   }, [travel, value]);
 
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="switch"
       accessibilityState={{ checked: value }}
       accessibilityLabel={label}
       onPress={onChange}
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
       // 44 × 24 visually, with vertical slop taking the touch target to 44 dp.
       hitSlop={{ top: 10, bottom: 10, left: 4, right: 4 }}
       style={[
         styles.track,
         { borderColor: t.rule2, backgroundColor: value ? t.accentTint2 : 'transparent' },
+        press.style,
       ]}
     >
       <Animated.View
@@ -43,9 +48,11 @@ export function Switch({
           { backgroundColor: t.ink, transform: [{ translateX: travel.interpolate({ inputRange: [0, 1], outputRange: [0, 20] }) }] },
         ]}
       />
-    </Pressable>
+    </AnimatedPressable>
   );
 }
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const styles = StyleSheet.create({
   track: {

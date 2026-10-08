@@ -13,7 +13,8 @@ import { DriveHud } from './components/DriveHud';
 import { OfflineBanner } from './components/OfflineBanner';
 import { CoverDrive } from './components/CoverDrive';
 import { DataNoticeBanner } from './components/DataNoticeBanner';
-import { TabBar, TabId } from './components/TabBar';
+import { TAB_IDS, TabBar, TabId } from './components/TabBar';
+import { ScreenTransition } from './components/ScreenTransition';
 import { ZoneSheet } from './components/ZoneSheet';
 import {
   BUNDLED_STALE_AFTER_DAYS,
@@ -113,6 +114,17 @@ function Verge() {
   // screen below it must not pad for it a second time.
   const screenInset = notice ? 0 : insets.top;
 
+  /**
+   * How many zones the publisher has dropped. The toggle that shows them reads
+   * as broken when there are none — nothing on screen changes, because nothing
+   * can — so More says the number outright rather than leaving it to be
+   * guessed at.
+   */
+  const removedCount = useMemo(
+    () => allZones.filter(z => statusOf(z) === 'removed').length,
+    [allZones, statusOf],
+  );
+
   /** Every county the feed carries, for the picker in More. */
   const counties = useMemo(() => countiesIn(allZones), [allZones]);
 
@@ -200,10 +212,21 @@ function Verge() {
     drive.start(target);
   }, [isCoverScreen, zones, origin, drive]);
 
-  const goToTab = useCallback((next: TabId) => {
-    setTab(next);
-    setSheetId(null);
-  }, []);
+  /**
+   * Which way the screens should travel. Taken from the tab order, so moving
+   * right through the bar brings the next screen in from the right — the one
+   * thing the motion is there to say.
+   */
+  const [travel, setTravel] = useState(1);
+
+  const goToTab = useCallback(
+    (next: TabId) => {
+      setTravel(TAB_IDS.indexOf(next) >= TAB_IDS.indexOf(tab) ? 1 : -1);
+      setTab(next);
+      setSheetId(null);
+    },
+    [tab],
+  );
 
   /**
    * Android's back gesture unwinds the app one layer at a time. Without this it
@@ -221,6 +244,8 @@ function Verge() {
         return true;
       }
       if (tab !== 'map') {
+        // Back goes left: Map is the first tab, so the screen comes from there.
+        setTravel(-1);
         setTab('map');
         return true;
       }
@@ -261,63 +286,66 @@ function Verge() {
         <DataNoticeBanner title={notice.title} body={notice.body} topInset={insets.top} />
       ) : null}
 
-      {tab === 'map' ? (
-        <MapScreen
-          zones={zones}
-          routes={savedRoutes.routes}
-          statusOf={statusOf}
-          origin={origin}
-          originIsReal={isReal}
-          mark={settings.mark}
-          sync={sync}
-          fetchedAt={fetchedAt}
-          now={now}
-          onRefresh={refresh}
-          onOpenZone={openZone}
-          onStartDrive={startDrive}
-          initialRegion={mapRegion.current}
-          onRegionChange={rememberRegion}
-          coverage={coverage}
-          topInset={screenInset}
-        />
-      ) : null}
+      <ScreenTransition token={tab} direction={travel}>
+        {tab === 'map' ? (
+          <MapScreen
+            zones={zones}
+            routes={savedRoutes.routes}
+            statusOf={statusOf}
+            origin={origin}
+            originIsReal={isReal}
+            mark={settings.mark}
+            sync={sync}
+            fetchedAt={fetchedAt}
+            now={now}
+            onRefresh={refresh}
+            onOpenZone={openZone}
+            onStartDrive={startDrive}
+            initialRegion={mapRegion.current}
+            onRegionChange={rememberRegion}
+            coverage={coverage}
+            topInset={screenInset}
+          />
+        ) : null}
 
-      {tab === 'today' ? (
-        <TodayScreen
-          zones={zones}
-          statusOf={statusOf}
-          listedOn={listedOn}
-          onOpenZone={openZone}
-          topInset={screenInset}
-        />
-      ) : null}
+        {tab === 'today' ? (
+          <TodayScreen
+            zones={zones}
+            statusOf={statusOf}
+            listedOn={listedOn}
+            onOpenZone={openZone}
+            topInset={screenInset}
+          />
+        ) : null}
 
-      {tab === 'routes' ? (
-        <RoutesScreen
-          routes={savedRoutes.routes}
-          zones={zones}
-          onAdd={savedRoutes.add}
-          onRemove={savedRoutes.remove}
-          origin={origin}
-          originIsReal={isReal}
-          topInset={screenInset}
-        />
-      ) : null}
+        {tab === 'routes' ? (
+          <RoutesScreen
+            routes={savedRoutes.routes}
+            zones={zones}
+            onAdd={savedRoutes.add}
+            onRemove={savedRoutes.remove}
+            origin={origin}
+            originIsReal={isReal}
+            topInset={screenInset}
+          />
+        ) : null}
 
-      {tab === 'more' ? (
-        <AlertsScreen
-          settings={settings}
-          set={set}
-          toggle={toggle}
-          sync={sync}
-          fetchedAt={fetchedAt}
-          now={now}
-          onRefresh={refresh}
-          onSimulateOffline={goOffline}
-          counties={counties}
-          topInset={screenInset}
-        />
-      ) : null}
+        {tab === 'more' ? (
+          <AlertsScreen
+            settings={settings}
+            set={set}
+            toggle={toggle}
+            sync={sync}
+            fetchedAt={fetchedAt}
+            now={now}
+            onRefresh={refresh}
+            onSimulateOffline={goOffline}
+            counties={counties}
+            removedCount={removedCount}
+            topInset={screenInset}
+          />
+        ) : null}
+      </ScreenTransition>
 
       <TabBar tab={tab} onChange={goToTab} bottomInset={insets.bottom} />
 

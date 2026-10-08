@@ -52,7 +52,7 @@ export function TodayScreen({ zones, statusOf, listedOn, onOpenZone, topInset }:
                     heading(19, -0.01),
                     tnum,
                     styles.rowRoad,
-                    { color: status === 'listed' ? t.mark : t.ink45 },
+                    { color: status === 'listed' ? t.mark : t.markRemoved },
                   ]}
                 >
                   {zone.road}
@@ -64,7 +64,16 @@ export function TodayScreen({ zones, statusOf, listedOn, onOpenZone, topInset }:
               {zone.name ? (
                 <Text style={[body(13), styles.rowName, { color: t.ink80 }]}>{zone.name}</Text>
               ) : null}
-              <Text style={[body(10.5), tnum, styles.rowNote, { color: t.ink50 }]}>
+              <Text
+                style={[
+                  body(10.5),
+                  tnum,
+                  styles.rowNote,
+                  // The removal line carries the same colour as the mark, so a
+                  // row reads as removed from the list as well as from the map.
+                  { color: status === 'listed' ? t.ink50 : t.markRemoved },
+                ]}
+              >
                 {rowNote(zone, status)}
               </Text>
             </Pressable>

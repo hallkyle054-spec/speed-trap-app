@@ -16,3 +16,16 @@ export const dayLabel = (d: Date) =>
 
 /** '28 Aug' — the stale stamp. */
 export const shortDayLabel = (d: Date) => `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+
+/** '22:05' — a 24-hour clock, zero-padded so the column does not jitter. */
+export const clockLabel = (d: Date) =>
+  `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+
+/**
+ * '8 Oct, 22:05' — when the list on screen was fetched.
+ *
+ * The time on its own was ambiguous in the one case that matters: a list
+ * fetched at 22:05 yesterday and one fetched at 22:05 today read identically,
+ * and telling a driver how current their list is is the whole point of the line.
+ */
+export const stampLabel = (d: Date) => `${shortDayLabel(d)}, ${clockLabel(d)}`;

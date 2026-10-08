@@ -1,8 +1,17 @@
 import React from 'react';
-import { Pressable, StyleProp, StyleSheet, Text, TextStyle, ViewStyle } from 'react-native';
+import {
+  Animated,
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  ViewStyle,
+} from 'react-native';
 
 import { useTheme } from '../theme/ThemeProvider';
 import { radius } from '../theme/tokens';
+import { usePressScale } from '../theme/motion';
 import { heading } from '../theme/type';
 
 /**
@@ -32,15 +41,19 @@ export function Button({
   disabled?: boolean;
 }) {
   const { t } = useTheme();
+  const press = usePressScale();
   const border = tone === 'accent' ? t.accent : t.rule2;
   const color = tone === 'accent' ? t.accentInk : tone === 'dashed' ? t.ink60 : t.ink70;
 
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityState={{ disabled: !!disabled }}
       disabled={disabled}
       onPress={onPress}
+      // A disabled button must not answer a press it is going to ignore.
+      onPressIn={disabled ? undefined : press.onPressIn}
+      onPressOut={disabled ? undefined : press.onPressOut}
       style={({ pressed }) => [
         styles.base,
         {
@@ -50,13 +63,16 @@ export function Button({
           backgroundColor: pressed && tone === 'accent' ? t.accentTint : 'transparent',
           opacity: pressed && tone !== 'accent' ? 0.65 : 1,
         },
+        press.style,
         style,
       ]}
     >
       <Text style={[heading(size, letterSpacingEm), { color }, textStyle]}>{label}</Text>
-    </Pressable>
+    </AnimatedPressable>
   );
 }
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const styles = StyleSheet.create({
   base: {
